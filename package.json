@@ -1,22 +1,53 @@
 {
   "name": "koishi-plugin-novelai",
-  "description": "[NovelAI](https://novelai.net/)",
-  "private": true,
-  "version": "1.0.0",
+  "description": "Generate images by NovelAI",
+  "version": "0.0.6",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
     "lib",
     "dist"
   ],
+  "author": "Ninzore <cillerpro@gmail.com>",
+  "maintainers": [
+    "Shigma <shigma10826@gmail.com>"
+  ],
   "license": "MIT",
-  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koishijs/koishi-plugin-novelai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/koishijs/koishi-plugin-novelai/issues"
+  },
+  "homepage": "https://github.com/koishijs/koishi-plugin-novelai",
+  "scripts": {
+    "build": "atsc -b"
+  },
+  "koishi": {
+    "browser": true,
+    "description": {
+      "en": "Generate images by [NovelAI](https://novelai.net/)",
+      "zh": "基于 [NovelAI](https://novelai.net/) 的画图插件"
+    }
+  },
   "keywords": [
     "chatbot",
     "koishi",
-    "plugin"
+    "plugin",
+    "novelai",
+    "ai",
+    "paint",
+    "image",
+    "generate"
   ],
   "peerDependencies": {
     "koishi": "^4.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.45",
+    "atsc": "^1.1.2",
+    "koishi": "^4.9.3",
+    "typescript": "^4.8.4"
   }
 }
