@@ -8,13 +8,15 @@ const logger = new Logger('novelai')
 export interface Config {
   token: string
   timeout?: number
-  concurrency?: number
+  recallTimeout?: number
+  maxConcurrency?: number
 }
 
 export const Config: Schema<Config> = Schema.object({
   token: Schema.string().description('API token。').required(),
   timeout: Schema.number().role('time').description('默认的请求时间。').default(Time.minute * 0.5),
-  concurrency: Schema.number().description('单个频道下的最大并发数量。'),
+  recallTimeout: Schema.number().role('time').description('发送后自动撤回的时间 (设置为 0 禁用此功能)。').default(0),
+  maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 禁用此功能)。').default(0),
 })
 
 const UNDESIRED = 'nsfw, lowres, text, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry'
@@ -50,9 +52,9 @@ export function apply(ctx: Context, config: Config) {
       if (/[^\s\w,\[\]\{\}]/.test(input)) return '只能用英文输入。'
 
       const id = Math.random().toString(36).slice(2)
-      if (config.concurrency) {
+      if (config.maxConcurrency) {
         states[session.cid] ||= new Set()
-        if (states[session.cid].size >= config.concurrency) {
+        if (states[session.cid].size >= config.maxConcurrency) {
           return '请稍后再试。'
         } else {
           states[session.cid].add(id)
@@ -104,14 +106,17 @@ export function apply(ctx: Context, config: Config) {
           {type: 'image', data: {file: 'base64://' + art}}
         )
 
-        session.bot.internal.sendGroupForwardMsg(
-          session.channelId, [infoNode, artNode]
-        )
+        const msgId = session.bot.internal.sendGroupForwardMsg(session.channelId, [infoNode, artNode])
+        if (config.recallTimeout) {
+          ctx.setTimeout(() => {
+            session.bot.deleteMessage(session.channelId, msgId)
+          }, config.recallTimeout)
+        }
       } catch(err) {
         logger.error(err)
         return '发生错误。'
       } finally {
-        states[session.cid].delete(id)
+        states[session.cid]?.delete(id)
       }
     })
 }
