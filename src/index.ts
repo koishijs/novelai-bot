@@ -27,14 +27,14 @@ export const RESOLUTIONS = {
   '方': { height: 640, width: 640 },
 }
 
-function assembleMsgNode(user: {uin: string, name: string}, content: string | string[] | {}) {
+function assembleMsgNode(user: {uin: string; name: string}, content: string | string[] | {}) {
   return {
     type: 'node',
     data: {
       uin: user.uin,
       name: user.name,
       content,
-    }
+    },
   }
 }
 
@@ -46,10 +46,10 @@ export function apply(ctx: Context, config: Config) {
     .shortcut('约稿', { fuzzy: true })
     .usage('使用英文 tag，用逗号隔开，例如 Mr.Quin,dark sword,red eyes，查找tag使用Danbooru')
     .option('res', '-r <resolution:str>', { fallback: '竖' })
-    .action(async ({session, options}, input) => {
+    .action(async ({ session, options }, input) => {
       if (!input.trim()) return session.execute('help novelai')
-      input = input.replace(/，/g, ', ').replace(/\s+/g, ' ')
-      if (/[^\s\w,\[\]\{\}]/.test(input)) return '只能用英文输入。'
+      input = input.replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
+      if (/[^\s\w,:|\[\]\{\}-]/.test(input)) return '只接受英文输入。'
 
       const id = Math.random().toString(36).slice(2)
       if (config.maxConcurrency) {
@@ -74,7 +74,7 @@ export function apply(ctx: Context, config: Config) {
             path: '/ai/generate-image',
             'content-type': 'application/json',
             referer: 'https://novelai.net/',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
           },
           data: {
             model: 'nai-diffusion',
@@ -92,18 +92,18 @@ export function apply(ctx: Context, config: Config) {
               uc: UNDESIRED,
               ucPreset: 1,
             },
-          }
+          },
         }).then(res => {
           return res.data.substr(27, res.data.length)
         })
 
         const infoNode = assembleMsgNode(
-          {uin: session.bot.selfId, name: 'AI画师'},
-          `seed = ${seed}\ntags = ${input}`
+          { uin: session.bot.selfId, name: 'AI画师' },
+          `seed = ${seed}\ntags = ${input}`,
         )
         const artNode = assembleMsgNode(
-          {uin: session.bot.selfId, name: 'AI画师'},
-          {type: 'image', data: {file: 'base64://' + art}}
+          { uin: session.bot.selfId, name: 'AI画师' },
+          { type: 'image', data: { file: 'base64://' + art } },
         )
 
         const msgId = session.bot.internal.sendGroupForwardMsg(session.channelId, [infoNode, artNode])
@@ -112,7 +112,7 @@ export function apply(ctx: Context, config: Config) {
             session.bot.deleteMessage(session.channelId, msgId)
           }, config.recallTimeout)
         }
-      } catch(err) {
+      } catch (err) {
         logger.error(err)
         return '发生错误。'
       } finally {
