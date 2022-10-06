@@ -37,6 +37,7 @@ export interface Config {
   token: string
   model?: Model
   orient?: Orient
+  undesiredMap?: Undesired
   sampler?: Sampler
   forbidden?: string[]
   requestTimeout?: number
