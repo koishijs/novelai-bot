@@ -18,15 +18,18 @@ const orientMap = {
 } as const
 
 type Model = keyof typeof modelMap
-type Orientation = keyof typeof orientMap
+type Orient = keyof typeof orientMap
+type Sampler = typeof samplers[number]
 
 const models = Object.keys(modelMap) as Model[]
-const orients = Object.keys(orientMap) as Orientation[]
+const orients = Object.keys(orientMap) as Orient[]
+const samplers = ['k_euler_ancestral', 'k_euler', 'k_lms', 'plms', 'ddim'] as const
 
 export interface Config {
   token: string
   model?: Model
-  orient?: Orientation
+  orient?: Orient
+  sampler?: Sampler
   waitTimeout?: number
   requestTimeout?: number
   recallTimeout?: number
@@ -37,6 +40,7 @@ export const Config: Schema<Config> = Schema.object({
   token: Schema.string().description('API token。').required(),
   model: Schema.union(models).description('默认的生成模型。').default('nai'),
   orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
+  sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
   waitTimeout: Schema.number().role('time').description('当请求超过这个时间时会发送一条等待消息。').default(Time.second * 5),
   requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute * 0.5),
   recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 禁用此功能)。').default(0),
@@ -66,6 +70,7 @@ export function apply(ctx: Context, config: Config) {
     .shortcut('约稿', { fuzzy: true })
     .option('model', '-m <model>', { type: models })
     .option('orient', '-o <orient>', { type: orients })
+    .option('sampler', '-s <sampler>', { type: samplers })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
       input = input.replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
@@ -111,7 +116,7 @@ export function apply(ctx: Context, config: Config) {
               seed,
               n_samples: 1,
               noise: 0.2,
-              sampler: 'k_euler_ancestral',
+              sampler: options.sampler,
               scale: 12,
               steps: 28,
               strength: 0.7,
@@ -148,8 +153,9 @@ export function apply(ctx: Context, config: Config) {
       }
     })
 
-  ctx.accept(['model', 'orient'], (config) => {
+  ctx.accept(['model', 'orient', 'sampler'], (config) => {
     cmd._options.model.fallback = config.model
     cmd._options.orient.fallback = config.orient
+    cmd._options.sampler.fallback = config.sampler
   }, { immediate: true })
 }
