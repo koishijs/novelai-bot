@@ -17,12 +17,20 @@ const orientMap = {
   square: { height: 640, width: 640 },
 } as const
 
+const undesiredMap = {
+  lowQuality_badAnatomy: 'nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry',
+  lowQuality: 'nsfw, lowres, text, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry',
+  none: 'lowres'
+} as const
+
 type Model = keyof typeof modelMap
 type Orient = keyof typeof orientMap
+type Undesired = keyof typeof undesiredMap
 type Sampler = typeof samplers[number]
 
 const models = Object.keys(modelMap) as Model[]
 const orients = Object.keys(orientMap) as Orient[]
+const undesiredContents = Object.keys(undesiredMap) as Undesired[]
 const samplers = ['k_euler_ancestral', 'k_euler', 'k_lms', 'plms', 'ddim'] as const
 
 export interface Config {
@@ -40,14 +48,13 @@ export const Config: Schema<Config> = Schema.object({
   token: Schema.string().description('授权令牌。').required(),
   model: Schema.union(models).description('默认的生成模型。').default('nai'),
   orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
+  undesiredContents: Schema.union(undesiredContents).description('排除的内容, 默认为lowQuality_badAnatomy。').default('lowQuality_badAnatomy'),
   sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
   forbidden: Schema.array(String).description('全局违禁词列表。'),
   requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute * 0.5),
   recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
   maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 以禁用此功能)。').default(0),
 })
-
-const UNDESIRED = 'nsfw, lowres, text, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry'
 
 function assembleMsgNode(user: {uin: string; name: string}, content: string | string[] | {}) {
   return {
@@ -72,6 +79,7 @@ export function apply(ctx: Context, config: Config) {
     .option('orient', '-o <orient>', { type: orients })
     .option('sampler', '-s <sampler>', { type: samplers })
     .option('seed', '-x <seed:number>')
+    .option('undesired', '-u <undesired>', { type: undesiredContents})
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
       input = input.toLowerCase().replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
@@ -97,6 +105,7 @@ export function apply(ctx: Context, config: Config) {
 
       const model = modelMap[options.model]
       const orient = orientMap[options.orient]
+      const undesired = undesiredMap[options.undesired]
       const seed = options.seed || Math.round(new Date().getTime() / 1000)
       session.send(session.text('.waiting'))
 
@@ -125,7 +134,7 @@ export function apply(ctx: Context, config: Config) {
               scale: 12,
               steps: 28,
               strength: 0.7,
-              uc: UNDESIRED,
+              uc: undesired,
               ucPreset: 1,
             },
           },
