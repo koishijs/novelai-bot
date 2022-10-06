@@ -5,13 +5,28 @@ export const name = 'novelai'
 
 const logger = new Logger('novelai')
 
-type Model = 'safe' | 'nai' | 'furry'
-type Orientation = 'portrait' | 'landscape' | 'square'
+const modelMap = {
+  safe: 'safe-diffusion',
+  nai: 'nai-diffusion',
+  furry: 'nai-diffusion-furry',
+} as const
+
+const orientMap = {
+  portrait: { height: 512, width: 768 },
+  landscape: { height: 768, width: 512 },
+  square: { height: 640, width: 640 },
+} as const
+
+type Model = keyof typeof modelMap
+type Orientation = keyof typeof orientMap
+
+const models = Object.keys(modelMap) as Model[]
+const orients = Object.keys(orientMap) as Orientation[]
 
 export interface Config {
   token: string
   model?: Model
-  orientation?: Orientation
+  orient?: Orientation
   timeout?: number
   recallTimeout?: number
   maxConcurrency?: number
@@ -19,8 +34,8 @@ export interface Config {
 
 export const Config: Schema<Config> = Schema.object({
   token: Schema.string().description('API token。').required(),
-  model: Schema.union(['safe', 'nai', 'furry'] as const).description('默认的生成模型。').default('nai'),
-  orientation: Schema.union(['portrait', 'landscape', 'square'] as const).description('默认的图片方向。').default('portrait'),
+  model: Schema.union(models).description('默认的生成模型。').default('nai'),
+  orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
   timeout: Schema.number().role('time').description('默认的请求时间。').default(Time.minute * 0.5),
   recallTimeout: Schema.number().role('time').description('发送后自动撤回的时间 (设置为 0 禁用此功能)。').default(0),
   maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 禁用此功能)。').default(0),
@@ -39,52 +54,30 @@ function assembleMsgNode(user: {uin: string; name: string}, content: string | st
   }
 }
 
-interface Viewport {
-  height: number
-  width: number
-}
-
-const resolutions: Dict<Viewport> = {
-  portrait: { height: 512, width: 768 },
-  landscape: { height: 768, width: 512 },
-  square: { height: 640, width: 640 },
-}
-
-const models: Dict<string> = {
-  safe: 'safe-diffusion',
-  nai: 'nai-diffusion',
-  furry: 'nai-diffusion-furry',
-}
-
 export function apply(ctx: Context, config: Config) {
+  ctx.i18n.define('zh', require('./locales/zh'))
+
   const states: Dict<Set<string>> = Object.create(null)
 
   const cmd = ctx.guild().command('novelai <prompts:text>')
     .shortcut('画画', { fuzzy: true })
     .shortcut('约稿', { fuzzy: true })
-    .usage('使用英文 tag，用逗号隔开，例如 Mr.Quin,dark sword,red eyes，查找tag使用Danbooru')
-    .option('model', '-m <model:string>')
-    .option('orientation', '-o <orientation:string>')
+    .option('model', '-m <model>', { type: models })
+    .option('orient', '-o <orient>', { type: orients })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
       input = input.replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
-      if (/[^\s\w.,:|\[\]\{\}-]/.test(input)) return '只接受英文输入。'
-
-      const model = models[options.model]
-      if (!model) {
-        return '-m, --model 参数错误，可选值：safe, nai, furry。'
+      if (/[^\s\w.,:|\[\]\{\}-]/.test(input)) {
+        return session.text('.invalid-input')
       }
 
-      const resolution = resolutions[options.orientation]
-      if (!model) {
-        return '-o, --orientation 参数错误，可选值：portrait, landscape, square。'
-      }
-
+      const model = modelMap[options.model]
+      const orient = orientMap[options.orient]
       const id = Math.random().toString(36).slice(2)
       if (config.maxConcurrency) {
         states[session.cid] ||= new Set()
         if (states[session.cid].size >= config.maxConcurrency) {
-          return '请稍后再试。'
+          return session.text('.concurrent-jobs')
         } else {
           states[session.cid].add(id)
         }
@@ -92,7 +85,7 @@ export function apply(ctx: Context, config: Config) {
 
       try {
         const seed = Math.round(new Date().getTime() / 1000)
-        session.send('在画了在画了')
+        session.send(session.text('.waiting'))
         const art = await ctx.http.axios('https://api.novelai.net/ai/generate-image', {
           method: 'POST',
           timeout: config.timeout,
@@ -108,8 +101,8 @@ export function apply(ctx: Context, config: Config) {
             model,
             input,
             parameters: {
-              height: resolution.height,
-              width: resolution.width,
+              height: orient.height,
+              width: orient.width,
               seed,
               n_samples: 1,
               noise: 0.2,
@@ -126,11 +119,11 @@ export function apply(ctx: Context, config: Config) {
         })
 
         const infoNode = assembleMsgNode(
-          { uin: session.bot.selfId, name: 'AI画师' },
+          { uin: session.bot.selfId, name: session.text('.nickname') },
           `seed = ${seed}\ntags = ${input}`,
         )
         const artNode = assembleMsgNode(
-          { uin: session.bot.selfId, name: 'AI画师' },
+          { uin: session.bot.selfId, name: session.text('.nickname') },
           { type: 'image', data: { file: 'base64://' + art } },
         )
 
@@ -142,14 +135,14 @@ export function apply(ctx: Context, config: Config) {
         }
       } catch (err) {
         logger.error(err)
-        return '发生错误。'
+        return session.text('.unknown-error')
       } finally {
         states[session.cid]?.delete(id)
       }
     })
 
-  ctx.accept(['model', 'orientation'], (config) => {
+  ctx.accept(['model', 'orient'], (config) => {
     cmd._options.model.fallback = config.model
-    cmd._options.orientation.fallback = config.orientation
+    cmd._options.orient.fallback = config.orient
   }, { immediate: true })
 }

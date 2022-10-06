@@ -1,0 +1,17 @@
+commands:
+  novelai:
+    description: AI 画图
+    usage: |-
+      输入用逗号隔开的英文标签，例如 Mr.Quin, dark sword, red eyes。
+      查找标签可以使用 Danbooru。
+
+    options:
+      model: 设定生成模型 (safe, nai, furry)
+      orientation: 设定图片方向 (portrait, landscape, square)
+
+    messages:
+      invalid-input: 只接受英文输入。
+      concurrent-jobs: 请稍后再试。
+      waiting: 在画了在画了
+      unknown-error: 发生未知错误。
+      nickname: AI 画师
