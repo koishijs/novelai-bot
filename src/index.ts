@@ -12,8 +12,8 @@ const modelMap = {
 } as const
 
 const orientMap = {
-  portrait: { height: 512, width: 768 },
-  landscape: { height: 768, width: 512 },
+  landscape: { height: 512, width: 768 },
+  portrait: { height: 768, width: 512 },
   square: { height: 640, width: 640 },
 } as const
 
@@ -30,6 +30,7 @@ export interface Config {
   model?: Model
   orient?: Orient
   sampler?: Sampler
+  forbidden?: string[]
   waitTimeout?: number
   requestTimeout?: number
   recallTimeout?: number
@@ -41,6 +42,7 @@ export const Config: Schema<Config> = Schema.object({
   model: Schema.union(models).description('默认的生成模型。').default('nai'),
   orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
   sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
+  forbidden: Schema.array(String).description('全局违禁词列表。'),
   waitTimeout: Schema.number().role('time').description('当请求超过这个时间时会发送一条等待消息。').default(Time.second * 5),
   requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute * 0.5),
   recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 禁用此功能)。').default(0),
@@ -76,6 +78,11 @@ export function apply(ctx: Context, config: Config) {
       input = input.replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
       if (/[^\s\w.,:|\[\]\{\}-]/.test(input)) {
         return session.text('.invalid-input')
+      }
+
+      const forbidden = config.forbidden.filter(word => input.includes(word))
+      if (forbidden.length) {
+        return session.text('.forbidden-word', [forbidden.join(', ')])
       }
 
       const id = Math.random().toString(36).slice(2)

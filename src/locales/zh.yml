@@ -11,6 +11,7 @@ commands:
 
     messages:
       invalid-input: 只接受英文输入。
+      forbidden-word: 请求含有违禁词 ({0})。
       concurrent-jobs: 请稍后再试。
       waiting: 在画了在画了
       unknown-error: 发生未知错误。
