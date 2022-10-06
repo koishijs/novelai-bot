@@ -1,4 +1,4 @@
-import { Context, Dict, Logger, Quester, Schema, Time } from 'koishi'
+import { Context, Dict, Logger, Quester, Schema, Time, Session } from 'koishi'
 
 export const reactive = true
 export const name = 'novelai'
@@ -66,6 +66,17 @@ function assembleMsgNode(user: {uin: string; name: string}, content: string | st
       content,
     },
   }
+}
+
+function errorHandler(session: Session, err: Error) {
+  if (Quester.isAxiosError(err)) {
+    if (err.response?.status === 429) {
+      return session.text('.rate-limited')
+    } else if (err.response?.status === 401) {
+      return session.text('.invalid-token')
+    }
+  }
+  logger.error(err)
 }
 
 export function apply(ctx: Context, config: Config) {
@@ -159,19 +170,13 @@ export function apply(ctx: Context, config: Config) {
           }, config.recallTimeout)
         }
       } catch (err) {
-        if (Quester.isAxiosError(err)) {
-          if (err.response?.status === 429) {
-            return session.text('.rate-limited')
-          } else if (err.response?.status === 401) {
-            return session.text('.invalid-token')
-          }
-        }
-        logger.error(err)
+        errorHandler(session, err)
         return session.text('.unknown-error')
       } finally {
         states[session.cid]?.delete(id)
       }
-    })
+    }
+  )
 
   ctx.accept(['model', 'orient', 'sampler'], (config) => {
     cmd._options.model.fallback = config.model
