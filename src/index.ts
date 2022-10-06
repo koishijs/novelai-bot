@@ -5,8 +5,12 @@ export const name = 'novelai'
 
 const logger = new Logger('novelai')
 
+type Model = 'safe' | 'nai' | 'furry'
+
 export interface Config {
   token: string
+  model?: Model
+
   timeout?: number
   recallTimeout?: number
   maxConcurrency?: number
@@ -21,12 +25,6 @@ export const Config: Schema<Config> = Schema.object({
 
 const UNDESIRED = 'nsfw, lowres, text, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry'
 
-export const RESOLUTIONS = {
-  '横': { height: 512, width: 768 },
-  '竖': { height: 768, width: 512 },
-  '方': { height: 640, width: 640 },
-}
-
 function assembleMsgNode(user: {uin: string; name: string}, content: string | string[] | {}) {
   return {
     type: 'node',
@@ -38,7 +36,18 @@ function assembleMsgNode(user: {uin: string; name: string}, content: string | st
   }
 }
 
-const models = {
+interface Viewport {
+  height: number
+  width: number
+}
+
+const resolutions: Dict<Viewport> = {
+  portrait: { height: 512, width: 768 },
+  landscape: { height: 768, width: 512 },
+  square: { height: 640, width: 640 },
+}
+
+const models: Dict<string> = {
   safe: 'safe-diffusion',
   nai: 'nai-diffusion',
   furry: 'nai-diffusion-furry',
@@ -51,16 +60,21 @@ export function apply(ctx: Context, config: Config) {
     .shortcut('画画', { fuzzy: true })
     .shortcut('约稿', { fuzzy: true })
     .usage('使用英文 tag，用逗号隔开，例如 Mr.Quin,dark sword,red eyes，查找tag使用Danbooru')
-    .option('res', '-r <resolution:str>', { fallback: '竖' })
-    .option('model', '-m <model>', { fallback: 'nai' })
+    .option('model', '-m <style:string>', { fallback: 'nai' })
+    .option('orientation', '-o <style:string>', { fallback: 'portrait' })
     .action(async ({ session, options }, input) => {
-      if (!input.trim()) return session.execute('help novelai')
+      if (!input?.trim()) return session.execute('help novelai')
       input = input.replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
-      if (/[^\s\w,:|\[\]\{\}-]/.test(input)) return '只接受英文输入。'
+      if (/[^\s\w.,:|\[\]\{\}-]/.test(input)) return '只接受英文输入。'
 
       const model = models[options.model]
       if (!model) {
         return '-m, --model 参数错误，可选值：safe, nai, furry。'
+      }
+
+      const resolution = resolutions[options.orientation]
+      if (!model) {
+        return '-o, --orientation 参数错误，可选值：portrait, landscape, square。'
       }
 
       const id = Math.random().toString(36).slice(2)
@@ -76,7 +90,6 @@ export function apply(ctx: Context, config: Config) {
       try {
         const seed = Math.round(new Date().getTime() / 1000)
         session.send('在画了在画了')
-        const resolution = RESOLUTIONS[options.res] || RESOLUTIONS['横']
         const art = await ctx.http.axios('https://api.novelai.net/ai/generate-image', {
           method: 'POST',
           timeout: config.timeout,
