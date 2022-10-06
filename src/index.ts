@@ -71,6 +71,7 @@ export function apply(ctx: Context, config: Config) {
     .option('model', '-m <model>', { type: models })
     .option('orient', '-o <orient>', { type: orients })
     .option('sampler', '-s <sampler>', { type: samplers })
+    .option('seed', '-x <seed:number>')
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
       input = input.toLowerCase().replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
@@ -96,7 +97,7 @@ export function apply(ctx: Context, config: Config) {
 
       const model = modelMap[options.model]
       const orient = orientMap[options.orient]
-      const seed = Math.round(new Date().getTime() / 1000)
+      const seed = options.seed || Math.round(new Date().getTime() / 1000)
       session.send(session.text('.waiting'))
 
       try {
