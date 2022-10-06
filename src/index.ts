@@ -1,4 +1,4 @@
-import { Context, Dict, Logger, Schema, Time } from 'koishi'
+import { Context, Dict, Logger, Quester, Schema, Time } from 'koishi'
 
 export const reactive = true
 export const name = 'novelai'
@@ -31,19 +31,17 @@ export interface Config {
   orient?: Orient
   sampler?: Sampler
   forbidden?: string[]
-  waitTimeout?: number
   requestTimeout?: number
   recallTimeout?: number
   maxConcurrency?: number
 }
 
 export const Config: Schema<Config> = Schema.object({
-  token: Schema.string().description('API token。').required(),
+  token: Schema.string().description('授权令牌。').required(),
   model: Schema.union(models).description('默认的生成模型。').default('nai'),
   orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
   sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
   forbidden: Schema.array(String).description('全局违禁词列表。'),
-  waitTimeout: Schema.number().role('time').description('当请求超过这个时间时会发送一条等待消息。').default(Time.second * 3),
   requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute * 0.5),
   recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 禁用此功能)。').default(0),
   maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 禁用此功能)。').default(0),
@@ -76,7 +74,7 @@ export function apply(ctx: Context, config: Config) {
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
       input = input.toLowerCase().replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
-      if (/[^\s\w.,:|\[\]\{\}-]/.test(input)) {
+      if (/[^\s\w"'“”‘’.,:|\[\]\{\}-]/.test(input)) {
         return session.text('.invalid-input')
       }
 
@@ -99,9 +97,7 @@ export function apply(ctx: Context, config: Config) {
       const model = modelMap[options.model]
       const orient = orientMap[options.orient]
       const seed = Math.round(new Date().getTime() / 1000)
-      const dispose = ctx.setTimeout(() => {
-        session.send(session.text('.waiting'))
-      }, config.waitTimeout)
+      session.send(session.text('.waiting'))
 
       try {
         const art = await ctx.http.axios('https://api.novelai.net/ai/generate-image', {
@@ -136,7 +132,6 @@ export function apply(ctx: Context, config: Config) {
           return res.data.substr(27, res.data.length)
         })
 
-        dispose()
         const infoNode = assembleMsgNode(
           { uin: session.bot.selfId, name: session.text('.nickname') },
           `seed = ${seed}\ntags = ${input}`,
@@ -153,7 +148,13 @@ export function apply(ctx: Context, config: Config) {
           }, config.recallTimeout)
         }
       } catch (err) {
-        dispose()
+        if (Quester.isAxiosError(err)) {
+          if (err.response?.status === 429) {
+            return session.text('.rate-limited')
+          } else if (err.response?.status === 401) {
+            return session.text('.invalid-token')
+          }
+        }
         logger.error(err)
         return session.text('.unknown-error')
       } finally {

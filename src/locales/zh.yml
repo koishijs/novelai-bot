@@ -7,7 +7,8 @@ commands:
 
     options:
       model: 设定生成模型 (safe, nai, furry)
-      orientation: 设定图片方向 (portrait, landscape, square)
+      orient: 设定图片方向 (portrait, landscape, square)
+      sampler: 设置采样器 (k_euler_ancestral, k_euler, k_lms, plms, ddim)
 
     messages:
       invalid-input: 只接受英文输入。
@@ -16,3 +17,5 @@ commands:
       waiting: 在画了在画了
       unknown-error: 发生未知错误。
       nickname: AI 画师
+      rate-limited: 访问频率过高，请稍后再试。
+      invalid-token: 无效的授权令牌，请联系管理员。
