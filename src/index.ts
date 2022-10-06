@@ -43,8 +43,8 @@ export const Config: Schema<Config> = Schema.object({
   sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
   forbidden: Schema.array(String).description('全局违禁词列表。'),
   requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute * 0.5),
-  recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 禁用此功能)。').default(0),
-  maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 禁用此功能)。').default(0),
+  recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
+  maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 以禁用此功能)。').default(0),
 })
 
 const UNDESIRED = 'nsfw, lowres, text, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry'
