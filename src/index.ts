@@ -79,6 +79,17 @@ function errorHandler(session: Session, err: Error) {
   logger.error(err)
 }
 
+function headers(config: Config) {
+  return {
+    authorization: 'Bearer ' + config.token,
+    authority: 'api.novelai.net',
+    path: '/ai/generate-image',
+    'content-type': 'application/json',
+    referer: 'https://novelai.net/',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+  }
+}
+
 export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh', require('./locales/zh'))
 
@@ -125,14 +136,7 @@ export function apply(ctx: Context, config: Config) {
         const art = await ctx.http.axios('https://api.novelai.net/ai/generate-image', {
           method: 'POST',
           timeout: config.requestTimeout,
-          headers: {
-            authorization: 'Bearer ' + config.token,
-            authority: 'api.novelai.net',
-            path: '/ai/generate-image',
-            'content-type': 'application/json',
-            referer: 'https://novelai.net/',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
-          },
+          headers: headers(config),
           data: {
             model,
             input,
