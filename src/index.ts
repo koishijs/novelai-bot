@@ -84,7 +84,7 @@ export function apply(ctx: Context, config: Config) {
 
   const states: Dict<Set<string>> = Object.create(null)
 
-  const cmd = ctx.guild().command('novelai <prompts:text>')
+  const draw = ctx.guild().command('novelai <prompts:text>')
     .shortcut('画画', { fuzzy: true })
     .shortcut('约稿', { fuzzy: true })
     .option('model', '-m <model>', { type: models })
@@ -179,8 +179,8 @@ export function apply(ctx: Context, config: Config) {
   )
 
   ctx.accept(['model', 'orient', 'sampler'], (config) => {
-    cmd._options.model.fallback = config.model
-    cmd._options.orient.fallback = config.orient
-    cmd._options.sampler.fallback = config.sampler
+    draw._options.model.fallback = config.model
+    draw._options.orient.fallback = config.orient
+    draw._options.sampler.fallback = config.sampler
   }, { immediate: true })
 }
