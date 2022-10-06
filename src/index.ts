@@ -6,11 +6,12 @@ export const name = 'novelai'
 const logger = new Logger('novelai')
 
 type Model = 'safe' | 'nai' | 'furry'
+type Orientation = 'portrait' | 'landscape' | 'square'
 
 export interface Config {
   token: string
   model?: Model
-
+  orientation?: Orientation
   timeout?: number
   recallTimeout?: number
   maxConcurrency?: number
@@ -18,6 +19,8 @@ export interface Config {
 
 export const Config: Schema<Config> = Schema.object({
   token: Schema.string().description('API token。').required(),
+  model: Schema.union(['safe', 'nai', 'furry'] as const).description('默认的生成模型。').default('nai'),
+  orientation: Schema.union(['portrait', 'landscape', 'square'] as const).description('默认的图片方向。').default('portrait'),
   timeout: Schema.number().role('time').description('默认的请求时间。').default(Time.minute * 0.5),
   recallTimeout: Schema.number().role('time').description('发送后自动撤回的时间 (设置为 0 禁用此功能)。').default(0),
   maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 禁用此功能)。').default(0),
@@ -56,12 +59,12 @@ const models: Dict<string> = {
 export function apply(ctx: Context, config: Config) {
   const states: Dict<Set<string>> = Object.create(null)
 
-  ctx.guild().command('novelai <prompts:text>')
+  const cmd = ctx.guild().command('novelai <prompts:text>')
     .shortcut('画画', { fuzzy: true })
     .shortcut('约稿', { fuzzy: true })
     .usage('使用英文 tag，用逗号隔开，例如 Mr.Quin,dark sword,red eyes，查找tag使用Danbooru')
-    .option('model', '-m <style:string>', { fallback: 'nai' })
-    .option('orientation', '-o <style:string>', { fallback: 'portrait' })
+    .option('model', '-m <model:string>')
+    .option('orientation', '-o <orientation:string>')
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
       input = input.replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
@@ -144,4 +147,9 @@ export function apply(ctx: Context, config: Config) {
         states[session.cid]?.delete(id)
       }
     })
+
+  ctx.accept(['model', 'orientation'], (config) => {
+    cmd._options.model.fallback = config.model
+    cmd._options.orientation.fallback = config.orientation
+  }, { immediate: true })
 }
