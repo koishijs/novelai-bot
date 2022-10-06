@@ -27,7 +27,8 @@ export interface Config {
   token: string
   model?: Model
   orient?: Orientation
-  timeout?: number
+  waitTimeout?: number
+  requestTimeout?: number
   recallTimeout?: number
   maxConcurrency?: number
 }
@@ -36,8 +37,9 @@ export const Config: Schema<Config> = Schema.object({
   token: Schema.string().description('API token。').required(),
   model: Schema.union(models).description('默认的生成模型。').default('nai'),
   orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
-  timeout: Schema.number().role('time').description('默认的请求时间。').default(Time.minute * 0.5),
-  recallTimeout: Schema.number().role('time').description('发送后自动撤回的时间 (设置为 0 禁用此功能)。').default(0),
+  waitTimeout: Schema.number().role('time').description('当请求超过这个时间时会发送一条等待消息。').default(Time.second * 5),
+  requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute * 0.5),
+  recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 禁用此功能)。').default(0),
   maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 禁用此功能)。').default(0),
 })
 
@@ -71,8 +73,6 @@ export function apply(ctx: Context, config: Config) {
         return session.text('.invalid-input')
       }
 
-      const model = modelMap[options.model]
-      const orient = orientMap[options.orient]
       const id = Math.random().toString(36).slice(2)
       if (config.maxConcurrency) {
         states[session.cid] ||= new Set()
@@ -83,12 +83,17 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
-      try {
-        const seed = Math.round(new Date().getTime() / 1000)
+      const model = modelMap[options.model]
+      const orient = orientMap[options.orient]
+      const seed = Math.round(new Date().getTime() / 1000)
+      const dispose = ctx.setTimeout(() => {
         session.send(session.text('.waiting'))
+      }, config.waitTimeout)
+
+      try {
         const art = await ctx.http.axios('https://api.novelai.net/ai/generate-image', {
           method: 'POST',
-          timeout: config.timeout,
+          timeout: config.requestTimeout,
           headers: {
             authorization: 'Bearer ' + config.token,
             authority: 'api.novelai.net',
@@ -118,6 +123,7 @@ export function apply(ctx: Context, config: Config) {
           return res.data.substr(27, res.data.length)
         })
 
+        dispose()
         const infoNode = assembleMsgNode(
           { uin: session.bot.selfId, name: session.text('.nickname') },
           `seed = ${seed}\ntags = ${input}`,
@@ -134,6 +140,7 @@ export function apply(ctx: Context, config: Config) {
           }, config.recallTimeout)
         }
       } catch (err) {
+        dispose()
         logger.error(err)
         return session.text('.unknown-error')
       } finally {
