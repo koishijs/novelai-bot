@@ -38,6 +38,12 @@ function assembleMsgNode(user: {uin: string; name: string}, content: string | st
   }
 }
 
+const models = {
+  safe: 'safe-diffusion',
+  nai: 'nai-diffusion',
+  furry: 'nai-diffusion-furry',
+}
+
 export function apply(ctx: Context, config: Config) {
   const states: Dict<Set<string>> = Object.create(null)
 
@@ -46,10 +52,16 @@ export function apply(ctx: Context, config: Config) {
     .shortcut('约稿', { fuzzy: true })
     .usage('使用英文 tag，用逗号隔开，例如 Mr.Quin,dark sword,red eyes，查找tag使用Danbooru')
     .option('res', '-r <resolution:str>', { fallback: '竖' })
+    .option('model', '-m <model>', { fallback: 'nai' })
     .action(async ({ session, options }, input) => {
       if (!input.trim()) return session.execute('help novelai')
       input = input.replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
       if (/[^\s\w,:|\[\]\{\}-]/.test(input)) return '只接受英文输入。'
+
+      const model = models[options.model]
+      if (!model) {
+        return '-m, --model 参数错误，可选值：safe, nai, furry。'
+      }
 
       const id = Math.random().toString(36).slice(2)
       if (config.maxConcurrency) {
@@ -77,7 +89,7 @@ export function apply(ctx: Context, config: Config) {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
           },
           data: {
-            model: 'nai-diffusion',
+            model,
             input,
             parameters: {
               height: resolution.height,
