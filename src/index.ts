@@ -1,4 +1,4 @@
-import { Context, Dict, Logger, Quester, Schema, Time } from 'koishi'
+import { Context, Dict, Logger, Quester, Schema, segment, Time } from 'koishi'
 
 export const reactive = true
 export const name = 'novelai'
@@ -54,17 +54,6 @@ export const Config: Schema<Config> = Schema.object({
   maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 以禁用此功能)。').default(0),
 })
 
-function assembleMsgNode(user: {uin: string; name: string}, content: string | string[] | {}) {
-  return {
-    type: 'node',
-    data: {
-      uin: user.uin,
-      name: user.name,
-      content,
-    },
-  }
-}
-
 export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh', require('./locales/zh'))
 
@@ -75,7 +64,7 @@ export function apply(ctx: Context, config: Config) {
     forbidden = config.forbidden.trim().toLowerCase().split(/\W+/g).filter(Boolean)
   }, { immediate: true })
 
-  const cmd = ctx.guild().command('novelai <prompts:text>')
+  const cmd = ctx.command('novelai <prompts:text>')
     .shortcut('画画', { fuzzy: true })
     .shortcut('约稿', { fuzzy: true })
     .option('model', '-m <model>', { type: models })
@@ -146,19 +135,20 @@ export function apply(ctx: Context, config: Config) {
           return res.data.substr(27, res.data.length)
         })
 
-        const infoNode = assembleMsgNode(
-          { uin: session.bot.selfId, name: session.text('.nickname') },
-          `seed = ${seed}\ntags = ${input}`,
-        )
-        const artNode = assembleMsgNode(
-          { uin: session.bot.selfId, name: session.text('.nickname') },
-          { type: 'image', data: { file: 'base64://' + art } },
-        )
-
-        const msgId = session.bot.internal.sendGroupForwardMsg(session.channelId, [infoNode, artNode])
+        const attrs = {
+          userId: session.selfId,
+          nickname: session.text('.nickname'),
+        }
+        const ids = await session.send(segment('message', { forward: true }, [
+          segment('message', attrs, `seed = ${seed}`),
+          segment('message', attrs, input),
+          segment('message', attrs, segment.image('base64://' + art)),
+        ]))
         if (config.recallTimeout) {
           ctx.setTimeout(() => {
-            session.bot.deleteMessage(session.channelId, msgId)
+            for (const id of ids) {
+              session.bot.deleteMessage(session.channelId, id)
+            }
           }, config.recallTimeout)
         }
       } catch (err) {
