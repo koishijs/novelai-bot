@@ -105,6 +105,22 @@ console.log(JSON.parse(localStorage.session).auth_token)
 - 类型：`'k_euler_ancestral' | 'k_euler' | 'k_lms' | 'plms' | 'ddim'`
 - 默认值：`'k_euler_ancestral'`
 
+默认的采样器。
+
+### anatomy
+
+- 类型：`boolean`
+- 默认值：`true`
+
+默认情况下是否过滤不良构图。
+
+### forbidden
+
+- 类型：`string`
+- 默认值：`''`
+
+违禁词列表。含有违禁词的请求将被拒绝。
+
 ### requestTimeout
 
 - 类型：`number`
