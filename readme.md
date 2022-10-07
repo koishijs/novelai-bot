@@ -2,8 +2,6 @@
 
 [![npm](https://img.shields.io/npm/v/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
 
-**别光看这里了，快去给 [Koishi](https://github.com/koishijs/koishi) 点个 star 吧！**
-
 基于 [NovelAI](https://novelai.net/) 的画图插件。已实现功能：
 
 - [x] 绘制图片
@@ -14,6 +12,15 @@
 - [x] 连接到自建私服
 - [ ] 图片增强功能
 - [ ] img2img
+
+得益于 Koishi 的插件化机制，只需配合其他插件即可轻松实现：
+
+- 多平台支持 (QQ、Discord、Telegram、开黑啦等)
+- 速率限制 (限制每个用户每天可以调用的次数和每次调用的间隔)
+- 上下文管理 (限制在哪些群聊中哪些用户可以访问)
+- 多语言支持 (为使用不同语言的用户提供对应的回复)
+
+**所以所以快去给 [Koishi](https://github.com/koishijs/koishi) 点个 star 吧！**
 
 ## 快速搭建
 
