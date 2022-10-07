@@ -1,4 +1,6 @@
-import { Context, Dict, Logger, Quester, Schema, Time } from 'koishi'
+import { Context, Dict, Logger, Quester, Schema, Time, Session, segment } from 'koishi'
+
+import { readRemote, getImgSize } from './utils'
 
 export const reactive = true
 export const name = 'novelai'
@@ -63,6 +65,28 @@ function assembleMsgNode(user: {uin: string; name: string}, content: string | st
   }
 }
 
+function errorHandler(session: Session, err: Error) {
+  if (Quester.isAxiosError(err)) {
+    if (err.response?.status === 429) {
+      return session.text('.rate-limited')
+    } else if (err.response?.status === 401) {
+      return session.text('.invalid-token')
+    }
+  }
+  logger.error(err)
+}
+
+function headers(config: Config) {
+  return {
+    authorization: 'Bearer ' + config.token,
+    authority: 'api.novelai.net',
+    path: '/ai/generate-image',
+    'content-type': 'application/json',
+    referer: 'https://novelai.net/',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+  }
+}
+
 export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh', require('./locales/zh'))
 
@@ -115,14 +139,7 @@ export function apply(ctx: Context, config: Config) {
         const art = await ctx.http.axios('https://api.novelai.net/ai/generate-image', {
           method: 'POST',
           timeout: config.requestTimeout,
-          headers: {
-            authorization: 'Bearer ' + config.token,
-            authority: 'api.novelai.net',
-            path: '/ai/generate-image',
-            'content-type': 'application/json',
-            referer: 'https://novelai.net/',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
-          },
+          headers: headers(config),
           data: {
             model,
             input,
@@ -160,23 +177,83 @@ export function apply(ctx: Context, config: Config) {
           }, config.recallTimeout)
         }
       } catch (err) {
-        if (Quester.isAxiosError(err)) {
-          if (err.response?.status === 429) {
-            return session.text('.rate-limited')
-          } else if (err.response?.status === 401) {
-            return session.text('.invalid-token')
-          }
-        }
-        logger.error(err)
+        errorHandler(session, err)
         return session.text('.unknown-error')
       } finally {
         states[session.cid]?.delete(id)
       }
-    })
+    }
+  )
+  
+  const enhance = ctx.guild().command('novelaiEnhance <img:text>')
+  .shortcut('增强', { fuzzy: true })
+  .option('model', '-m <model>', { type: models })
+  .option('sampler', '-s <sampler>', { type: samplers })
+  .option('undesired', '-u <undesired>', { type: undesiredContents})
+  .before(session => {
+    if (!session.args || segment.parse(session.args[0])[0].type !== 'image') return '需要传入图片'
+  })
+  .action(async ({ session, options, args }, input) => {
+    const id = Math.random().toString(36).slice(2)
+    if (config.maxConcurrency) {
+      states[session.cid] ||= new Set()
+      if (states[session.cid].size >= config.maxConcurrency) {
+        return session.text('.concurrent-jobs')
+      } else {
+        states[session.cid].add(id)
+      }
+    }
+
+    const model = modelMap[options.model]
+    const undesired = undesiredMap[options.undesired]
+    const seed = Math.round(new Date().getTime() / 1000)
+    const imgUrl = segment.parse(args[0])[0].attrs.url
+    const image = await readRemote(imgUrl, {})
+    const dim = getImgSize(image)
+    const b64Img = Buffer.from(image).toString('base64')
+    
+    try {
+      const art = await ctx.http.axios('https://api.novelai.net/ai/generate-image', {
+          method: 'POST',
+          timeout: config.requestTimeout,
+          headers: headers(config),
+          data: {
+            model,
+            input: "masterpiece, best quality, girl",
+            parameters: {
+              height: dim.height * 1.5,
+              width: dim.width * 1.5,
+              image: b64Img,
+              seed,
+              n_samples: 1,
+              noise: 0,
+              sampler: options.sampler,
+              scale: 11,
+              steps: 50,
+              strength: 0.2,
+              uc: undesired,
+              ucPreset: 0,
+            },
+          },
+        }).then(res => {
+          return res.data.substr(27, res.data.length)
+        })
+        return segment.image('base64://' + art)
+    } catch (err) {
+      errorHandler(session, err)
+      return session.text('.unknown-error')
+    } finally {
+      states[session.cid]?.delete(id)
+    }
+  })
 
   ctx.accept(['model', 'orient', 'sampler'], (config) => {
-    cmd._options.model.fallback = config.model
-    cmd._options.orient.fallback = config.orient
-    cmd._options.sampler.fallback = config.sampler
+    draw._options.model.fallback = config.model
+    draw._options.orient.fallback = config.orient
+    draw._options.sampler.fallback = config.sampler
+    draw._options.undesired.fallback = config.undesiredContents
+    enhance._options.model.fallback = config.model
+    enhance._options.sampler.fallback = config.sampler
+    enhance._options.undesired.fallback = config.undesiredContents
   }, { immediate: true })
 }
