@@ -2,7 +2,18 @@
 
 [![npm](https://img.shields.io/npm/v/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
 
-基于 [NovelAI](https://novelai.net/) 的画图插件。
+基于 [NovelAI](https://novelai.net/) 的画图插件。已实现的功能：
+
+- [x] 绘制图片
+- [x] 更改模型、采样器、图片尺寸
+- [x] 高级请求语法
+- [x] 自定义违禁词表
+- [x] 发送一段时间后自动撤回
+- [x] 连接到自建私服
+- [ ] 图片增强功能
+- [ ] img2img
+
+别光看这里了，快去给 [Koishi](https://github.com/koishijs/koishi) 点个 star 吧！
 
 ## 使用方法
 
@@ -55,7 +66,7 @@
 使用半角方括号 `[]` 包裹关键词以弱化该关键词的影响，使用半角花括号 `{}` 包裹关键词以强化该关键词的影响。例如：
 
 ```
-约稿 [tears] {spread legs}
+约稿 [tears], {spread legs}
 ```
 
 ### 要素混合
