@@ -20,7 +20,7 @@
 给没有使用过 Koishi 的新人提供一份简单的快速搭建指南：
 
 > **Warning** \
-> 在此之前，你需要一个**拥有有效付费计划的 [NovelAI](https://novelai.net/) 账号**，本插件不提供任何付费功能！
+> 在此之前，你需要一个**拥有有效付费计划的 [NovelAI](https://novelai.net/) 账号**，本插件只使用 NovelAI 提供的接口
 
 1. 准备一个 [NovelAI](https://novelai.net/) 账号
 2. 前往[这里](https://github.com/koishijs/koishi-desktop/releases)下载 Koishi 桌面版
