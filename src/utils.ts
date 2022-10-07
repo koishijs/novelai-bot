@@ -1,4 +1,5 @@
 import axios from 'axios'
+import sizeOf from 'image-size'
 
 const MAX_CONTENT_SIZE = 10485760
 const ALLOW_MIMETYPE = ['jpeg', 'png']
@@ -17,4 +18,8 @@ async function readRemote(url: string, headers: {}) {
     }).then(res => { return res.data })
 }
 
-export { readRemote }
+function getImgSize(img: Buffer) {
+    return sizeOf(img)
+}
+
+export { readRemote, getImgSize }
