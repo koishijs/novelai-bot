@@ -22,12 +22,12 @@
 > **Warning** \
 > 在此之前，你需要一个**拥有有效付费计划的 [NovelAI](https://novelai.net/) 账号**，本插件只使用 NovelAI 提供的接口
 
-1. 准备一个 [NovelAI](https://novelai.net/) 账号
-2. 前往[这里](https://github.com/koishijs/koishi-desktop/releases)下载 Koishi 桌面版
-3. 启动桌面版，你将会看到一个控制台界面
-4. 点击左侧的「插件市场」，搜索「novelai」并点击「安装」
-5. 点击左侧的「插件配置」，选择「novelai」插件，填写你的[授权令牌](#token)，并点击右上角的「启用」按钮
-6. 现在你已经可以在「沙盒」中使用画图功能了！
+
+1. 前往[这里](https://github.com/koishijs/koishi-desktop/releases)下载 Koishi 桌面版
+2. 启动桌面版，你将会看到一个控制台界面
+3. 点击左侧的「插件市场」，搜索「novelai」并点击「安装」
+4. 点击左侧的「插件配置」，选择「novelai」插件，填写你的[授权令牌](#token)，并点击右上角的「启用」按钮
+5. 现在你已经可以在「沙盒」中使用画图功能了！
 
 如果想进一步在 QQ 中使用，可继续进行下列操作：
 
