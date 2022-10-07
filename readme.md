@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
 
-基于 [NovelAI](https://novelai.net/) 的画图插件。已实现的功能：
+基于 [NovelAI](https://novelai.net/) 的画图插件。已实现功能：
 
 - [x] 绘制图片
 - [x] 更改模型、采样器、图片尺寸
@@ -13,7 +13,31 @@
 - [ ] 图片增强功能
 - [ ] img2img
 
-别光看这里了，快去给 [Koishi](https://github.com/koishijs/koishi) 点个 star 吧！
+**别光看这里了，快去给 [Koishi](https://github.com/koishijs/koishi) 点个 star 吧！**
+
+## 快读搭建
+
+给没有使用过 Koishi 的新人提供一份简单的快速搭建指南：
+
+1. 准备一个 [NovelAI](https://novelai.net/) 账号
+2. 前往[这里](https://github.com/koishijs/koishi-desktop/releases)下载 Koishi 桌面版
+3. 启动桌面版，你将会看到一个控制台界面
+4. 点击左侧的「插件市场」，搜索「novelai」并点击「安装」
+5. 点击左侧的「插件配置」，选择「novelai」插件，填写你的[授权令牌](#token)，并点击右上角的「启用」按钮
+6. 现在你已经可以在「沙盒」中使用画图功能了！
+
+如果想进一步在 QQ 中使用，可继续进行下列操作：
+
+1. 准备一个 QQ 号 (等级不要过低，否则可能被风控)
+2. 点击左侧的「插件配置」，选择「onebot」插件
+3. 填写你的 QQ 号和密码，并勾选「gocqhttp.enable」选项
+4. 点击右上角的「启用」按钮
+5. 现在你可以在 QQ 上中使用画图功能了！
+
+使用示例：
+
+| ![example-0](./public/example-0.jpg) | ![example-1](./public/example-1.jpg) |
+|:-:|:-:|
 
 ## 使用方法
 
