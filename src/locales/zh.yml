@@ -3,7 +3,7 @@ commands:
     description: AI 画图
     usage: |-
       输入用逗号隔开的英文标签，例如 Mr.Quin, dark sword, red eyes。
-      查找标签可以使用 https://danbooru.donmai.us/
+      查找标签可以使用 Danbooru。
       快来给仓库点个 star 吧：https://github.com/koishijs/koishi-plugin-novelai
 
     options:
