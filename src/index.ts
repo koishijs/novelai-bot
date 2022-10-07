@@ -186,5 +186,6 @@ export function apply(ctx: Context, config: Config) {
     draw._options.model.fallback = config.model
     draw._options.orient.fallback = config.orient
     draw._options.sampler.fallback = config.sampler
+    draw._options.undesired.fallback = config.undesiredContents
   }, { immediate: true })
 }
