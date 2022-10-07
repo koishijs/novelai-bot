@@ -2,6 +2,8 @@
 
 [![npm](https://img.shields.io/npm/v/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
 
+**别光看这里了，快去给 [Koishi](https://github.com/koishijs/koishi) 点个 star 吧！**
+
 基于 [NovelAI](https://novelai.net/) 的画图插件。已实现功能：
 
 - [x] 绘制图片
@@ -13,9 +15,7 @@
 - [ ] 图片增强功能
 - [ ] img2img
 
-**别光看这里了，快去给 [Koishi](https://github.com/koishijs/koishi) 点个 star 吧！**
-
-## 快读搭建
+## 快速搭建
 
 给没有使用过 Koishi 的新人提供一份简单的快速搭建指南：
 
@@ -159,7 +159,7 @@ console.log(JSON.parse(localStorage.session).auth_token)
 ### endpoint
 
 - 类型：`string`
-- 默认值：`'https://api.novelai.cn'`
+- 默认值：`'https://api.novelai.net'`
 
 API 服务器地址。如果你通过泄露的模型搭建了私服，可以将此项设置为你的服务器地址。
 
