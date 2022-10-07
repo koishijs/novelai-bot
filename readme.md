@@ -121,6 +121,13 @@ console.log(JSON.parse(localStorage.session).auth_token)
 
 违禁词列表。含有违禁词的请求将被拒绝。
 
+### endpoint
+
+- 类型：`string`
+- 默认值：`'https://api.novelai.cn'`
+
+API 服务器地址。如果你通过泄露的模型搭建了私服，可以将此项设置为你的服务器地址。
+
 ### requestTimeout
 
 - 类型：`number`

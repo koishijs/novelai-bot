@@ -35,6 +35,7 @@ export interface Config {
   sampler?: Sampler
   anatomy?: boolean
   forbidden?: string
+  endpoint?: string
   requestTimeout?: number
   recallTimeout?: number
   maxConcurrency?: number
@@ -46,6 +47,7 @@ export const Config: Schema<Config> = Schema.object({
   orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
   sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
   anatomy: Schema.boolean().default(true).description('是否过滤不合理构图。'),
+  endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
   forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
   requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute * 0.5),
   recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
@@ -112,7 +114,7 @@ export function apply(ctx: Context, config: Config) {
       session.send(session.text('.waiting'))
 
       try {
-        const art = await ctx.http.axios('https://api.novelai.net/ai/generate-image', {
+        const art = await ctx.http.axios(config.endpoint + '/ai/generate-image', {
           method: 'POST',
           timeout: config.requestTimeout,
           headers: {
