@@ -17,6 +17,9 @@ const orientMap = {
   square: { height: 640, width: 640 },
 } as const
 
+const lowQuality = 'nsfw, lowres, text, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry'
+const badAnatomy = 'bad anatomy, bad hands, error, missing fingers, extra digit, fewer digits'
+
 type Model = keyof typeof modelMap
 type Orient = keyof typeof orientMap
 type Sampler = typeof samplers[number]
@@ -30,7 +33,8 @@ export interface Config {
   model?: Model
   orient?: Orient
   sampler?: Sampler
-  forbidden?: string[]
+  anatomy?: boolean
+  forbidden?: string
   requestTimeout?: number
   recallTimeout?: number
   maxConcurrency?: number
@@ -41,13 +45,12 @@ export const Config: Schema<Config> = Schema.object({
   model: Schema.union(models).description('默认的生成模型。').default('nai'),
   orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
   sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
-  forbidden: Schema.array(String).description('全局违禁词列表。'),
+  anatomy: Schema.boolean().default(true).description('是否过滤不合理构图。'),
+  forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
   requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute * 0.5),
   recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
   maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 以禁用此功能)。').default(0),
 })
-
-const UNDESIRED = 'nsfw, lowres, text, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry'
 
 function assembleMsgNode(user: {uin: string; name: string}, content: string | string[] | {}) {
   return {
@@ -63,7 +66,12 @@ function assembleMsgNode(user: {uin: string; name: string}, content: string | st
 export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh', require('./locales/zh'))
 
+  let forbidden: string[]
   const states: Dict<Set<string>> = Object.create(null)
+
+  ctx.accept(['forbidden'], (config) => {
+    forbidden = config.forbidden.trim().toLowerCase().split(/\W+/g).filter(Boolean)
+  }, { immediate: true })
 
   const cmd = ctx.guild().command('novelai <prompts:text>')
     .shortcut('画画', { fuzzy: true })
@@ -72,6 +80,8 @@ export function apply(ctx: Context, config: Config) {
     .option('orient', '-o <orient>', { type: orients })
     .option('sampler', '-s <sampler>', { type: samplers })
     .option('seed', '-x <seed:number>')
+    .option('anatomy', '-a', { value: true })
+    .option('anatomy', '-A', { value: false })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
       input = input.toLowerCase().replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
@@ -79,10 +89,9 @@ export function apply(ctx: Context, config: Config) {
         return session.text('.invalid-input')
       }
 
-      const words = input.split(/\W+/g)
-      const forbidden = config.forbidden.filter(word => words.includes(word))
-      if (forbidden.length) {
-        return session.text('.forbidden-word', [forbidden.join(', ')])
+      const words = input.split(/\W+/g).filter(word => forbidden.includes(word))
+      if (words.length) {
+        return session.text('.forbidden-word', [words.join(', ')])
       }
 
       const id = Math.random().toString(36).slice(2)
@@ -97,6 +106,8 @@ export function apply(ctx: Context, config: Config) {
 
       const model = modelMap[options.model]
       const orient = orientMap[options.orient]
+      const undesired = [lowQuality]
+      if (options.anatomy ?? config.anatomy) undesired.push(badAnatomy)
       const seed = options.seed || Math.round(new Date().getTime() / 1000)
       session.send(session.text('.waiting'))
 
@@ -125,7 +136,7 @@ export function apply(ctx: Context, config: Config) {
               scale: 12,
               steps: 28,
               strength: 0.7,
-              uc: UNDESIRED,
+              uc: undesired.join(', '),
               ucPreset: 1,
             },
           },

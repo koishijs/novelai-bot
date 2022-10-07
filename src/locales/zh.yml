@@ -9,6 +9,7 @@ commands:
       model: 设定生成模型 (safe, nai, furry)
       orient: 设定图片方向 (portrait, landscape, square)
       sampler: 设置采样器 (k_euler_ancestral, k_euler, k_lms, plms, ddim)
+      anatony: 过滤不合理构图
       seed: 设置随机种子
 
     messages:
