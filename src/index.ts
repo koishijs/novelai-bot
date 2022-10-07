@@ -157,6 +157,8 @@ export function apply(ctx: Context, config: Config) {
             return session.text('.rate-limited')
           } else if (err.response?.status === 401) {
             return session.text('.invalid-token')
+          } else if (err.response?.status === 402) {
+            return session.text('.unauthorized')
           }
         }
         logger.error(err)
