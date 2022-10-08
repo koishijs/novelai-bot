@@ -1,16 +1,17 @@
 # koishi-plugin-novelai
 
+[![downloads](https://img.shields.io/npm/dm/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
 [![npm](https://img.shields.io/npm/v/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
 
 基于 [NovelAI](https://novelai.net/) 的画图插件。已实现功能：
 
-- [x] 绘制图片
-- [x] 更改模型、采样器、图片尺寸
-- [x] 高级请求语法
-- [x] 自定义违禁词表
-- [x] 发送一段时间后自动撤回
-- [x] 连接到自建私服
-- [x] img2img · 图片增强功能
+- 绘制图片
+- 更改模型、采样器、图片尺寸
+- 高级请求语法
+- 自定义违禁词表
+- 发送一段时间后自动撤回
+- 连接到自建私服
+- img2img · 图片增强
 
 得益于 Koishi 的插件化机制，只需配合其他插件即可实现更多功能：
 
@@ -20,6 +21,14 @@
 - 多语言支持 (为使用不同语言的用户提供对应的回复)
 
 **所以所以快去给 [Koishi](https://github.com/koishijs/koishi) 点个 star 吧！**
+
+## 效果展示
+
+以下图片均使用本插件在聊天平台生成：
+
+| ![example](https://novelai-gallery.vercel.app/69ff89485ee83344868446d9c2b445590cea859d.png) | ![example](https://novelai-gallery.vercel.app/91a9b0a1c3abad3a515efaa4befe27a64aa7c4b8.png) | ![example](https://novelai-gallery.vercel.app/d0e3dbcbdfba07e435c7c84b4de47cd99c4918c0.png) | ![example](https://novelai-gallery.vercel.app/40e5341a66c0fb97e51ef3d23e51c8150a0f3613.png) |
+|:-:|:-:|:-:|:-:|
+| ![example](https://novelai-gallery.vercel.app/2e631c1944b9579b2c004481c9edff9ac1784330.png) |
 
 ## 快速搭建
 
@@ -46,14 +55,9 @@
 3. 点击右上角的「启用」按钮
 4. 现在你可以在 QQ 上中使用画图功能了！
 
-使用示例：
-
-| ![example-0](./public/example-0.jpg) | ![example-1](./public/example-1.jpg) |
-|:-:|:-:|
-
 ## 基本用法
 
-输入「约稿」+ 关键词进行图片绘制。关键词需要为英文，多个关键词之间用逗号分隔。例如：
+输入「约稿 / 画画」+ 关键词进行图片绘制。关键词需要为英文，多个关键词之间用逗号分隔。例如：
 
 ```
 约稿 koishi
