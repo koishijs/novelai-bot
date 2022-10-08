@@ -6,11 +6,11 @@ const ALLOWED_TYPES = ['jpeg', 'png']
 export async function download(ctx: Context, url: string, headers = {}): Promise<Buffer> {
   const head = await ctx.http.head(url, { headers })
 
-  if (+head.headers['content-length'] > MAX_CONTENT_SIZE) {
+  if (+head['content-length'] > MAX_CONTENT_SIZE) {
     throw new Error('file too large')
   }
 
-  if (ALLOWED_TYPES.every(t => head.headers['content-type'].includes(t))) {
+  if (ALLOWED_TYPES.every(t => head['content-type'].includes(t))) {
     throw new Error('unsupported file type')
   }
 

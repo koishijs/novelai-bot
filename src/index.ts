@@ -100,8 +100,8 @@ export function apply(ctx: Context, config: Config) {
     .option('orient', '-o <orient>', { type: orients })
     .option('sampler', '-s <sampler>', { type: samplers })
     .option('seed', '-x <seed:number>')
-    .option('anatomy', '-a', { value: true })
-    .option('anatomy', '-A', { value: false })
+    .option('anatomy', '-a, --strict-anatomy', { value: true })
+    .option('anatomy', '-A, --loose-anatomy', { value: false })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
@@ -115,6 +115,10 @@ export function apply(ctx: Context, config: Config) {
 
       if (options.enhance && !imgUrl) {
         return session.text('.expect-image')
+      }
+
+      if (!input.trim() && !config.basePrompt) {
+        return session.text('.expect-prompt')
       }
 
       input = input.toLowerCase().replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
@@ -143,13 +147,17 @@ export function apply(ctx: Context, config: Config) {
       if (options.anatomy ?? config.anatomy) undesired.push(badAnatomy)
       const seed = options.seed || Math.round(new Date().getTime() / 1000)
       session.send(session.text('.waiting'))
-      input += config.basePrompt ? ', ' + config.basePrompt : ''
+
+      const prompts = []
+      if (input) prompts.push(input)
+      if (config.basePrompt) prompts.push(config.basePrompt)
+      input = prompts.join(', ')
 
       const parameters: Dict = {
         seed,
         n_samples: 1,
         sampler: options.sampler,
-        uc: undesired,
+        uc: undesired.join(', '),
         ucPreset: 0,
       }
 
