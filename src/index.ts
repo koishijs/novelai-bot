@@ -92,14 +92,18 @@ export function apply(ctx: Context, config: Config) {
     forbidden = config.forbidden.trim().toLowerCase().split(/\W+/g).filter(Boolean)
   }, { immediate: true })
 
+  const hidden = () => !config.allowAnlas
+
   const cmd = ctx.command('novelai <prompts:text>')
     .shortcut('画画', { fuzzy: true })
     .shortcut('约稿', { fuzzy: true })
-    .option('enhance', '-e')
+    .option('enhance', '-e', { hidden })
     .option('model', '-m <model>', { type: models })
     .option('orient', '-o <orient>', { type: orients })
     .option('sampler', '-s <sampler>', { type: samplers })
     .option('seed', '-x <seed:number>')
+    .option('steps', '-t <step:number>', { hidden })
+    .option('scale', '-c <scale:number>', { hidden })
     .option('anatomy', '-a, --strict-anatomy', { value: true })
     .option('anatomy', '-A, --loose-anatomy', { value: false })
     .action(async ({ session, options }, input) => {
@@ -121,6 +125,10 @@ export function apply(ctx: Context, config: Config) {
         if (!input.trim() && !config.basePrompt) {
           return session.text('.expect-prompt')
         }
+      } else {
+        delete options.enhance
+        delete options.steps
+        delete options.scale
       }
 
       input = input.toLowerCase().replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
@@ -168,8 +176,8 @@ export function apply(ctx: Context, config: Config) {
         const size = getImageSize(image)
         Object.assign(parameters, {
           image: Buffer.from(image).toString('base64'),
-          scale: 11,
-          steps: 50,
+          scale: options.scale ?? 11,
+          steps: options.steps ?? 50,
         })
         if (options.enhance) {
           Object.assign(parameters, {
@@ -181,8 +189,8 @@ export function apply(ctx: Context, config: Config) {
         }
       } else {
         Object.assign(parameters, {
-          scale: 12,
-          steps: 28,
+          scale: options.scale ?? 12,
+          steps: options.steps ?? 28,
         })
       }
 

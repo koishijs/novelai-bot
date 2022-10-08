@@ -14,6 +14,8 @@ commands:
       anatomy.true: 过滤不合理构图
       anatomy.false: 允许不合理构图
       seed: 设置随机种子
+      steps: 设置迭代步数
+      scale: 设置对输入的服从度
 
     messages:
       expect-prompt: 请输入标签。
