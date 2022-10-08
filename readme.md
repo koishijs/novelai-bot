@@ -2,7 +2,55 @@
 
 [![npm](https://img.shields.io/npm/v/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
 
-基于 [NovelAI](https://novelai.net/) 的画图插件。
+基于 [NovelAI](https://novelai.net/) 的画图插件。已实现功能：
+
+- [x] 绘制图片
+- [x] 更改模型、采样器、图片尺寸
+- [x] 高级请求语法
+- [x] 自定义违禁词表
+- [x] 发送一段时间后自动撤回
+- [x] 连接到自建私服
+- [ ] 图片增强功能
+- [ ] img2img
+
+得益于 Koishi 的插件化机制，只需配合其他插件即可实现更多功能：
+
+- 多平台支持 (QQ、Discord、Telegram、开黑啦等)
+- 速率限制 (限制每个用户每天可以调用的次数和每次调用的间隔)
+- 上下文管理 (限制在哪些群聊中哪些用户可以访问)
+- 多语言支持 (为使用不同语言的用户提供对应的回复)
+
+**所以所以快去给 [Koishi](https://github.com/koishijs/koishi) 点个 star 吧！**
+
+## 快速搭建
+
+给没有使用过 Koishi 的新人提供一份简单的快速搭建指南：
+
+> **Warning** \
+> 在此之前，你需要一个**拥有有效付费计划的 NovelAI 账号**，本插件只使用 NovelAI 提供的接口。 \
+> 付费计划请自行前往 [NovelAI](https://novelai.net/) 了解。
+
+1. 前往[这里](https://github.com/koishijs/koishi-desktop/releases)下载 Koishi 桌面版
+2. 启动桌面版，你将会看到一个控制台界面
+3. 点击左侧的「插件市场」，搜索「novelai」并点击「安装」
+4. 点击左侧的「插件配置」，选择「novelai」插件，填写你的[授权令牌](#token)，并点击右上角的「启用」按钮
+5. 现在你已经可以在「沙盒」中使用画图功能了！
+
+如果想进一步在 QQ 中使用，可继续进行下列操作：
+
+1. 准备一个 QQ 号 (等级不要过低，否则可能被风控)
+2. 点击左侧的「插件配置」，选择「onebot」插件，完成以下配置：
+    - 在「selfId」填写你的 QQ 号
+    - 在「password」填写你的密码
+    - 在「protocol」选择 `ws-reverse`
+    - 开启「gocqhttp.enable」选项
+3. 点击右上角的「启用」按钮
+4. 现在你可以在 QQ 上中使用画图功能了！
+
+使用示例：
+
+| ![example-0](./public/example-0.jpg) | ![example-1](./public/example-1.jpg) |
+|:-:|:-:|
 
 ## 使用方法
 
@@ -55,7 +103,7 @@
 使用半角方括号 `[]` 包裹关键词以弱化该关键词的影响，使用半角花括号 `{}` 包裹关键词以强化该关键词的影响。例如：
 
 ```
-约稿 [tears] {spread legs}
+约稿 [tears], {spread legs}
 ```
 
 ### 要素混合
@@ -114,12 +162,26 @@ console.log(JSON.parse(localStorage.session).auth_token)
 
 默认情况下是否过滤不良构图。
 
+### baseTags
+
+- 类型: `string`
+- 默认值: `''`
+
+默认的附加标签。可以自定义一些常用的标签，例如 `best quality`, `masterpiece` 等。
+
 ### forbidden
 
 - 类型：`string`
 - 默认值：`''`
 
 违禁词列表。含有违禁词的请求将被拒绝。
+
+### endpoint
+
+- 类型：`string`
+- 默认值：`'https://api.novelai.net'`
+
+API 服务器地址。如果你通过泄露的模型搭建了私服，可以将此项设置为你的服务器地址。
 
 ### requestTimeout
 

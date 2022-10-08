@@ -4,6 +4,7 @@ commands:
     usage: |-
       输入用逗号隔开的英文标签，例如 Mr.Quin, dark sword, red eyes。
       查找标签可以使用 Danbooru。
+      快来给仓库点个 star 吧：https://github.com/koishijs/koishi-plugin-novelai
 
     options:
       model: 设定生成模型 (safe, nai, furry)
@@ -20,4 +21,5 @@ commands:
       unknown-error: 发生未知错误。
       nickname: AI 画师
       rate-limited: 访问频率过高，请稍后再试。
-      invalid-token: 无效的授权令牌，请联系管理员。
+      invalid-token: 令牌无效或已过期，请联系管理员。
+      unauthorized: 令牌未授权，可能需要续费，请联系管理员。

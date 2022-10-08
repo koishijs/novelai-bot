@@ -1,6 +1,7 @@
+import { Context, Dict, Logger, Quester, Schema, segment, Time } from 'koishi'
+
 import { Context, Dict, Logger, Quester, Schema, Time, Session, segment } from 'koishi'
 
-import { readRemote, getImgSize } from './utils'
 
 export const reactive = true
 export const name = 'novelai'
@@ -36,7 +37,9 @@ export interface Config {
   orient?: Orient
   sampler?: Sampler
   anatomy?: boolean
+  baseTags?: string
   forbidden?: string
+  endpoint?: string
   requestTimeout?: number
   recallTimeout?: number
   maxConcurrency?: number
@@ -48,6 +51,8 @@ export const Config: Schema<Config> = Schema.object({
   orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
   sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
   anatomy: Schema.boolean().default(true).description('是否过滤不合理构图。'),
+  baseTags: Schema.string().description('默认的附加标签。').default(''),
+  endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
   forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
   requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute * 0.5),
   recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
@@ -97,7 +102,7 @@ export function apply(ctx: Context, config: Config) {
     forbidden = config.forbidden.trim().toLowerCase().split(/\W+/g).filter(Boolean)
   }, { immediate: true })
 
-  const cmd = ctx.guild().command('novelai <prompts:text>')
+  const cmd = ctx.command('novelai <prompts:text>')
     .shortcut('画画', { fuzzy: true })
     .shortcut('约稿', { fuzzy: true })
     .option('model', '-m <model>', { type: models })
@@ -134,9 +139,10 @@ export function apply(ctx: Context, config: Config) {
       if (options.anatomy ?? config.anatomy) undesired.push(badAnatomy)
       const seed = options.seed || Math.round(new Date().getTime() / 1000)
       session.send(session.text('.waiting'))
+      input += config.baseTags ? ', ' + config.baseTags : ''
 
       try {
-        const art = await ctx.http.axios('https://api.novelai.net/ai/generate-image', {
+        const art = await ctx.http.axios(config.endpoint + '/ai/generate-image', {
           method: 'POST',
           timeout: config.requestTimeout,
           headers: headers(config),
@@ -161,19 +167,20 @@ export function apply(ctx: Context, config: Config) {
           return res.data.substr(27, res.data.length)
         })
 
-        const infoNode = assembleMsgNode(
-          { uin: session.bot.selfId, name: session.text('.nickname') },
-          `seed = ${seed}\ntags = ${input}`,
-        )
-        const artNode = assembleMsgNode(
-          { uin: session.bot.selfId, name: session.text('.nickname') },
-          { type: 'image', data: { file: 'base64://' + art } },
-        )
-
-        const msgId = session.bot.internal.sendGroupForwardMsg(session.channelId, [infoNode, artNode])
+        const attrs = {
+          userId: session.selfId,
+          nickname: session.text('.nickname'),
+        }
+        const ids = await session.send(segment('message', { forward: true }, [
+          segment('message', attrs, `seed = ${seed}`),
+          segment('message', attrs, input),
+          segment('message', attrs, segment.image('base64://' + art)),
+        ]))
         if (config.recallTimeout) {
           ctx.setTimeout(() => {
-            session.bot.deleteMessage(session.channelId, msgId)
+            for (const id of ids) {
+              session.bot.deleteMessage(session.channelId, id)
+            }
           }, config.recallTimeout)
         }
       } catch (err) {
