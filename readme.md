@@ -162,6 +162,13 @@ console.log(JSON.parse(localStorage.session).auth_token)
 
 默认情况下是否过滤不良构图。
 
+### baseTags
+
+- 类型: `string`
+- 默认值: `` (空字符串)
+
+默认的附加标签。可以自定义一些常用的标签，例如 `best quality`, `masterpiece` 等。
+
 ### forbidden
 
 - 类型：`string`
@@ -189,12 +196,3 @@ API 服务器地址。如果你通过泄露的模型搭建了私服，可以将�
 - 默认值：`0`
 
 图片发送后自动撤回的时间 (设置为 `0` 禁用此功能)。
-
-
-### baseTags
-
-- 类型: `string`
-- 默认值: `` (空字符串)
-
-默认的附加标签。可以自定义一些常用的标签，例如 `best quality`, `masterpiece` 等。
-
