@@ -10,8 +10,7 @@
 - [x] 自定义违禁词表
 - [x] 发送一段时间后自动撤回
 - [x] 连接到自建私服
-- [ ] 图片增强功能
-- [ ] img2img
+- [x] img2img · 图片增强功能
 
 得益于 Koishi 的插件化机制，只需配合其他插件即可实现更多功能：
 
@@ -162,12 +161,12 @@ console.log(JSON.parse(localStorage.session).auth_token)
 
 默认情况下是否过滤不良构图。
 
-### baseTags
+### basePrompt
 
 - 类型: `string`
-- 默认值: `''`
+- 默认值: `'masterpiece, best quality'`
 
-默认的附加标签。可以自定义一些常用的标签，例如 `best quality`, `masterpiece` 等。
+所有请求的附加标签。默认值相当于开启网页版的「Add Quality Tags」功能。
 
 ### forbidden
 
