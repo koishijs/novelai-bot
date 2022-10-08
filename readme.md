@@ -161,6 +161,13 @@ console.log(JSON.parse(localStorage.session).auth_token)
 
 默认情况下是否过滤不良构图。
 
+### allowAnlas
+
+- 类型：`boolean`
+- 默认值：`true`
+
+是否允许使用点数。禁用后部分功能 (图片增强和手动设置某些参数) 将无法使用。
+
 ### basePrompt
 
 - 类型: `string`

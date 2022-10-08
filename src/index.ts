@@ -51,7 +51,7 @@ export const Config: Schema<Config> = Schema.object({
   orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
   sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
   anatomy: Schema.boolean().default(true).description('是否过滤不合理构图。'),
-  allowAnlas: Schema.boolean().default(true).description('是否允许使用点数。'),
+  allowAnlas: Schema.boolean().default(true).description('是否允许使用点数。禁用后部分功能 (图片增强和手动设置某些参数) 将无法使用。'),
   basePrompt: Schema.string().description('默认的附加标签。').default('masterpiece, best quality'),
   forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
   endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
@@ -106,19 +106,21 @@ export function apply(ctx: Context, config: Config) {
       if (!input?.trim()) return session.execute('help novelai')
 
       let imgUrl: string
-      input = segment.transform(input, {
-        image(attrs) {
-          imgUrl = attrs.url
-          return ''
-        },
-      })
+      if (config.allowAnlas) {
+        input = segment.transform(input, {
+          image(attrs) {
+            imgUrl = attrs.url
+            return ''
+          },
+        })
 
-      if (options.enhance && !imgUrl) {
-        return session.text('.expect-image')
-      }
+        if (options.enhance && !imgUrl) {
+          return session.text('.expect-image')
+        }
 
-      if (!input.trim() && !config.basePrompt) {
-        return session.text('.expect-prompt')
+        if (!input.trim() && !config.basePrompt) {
+          return session.text('.expect-prompt')
+        }
       }
 
       input = input.toLowerCase().replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
