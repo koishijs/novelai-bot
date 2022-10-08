@@ -191,9 +191,10 @@ API 服务器地址。如果你通过泄露的模型搭建了私服，可以将�
 图片发送后自动撤回的时间 (设置为 `0` 禁用此功能)。
 
 
-### alwaysGenerateBestImage
+### baseTags
 
-- 类型: `boolean`
-- 默认值: `true`
+- 类型: `string`
+- 默认值: `` (空字符串)
 
-是否总是生成最佳图片。保持NovelAI的网页选项一致。
+默认的附加标签。可以自定义一些常用的标签，例如 `best quality`, `masterpiece` 等。
+
