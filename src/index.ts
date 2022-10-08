@@ -34,6 +34,7 @@ export interface Config {
   orient?: Orient
   sampler?: Sampler
   anatomy?: boolean
+  baseTags?: string
   forbidden?: string
   endpoint?: string
   requestTimeout?: number
@@ -47,6 +48,7 @@ export const Config: Schema<Config> = Schema.object({
   orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
   sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
   anatomy: Schema.boolean().default(true).description('是否过滤不合理构图。'),
+  baseTags: Schema.string().description('默认的附加标签。').default(''),
   endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
   forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
   requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute * 0.5),
@@ -101,6 +103,7 @@ export function apply(ctx: Context, config: Config) {
       if (options.anatomy ?? config.anatomy) undesired.push(badAnatomy)
       const seed = options.seed || Math.round(new Date().getTime() / 1000)
       session.send(session.text('.waiting'))
+      input += config.baseTags ? ', ' + config.baseTags : ''
 
       try {
         const art = await ctx.http.axios(config.endpoint + '/ai/generate-image', {

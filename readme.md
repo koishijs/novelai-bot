@@ -162,6 +162,13 @@ console.log(JSON.parse(localStorage.session).auth_token)
 
 默认情况下是否过滤不良构图。
 
+### baseTags
+
+- 类型: `string`
+- 默认值: `` (空字符串)
+
+默认的附加标签。可以自定义一些常用的标签，例如 `best quality`, `masterpiece` 等。
+
 ### forbidden
 
 - 类型：`string`
