@@ -13,7 +13,7 @@
 - [ ] 图片增强功能
 - [ ] img2img
 
-得益于 Koishi 的插件化机制，只需配合其他插件即可轻松实现：
+得益于 Koishi 的插件化机制，只需配合其他插件即可实现更多功能：
 
 - 多平台支持 (QQ、Discord、Telegram、开黑啦等)
 - 速率限制 (限制每个用户每天可以调用的次数和每次调用的间隔)
@@ -165,7 +165,7 @@ console.log(JSON.parse(localStorage.session).auth_token)
 ### baseTags
 
 - 类型: `string`
-- 默认值: `` (空字符串)
+- 默认值: `''`
 
 默认的附加标签。可以自定义一些常用的标签，例如 `best quality`, `masterpiece` 等。
 
