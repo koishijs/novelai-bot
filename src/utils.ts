@@ -3,7 +3,7 @@ import { Context } from 'koishi'
 const MAX_CONTENT_SIZE = 10485760
 const ALLOWED_TYPES = ['jpeg', 'png']
 
-export async function download(ctx: Context, url: string, headers = {}): Promise<Buffer> {
+export async function download(ctx: Context, url: string, headers = {}): Promise<ArrayBuffer> {
   const head = await ctx.http.head(url, { headers })
 
   if (+head['content-length'] > MAX_CONTENT_SIZE) {

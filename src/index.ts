@@ -97,6 +97,7 @@ export function apply(ctx: Context, config: Config) {
   const cmd = ctx.command('novelai <prompts:text>')
     .shortcut('画画', { fuzzy: true })
     .shortcut('约稿', { fuzzy: true })
+    .shortcut('增强', { fuzzy: true, options: { enhance: true } })
     .option('enhance', '-e', { hidden })
     .option('model', '-m <model>', { type: models })
     .option('orient', '-o <orient>', { type: orients })
@@ -104,8 +105,8 @@ export function apply(ctx: Context, config: Config) {
     .option('seed', '-x <seed:number>')
     .option('steps', '-t <step:number>', { hidden })
     .option('scale', '-c <scale:number>')
-    .option('anatomy', '-a, --strict-anatomy', { value: true })
-    .option('anatomy', '-A, --loose-anatomy', { value: false })
+    .option('anatomy', '-a, --strict-anatomy', { value: true, hidden: () => config.anatomy })
+    .option('anatomy', '-A, --loose-anatomy', { value: false, hidden: () => !config.anatomy })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
@@ -171,10 +172,10 @@ export function apply(ctx: Context, config: Config) {
       }
 
       if (imgUrl) {
-        const image = await download(ctx, imgUrl)
+        const image = Buffer.from(await download(ctx, imgUrl))
         const size = getImageSize(image)
         Object.assign(parameters, {
-          image: Buffer.from(image).toString('base64'),
+          image: image.toString('base64'),
           scale: options.scale ?? 11,
           steps: options.steps ?? 50,
         })
