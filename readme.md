@@ -1,17 +1,17 @@
 # koishi-plugin-novelai
 
+[![downloads](https://img.shields.io/npm/dm/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
 [![npm](https://img.shields.io/npm/v/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
 
 基于 [NovelAI](https://novelai.net/) 的画图插件。已实现功能：
 
-- [x] 绘制图片
-- [x] 更改模型、采样器、图片尺寸
-- [x] 高级请求语法
-- [x] 自定义违禁词表
-- [x] 发送一段时间后自动撤回
-- [x] 连接到自建私服
-- [ ] 图片增强功能
-- [ ] img2img
+- 绘制图片
+- 更改模型、采样器、图片尺寸
+- 高级请求语法
+- 自定义违禁词表
+- 发送一段时间后自动撤回
+- 连接到自建私服
+- img2img · 图片增强
 
 得益于 Koishi 的插件化机制，只需配合其他插件即可实现更多功能：
 
@@ -21,6 +21,14 @@
 - 多语言支持 (为使用不同语言的用户提供对应的回复)
 
 **所以所以快去给 [Koishi](https://github.com/koishijs/koishi) 点个 star 吧！**
+
+## 效果展示
+
+以下图片均使用本插件在聊天平台生成：
+
+| ![example](https://novelai-gallery.vercel.app/69ff89485ee83344868446d9c2b445590cea859d.png) | ![example](https://novelai-gallery.vercel.app/91a9b0a1c3abad3a515efaa4befe27a64aa7c4b8.png) | ![example](https://novelai-gallery.vercel.app/d0e3dbcbdfba07e435c7c84b4de47cd99c4918c0.png) | ![example](https://novelai-gallery.vercel.app/40e5341a66c0fb97e51ef3d23e51c8150a0f3613.png) |
+|:-:|:-:|:-:|:-:|
+| ![example](https://novelai-gallery.vercel.app/2e631c1944b9579b2c004481c9edff9ac1784330.png) |
 
 ## 快速搭建
 
@@ -47,20 +55,15 @@
 3. 点击右上角的「启用」按钮
 4. 现在你可以在 QQ 上中使用画图功能了！
 
-使用示例：
+## 基本用法
 
-| ![example-0](./public/example-0.jpg) | ![example-1](./public/example-1.jpg) |
-|:-:|:-:|
-
-## 使用方法
-
-### 绘制图片
-
-输入「约稿」+ 关键词进行图片绘制。关键词需要为英文，多个关键词之间用逗号分隔。例如：
+输入「约稿 / 画画」+ 关键词进行图片绘制。关键词需要为英文，多个关键词之间用逗号分隔。例如：
 
 ```
 约稿 koishi
 ```
+
+## 高级功能
 
 ### 切换生成模型
 
@@ -130,10 +133,36 @@
 
 这时会得到一个更像猫的猫狗。
 
-### Seed 种子
+### 随机种子
 
-AI会使用种子来生成噪音然后进一步生成你需要的图片，每次随机生成时都会有一个唯一的种子。使用相同的种子可以让AI尝试使用相同的路数来生成图片。
-**注意**！这并不意味着使用相同的种子会输出相同的图片，只是会有更多的相似之处。
+AI 会使用种子来生成噪音然后进一步生成你需要的图片，每次随机生成时都会有一个唯一的种子。使用 `-x` 或 `--seed` 并传入相同的种子可以让 AI 尝试使用相同的路数来生成图片。
+
+```
+约稿 -x 1234567890 koishi
+```
+
+> **Warning** \
+> 注意：这并不意味着使用相同的种子会输出相同的图片，只是会有更多的相似之处。
+
+### 迭代步数
+
+更多的迭代步数**可能**会有更好的生成效果，但是一定会导致生成时间变长。
+
+默认情况下的迭代步数为 28 (传入图片时为 50)。可以使用 `-t` 或 `--steps` 手动控制迭代步数。
+
+```
+约稿 -t 50 koishi
+```
+
+### 对输入的服从度
+
+服从度较低时 AI 有较大的自由发挥空间，服从度较高时 AI 则更倾向于遵守你的输入。
+
+默认情况下的服从度为 12 (传入图片时为 11)。可以使用 `-c` 或 `--scale` 手动控制迭代步数。
+
+```
+约稿 -c 10 koishi
+```
 
 ## 配置项
 
@@ -181,12 +210,19 @@ console.log(JSON.parse(localStorage.session).auth_token)
 
 默认情况下是否过滤不良构图。
 
-### baseTags
+### allowAnlas
+
+- 类型：`boolean`
+- 默认值：`true`
+
+是否允许使用点数。禁用后部分功能 (图片增强和手动设置某些参数) 将无法使用。
+
+### basePrompt
 
 - 类型: `string`
-- 默认值: `''`
+- 默认值: `'masterpiece, best quality'`
 
-默认的附加标签。可以自定义一些常用的标签，例如 `best quality`, `masterpiece` 等。
+所有请求的附加标签。默认值相当于开启网页版的「Add Quality Tags」功能。
 
 ### forbidden
 

@@ -4,18 +4,24 @@ commands:
     usage: |-
       输入用逗号隔开的英文标签，例如 Mr.Quin, dark sword, red eyes。
       查找标签可以使用 Danbooru。
-      快来给仓库点个 star 吧：https://github.com/koishijs/koishi-plugin-novelai
+      快来给仓库点个 star 吧：https://github.com/koishijs/novelai-bot
 
     options:
+      enhance: 图片增强模式
       model: 设定生成模型 (safe, nai, furry)
       orient: 设定图片方向 (portrait, landscape, square)
       sampler: 设置采样器 (k_euler_ancestral, k_euler, k_lms, plms, ddim)
-      anatony: 过滤不合理构图
+      anatomy.true: 过滤不合理构图
+      anatomy.false: 允许不合理构图
       seed: 设置随机种子
+      steps: 设置迭代步数
+      scale: 设置对输入的服从度
 
     messages:
+      expect-prompt: 请输入标签。
+      expect-image: 请输入图片。
       invalid-input: 只接受英文输入。
-      forbidden-word: 请求含有违禁词 ({0})。
+      forbidden-word: 输入含有违禁词。
       concurrent-jobs: 请稍后再试。
       waiting: 在画了在画了
       unknown-error: 发生未知错误。
