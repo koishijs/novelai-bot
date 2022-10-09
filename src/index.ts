@@ -103,7 +103,7 @@ export function apply(ctx: Context, config: Config) {
     .option('sampler', '-s <sampler>', { type: samplers })
     .option('seed', '-x <seed:number>')
     .option('steps', '-t <step:number>', { hidden })
-    .option('scale', '-c <scale:number>', { hidden })
+    .option('scale', '-c <scale:number>')
     .option('anatomy', '-a, --strict-anatomy', { value: true })
     .option('anatomy', '-A, --loose-anatomy', { value: false })
     .action(async ({ session, options }, input) => {
@@ -128,7 +128,6 @@ export function apply(ctx: Context, config: Config) {
       } else {
         delete options.enhance
         delete options.steps
-        delete options.scale
       }
 
       input = input.toLowerCase().replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
