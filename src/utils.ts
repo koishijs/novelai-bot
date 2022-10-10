@@ -36,3 +36,10 @@ export async function calcHash(username: string, password: string): Promise<stri
     outputType: 'hex',
   }).then(res => { return Buffer.from(res, 'hex').toString('base64url') })
 }
+
+export async function login(ctx: Context): Promise<string> {
+  const { config } = ctx
+  return ctx.http.post(ctx.config.endpoint + '/user/login', {
+    key: await calcHash(config.username, config.password),
+  }).then(res => { return res.accessToken })
+}
