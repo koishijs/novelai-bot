@@ -1,5 +1,8 @@
 import { Context } from 'koishi'
-import { argon2id, blake2b } from 'hash-wasm'
+import {
+  crypto_generichash, crypto_pwhash,
+  crypto_pwhash_ALG_ARGON2ID13, crypto_pwhash_SALTBYTES, ready,
+} from 'libsodium-wrappers'
 
 const MAX_CONTENT_SIZE = 10485760
 const ALLOWED_TYPES = ['jpeg', 'png']
@@ -18,28 +21,38 @@ export async function download(ctx: Context, url: string, headers = {}): Promise
   return ctx.http.get(url, { responseType: 'arraybuffer', headers })
 }
 
-export async function calcHash(username: string, password: string): Promise<string> {
-  const salt = await blake2b(
-    password.substring(0, 6) + username + 'novelai_data_access_key',
-    16 * 8,
-    null,
-  )
+export async function calcAccessKey(username: string, password: string): Promise<string> {
+  await ready
+  return crypto_pwhash(
+    64,
+    new Uint8Array(Buffer.from(password)),
+    crypto_generichash(
+      crypto_pwhash_SALTBYTES,
+      password.slice(0, 6) + username + 'novelai_data_access_key',
+    ),
+    2,
+    2e6,
+    crypto_pwhash_ALG_ARGON2ID13,
+    'base64').slice(0, 64)
+}
 
-  /* TODO: 这地方结果是错的需要改 */
-  return argon2id({
-    hashLength: 64,
-    password,
-    salt,
-    iterations: 1,
-    parallelism: 1,
-    memorySize: 2000000,
-    outputType: 'hex',
-  }).then(res => { return Buffer.from(res, 'hex').toString('base64url') })
+export async function calcEncryptionKey(username: string, password: string): Promise<string> {
+  await ready
+  return crypto_pwhash(
+    128,
+    new Uint8Array(Buffer.from(password)),
+    crypto_generichash(
+      crypto_pwhash_SALTBYTES,
+      password.slice(0, 6) + username + 'novelai_data_encryption_key'),
+    2,
+    2e6,
+    crypto_pwhash_ALG_ARGON2ID13,
+    'base64')
 }
 
 export async function login(ctx: Context): Promise<string> {
   const { config } = ctx
   return ctx.http.post(ctx.config.endpoint + '/user/login', {
-    key: await calcHash(config.username, config.password),
+    key: await calcAccessKey(config.username, config.password),
   }).then(res => { return res.accessToken })
 }
