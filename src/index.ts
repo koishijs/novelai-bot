@@ -46,7 +46,7 @@ export interface Config {
 }
 
 export const Config: Schema<Config> = Schema.object({
-  token: Schema.string().description('授权令牌。').required(),
+  token: Schema.string().description('授权令牌。').role('secret').required(),
   model: Schema.union(models).description('默认的生成模型。').default('nai'),
   orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
   sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
@@ -62,10 +62,12 @@ export const Config: Schema<Config> = Schema.object({
 
 function errorHandler(session: Session, err: Error) {
   if (Quester.isAxiosError(err)) {
-    if (err.response?.status === 429) {
-      return session.text('.rate-limited')
-    } else if (err.response?.status === 401) {
+    if (err.response?.status === 401) {
       return session.text('.invalid-token')
+    } else if (err.response?.status === 402) {
+      return session.text('.unauthorized')
+    } else if (err.response?.status) {
+      return session.text('.response-error', [err.response.status])
     }
   }
   logger.error(err)
