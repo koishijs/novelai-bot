@@ -21,14 +21,14 @@ export async function download(ctx: Context, url: string, headers = {}): Promise
   return ctx.http.get(url, { responseType: 'arraybuffer', headers })
 }
 
-export async function calcAccessKey(username: string, password: string): Promise<string> {
+export async function calcAccessKey(email: string, password: string) {
   await ready
   return crypto_pwhash(
     64,
     new Uint8Array(Buffer.from(password)),
     crypto_generichash(
       crypto_pwhash_SALTBYTES,
-      password.slice(0, 6) + username + 'novelai_data_access_key',
+      password.slice(0, 6) + email + 'novelai_data_access_key',
     ),
     2,
     2e6,
@@ -36,23 +36,31 @@ export async function calcAccessKey(username: string, password: string): Promise
     'base64').slice(0, 64)
 }
 
-export async function calcEncryptionKey(username: string, password: string): Promise<string> {
+export async function calcEncryptionKey(email: string, password: string) {
   await ready
   return crypto_pwhash(
     128,
     new Uint8Array(Buffer.from(password)),
     crypto_generichash(
       crypto_pwhash_SALTBYTES,
-      password.slice(0, 6) + username + 'novelai_data_encryption_key'),
+      password.slice(0, 6) + email + 'novelai_data_encryption_key'),
     2,
     2e6,
     crypto_pwhash_ALG_ARGON2ID13,
     'base64')
 }
 
-export async function login(ctx: Context): Promise<string> {
-  const { config } = ctx
+export const headers = {
+  authority: 'api.novelai.net',
+  path: '/ai/generate-image',
+  'content-type': 'application/json',
+  referer: 'https://novelai.net/',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+}
+
+export async function login(ctx: Context) {
+  if (ctx.config.type !== 'login') return ctx.config.token
   return ctx.http.post(ctx.config.endpoint + '/user/login', {
-    key: await calcAccessKey(config.username, config.password),
-  }).then(res => { return res.accessToken })
+    key: await calcAccessKey(ctx.config.email, ctx.config.password),
+  }).then(res => res.accessToken)
 }
