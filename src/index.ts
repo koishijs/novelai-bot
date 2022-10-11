@@ -95,6 +95,7 @@ function errorHandler(session: Session, err: Error) {
 
 export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh', require('./locales/zh'))
+  ctx.i18n.define('zh-tw', require('./locales/zh-tw'))
 
   let forbidden: string[]
   const states: Dict<Set<string>> = Object.create(null)
@@ -111,8 +112,11 @@ export function apply(ctx: Context, config: Config) {
 
   const cmd = ctx.command('novelai <prompts:text>')
     .shortcut('画画', { fuzzy: true })
+    .shortcut('畫畫', { fuzzy: true })
     .shortcut('约稿', { fuzzy: true })
+    .shortcut('約稿', { fuzzy: true })
     .shortcut('增强', { fuzzy: true, options: { enhance: true } })
+    .shortcut('增強', { fuzzy: true, options: { enhance: true } })
     .option('enhance', '-e', { hidden })
     .option('model', '-m <model>', { type: models })
     .option('orient', '-o <orient>', { type: orients })
