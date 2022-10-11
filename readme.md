@@ -288,3 +288,31 @@ API 服务器地址。如果你搭建了私服，可以将此项设置为你的�
 - 默认值：`0`
 
 图片发送后自动撤回的时间 (设置为 `0` 禁用此功能)。
+
+## 修改回复内容
+
+> **Note** \
+> 需要先在插件市场中安装`locales`插件并启用插件
+
+在`locales`插件的设置中可以看到`root`选项，这是存放自定义语言包的根目录。默认值为`locales`，也就是在你的 koishi 根目录下的`locales`文件夹。
+
+打开该文件夹，这里空空如也。新建一个`zh.yml`文件，复制以下内容到文件中。
+
+```
+commands:
+  novelai:
+    messages:
+      expect-prompt: 请输入标签。
+      expect-image: 请输入图片。
+      invalid-input: 只接受英文输入。
+      forbidden-word: 输入含有违禁词。
+      concurrent-jobs: 请稍后再试。
+      waiting: 在画了在画了
+      nickname: AI 画师
+      unknown-error: 发生未知错误。
+      response-error: 发生未知错误 ({0})。
+      invalid-token: 令牌无效或已过期，请联系管理员。
+      unauthorized: 令牌未授权，可能需要续费，请联系管理员。
+```
+
+之后修改`message`字段下的回复就可以自定义novelai的回复内容啦。对于其他的插件也是同样方法操作。
