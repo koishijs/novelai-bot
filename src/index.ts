@@ -33,7 +33,7 @@ const samplers = ['k_euler_ancestral', 'k_euler', 'k_lms', 'plms', 'ddim'] as co
 export interface Config {
   type: 'token'
   token: string
-  username: string
+  email: string
   password: string
   model?: Model
   orient?: Orient
@@ -62,7 +62,7 @@ export const Config = Schema.intersect([
     }),
     Schema.object({
       type: Schema.const('login' as const),
-      username: Schema.string().description('用户名。').required(),
+      email: Schema.string().description('用户名。').required(),
       password: Schema.string().description('密码。').role('secret').required(),
     }),
   ] as const),
@@ -126,8 +126,8 @@ export function apply(ctx: Context, config: Config) {
     .option('scale', '-c <scale:number>')
     .option('noise', '-n <noise:number>', { hidden })
     .option('strength', '-N <strength:number>', { hidden })
-    .option('anatomy', '-a, --strict-anatomy', { value: true, hidden: () => config.anatomy })
-    .option('anatomy', '-A, --loose-anatomy', { value: false, hidden: () => !config.anatomy })
+    .option('anatomy', '-a, --strict-anatomy', { value: true, hidden: () => ctx.config.anatomy })
+    .option('anatomy', '-A, --loose-anatomy', { value: false, hidden: () => !ctx.config.anatomy })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
