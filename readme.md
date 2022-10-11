@@ -2,6 +2,7 @@
 
 [![downloads](https://img.shields.io/npm/dm/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
 [![npm](https://img.shields.io/npm/v/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkoishijs%2Fnovelai-bot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkoishijs%2Fnovelai-bot?ref=badge_shield)
 
 基于 [NovelAI](https://novelai.net/) 的画图插件。已实现功能：
 
@@ -262,3 +263,7 @@ API 服务器地址。如果你搭建了私服，可以将此项设置为你的�
 - 默认值：`0`
 
 图片发送后自动撤回的时间 (设置为 `0` 禁用此功能)。
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkoishijs%2Fnovelai-bot.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkoishijs%2Fnovelai-bot?ref=badge_large)
