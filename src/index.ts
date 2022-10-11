@@ -1,5 +1,5 @@
 import { Context, Dict, Logger, Quester, Schema, segment, Session, Time } from 'koishi'
-import { download, headers, login } from './utils'
+import { download, headers, login, LoginError } from './utils'
 import getImageSize from 'image-size'
 
 export const reactive = true
@@ -83,15 +83,14 @@ export const Config = Schema.intersect([
 
 function errorHandler(session: Session, err: Error) {
   if (Quester.isAxiosError(err)) {
-    if (err.response?.status === 401) {
-      return session.text('.invalid-token')
-    } else if (err.response?.status === 402) {
+    if (err.response?.status === 402) {
       return session.text('.unauthorized')
     } else if (err.response?.status) {
       return session.text('.response-error', [err.response.status])
     }
   }
   logger.error(err)
+  return session.text('.unknown-error')
 }
 
 export function apply(ctx: Context, config: Config) {
@@ -148,7 +147,7 @@ export function apply(ctx: Context, config: Config) {
       }
 
       input = input.toLowerCase().replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
-      if (/[^\s\w"'“”‘’.,:|\[\]\{\}-]/.test(input)) {
+      if (/[^\s\w"'“”‘’.,:|()\[\]{}-]/.test(input)) {
         return session.text('.invalid-input')
       }
 
@@ -161,7 +160,11 @@ export function apply(ctx: Context, config: Config) {
       try {
         token = await getToken()
       } catch (err) {
-        return errorHandler(session, err)
+        if (err instanceof LoginError) {
+          return session.text(err.message, [err.code])
+        }
+        logger.error(err)
+        return session.text('.unknown-error')
       }
 
       const id = Math.random().toString(36).slice(2)
@@ -256,8 +259,7 @@ export function apply(ctx: Context, config: Config) {
           }, config.recallTimeout)
         }
       } catch (err) {
-        errorHandler(session, err)
-        return session.text('.unknown-error')
+        return errorHandler(session, err)
       } finally {
         states[session.cid]?.delete(id)
       }
