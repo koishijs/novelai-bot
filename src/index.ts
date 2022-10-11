@@ -120,6 +120,8 @@ export function apply(ctx: Context, config: Config) {
     .option('seed', '-x <seed:number>')
     .option('steps', '-t <step:number>', { hidden })
     .option('scale', '-c <scale:number>')
+    .option('noise', '-n <noise:number>', { hidden })
+    .option('strength', '-N <strength:number>', { hidden })
     .option('anatomy', '-a, --strict-anatomy', { value: true, hidden: () => config.anatomy })
     .option('anatomy', '-A, --loose-anatomy', { value: false, hidden: () => !config.anatomy })
     .action(async ({ session, options }, input) => {
@@ -212,16 +214,16 @@ export function apply(ctx: Context, config: Config) {
           Object.assign(parameters, {
             height: size.height * 1.5,
             width: size.width * 1.5,
-            noise: 0,
-            strength: 0.2,
+            noise: options.noise ?? 0,
+            strength: options.strength ?? 0.2,
           })
         } else {
           const orient = resizeInput(size)
           Object.assign(parameters, {
             height: orient.height,
             width: orient.width,
-            noise: 0.2,
-            strength: 0.7,
+            noise: options.noise ?? 0.2,
+            strength: options.strength ?? 0.7,
           })
         }
       } else {
@@ -230,8 +232,8 @@ export function apply(ctx: Context, config: Config) {
           width: orient.width,
           scale: options.scale ?? 12,
           steps: options.steps ?? 28,
-          noise: 0.2,
-          strength: 0.7,
+          noise: options.noise ?? 0.2,
+          strength: options.strength ?? 0.7,
         })
       }
 
