@@ -2,11 +2,33 @@
 
 ## 登录设置
 
+### type
+
+- 类型：`'login' | 'token'`
+- 默认值：`'token'`
+
+登录方式。`login` 表示使用账号密码登录，`token` 表示使用授权令牌登录。
+
+### email
+
+- 类型：`string`
+- 当 `type` 为 `login` 时必填
+
+你的账号邮箱。
+
+### password
+
+- 类型：`string`
+- 当 `type` 为 `login` 时必填
+
+你的账号密码。
+
 ### token
 
 - 类型：`string`
+- 当 `type` 为 `token` 时必填
 
-授权令牌 (必填)。获取方式如下：
+授权令牌。获取方式如下：
 
 1. 在网页中登录你的 NovelAI 账号
 2. 打开控制台 (F12)，并切换到控制台 (Console) 标签页
