@@ -17,6 +17,7 @@ export default defineConfig({
       text: '进阶',
       items: [
         { text: '配置文件', link: '/advanced/config-file' },
+        { text: '自定义回复', link: '/advanced/i18n' },
       ],
     }]
   },
