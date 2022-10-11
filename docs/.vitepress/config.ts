@@ -13,6 +13,11 @@ export default defineConfig({
         { text: '用法', link: '/usage' },
         { text: '配置项', link: '/config' },
       ],
+    }, {
+      text: '进阶',
+      items: [
+        { text: '配置文件', link: '/advanced/config-file' },
+      ],
     }]
   },
   vite: {
