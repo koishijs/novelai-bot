@@ -4,6 +4,7 @@ import {
   crypto_pwhash_ALG_ARGON2ID13, crypto_pwhash_SALTBYTES, ready,
 } from 'libsodium-wrappers'
 
+const MAX_OUTPUT_SIZE = 1048576
 const MAX_CONTENT_SIZE = 10485760
 const ALLOWED_TYPES = ['jpeg', 'png']
 
@@ -126,5 +127,56 @@ export async function login(ctx: Context) {
     return ctx.http.post(ctx.config.endpoint + '/user/login', {
       key: await calcAccessKey(ctx.config.email, ctx.config.password),
     }).catch(LoginError.catch({ 401: '.invalid-password' })).then(res => res.accessToken)
+  }
+}
+
+export function closestMultiple(num: number, mult: number) {
+  const numInt = num
+  const floor = Math.floor(numInt / mult) * mult
+  const ceil = Math.ceil(numInt / mult) * mult
+  const closest = numInt - floor < ceil - numInt ? floor : ceil
+  if (Number.isNaN(closest)) return 0
+  return closest <= 0 ? mult : closest
+}
+
+export interface Size {
+  width: number
+  height: number
+}
+
+export function resizeInput(size: Size): Size {
+  // if width and height produce a valid size, use it
+  const { width, height } = size
+  if (width % 64 === 0 && height % 64 === 0 && width * height <= MAX_OUTPUT_SIZE) {
+    return { width, height }
+  }
+
+  // otherwise, set lower size as 512 and use aspect ratio to the other dimension
+  const aspectRatio = width / height
+  if (aspectRatio > 1) {
+    const height = 512
+    const width = closestMultiple(height * aspectRatio, 64)
+    // check that image is not too large
+    if (width * height <= MAX_OUTPUT_SIZE) {
+      return { width, height }
+    }
+  } else {
+    const width = 512
+    const height = closestMultiple(width / aspectRatio, 64)
+    // check that image is not too large
+    if (width * height <= MAX_OUTPUT_SIZE) {
+      return { width, height }
+    }
+  }
+
+  // if that fails set the higher size as 1024 and use aspect ratio to the other dimension
+  if (aspectRatio > 1) {
+    const width = 1024
+    const height = closestMultiple(width / aspectRatio, 64)
+    return { width, height }
+  } else {
+    const height = 1024
+    const width = closestMultiple(height * aspectRatio, 64)
+    return { width, height }
   }
 }

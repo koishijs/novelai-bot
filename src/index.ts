@@ -1,5 +1,5 @@
 import { Context, Dict, Logger, Quester, Schema, segment, Session, Time } from 'koishi'
-import { download, headers, login, LoginError } from './utils'
+import { download, headers, login, LoginError, resizeInput } from './utils'
 import getImageSize from 'image-size'
 
 export const reactive = true
@@ -206,24 +206,30 @@ export function apply(ctx: Context, config: Config) {
           steps: options.steps ?? 50,
         })
         if (options.enhance) {
+          if (size.width + size.height !== 1280) {
+            return session.text('.invalid-size')
+          }
           Object.assign(parameters, {
             height: size.height * 1.5,
             width: size.width * 1.5,
             noise: 0,
             strength: 0.2,
           })
+        } else {
+          const orient = resizeInput(size)
+          Object.assign(parameters, {
+            height: orient.height,
+            width: orient.width,
+            noise: 0.2,
+            strength: 0.7,
+          })
         }
       } else {
         Object.assign(parameters, {
-          scale: options.scale ?? 12,
-          steps: options.steps ?? 28,
-        })
-      }
-
-      if (!options.enhance) {
-        Object.assign(parameters, {
           height: orient.height,
           width: orient.width,
+          scale: options.scale ?? 12,
+          steps: options.steps ?? 28,
           noise: 0.2,
           strength: 0.7,
         })
