@@ -32,7 +32,7 @@ const orients = Object.keys(orientMap) as Orient[]
 const samplers = ['k_euler_ancestral', 'k_euler', 'k_lms', 'plms', 'ddim'] as const
 
 export interface Config {
-  type: 'token'
+  type: 'token' | 'login' | 'naifu'
   token: string
   email: string
   password: string
@@ -54,17 +54,25 @@ export const Config = Schema.intersect([
     type: Schema.union([
       Schema.const('token' as const).description('授权令牌'),
       Schema.const('login' as const).description('账号密码'),
+      Schema.const('naifu' as const).description('NAIFU'),
     ] as const).description('登录方式'),
-  }),
+  }).description('登录设置'),
   Schema.union([
     Schema.object({
       type: Schema.const('token' as const),
       token: Schema.string().description('授权令牌。').role('secret').required(),
+      endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
     }),
     Schema.object({
       type: Schema.const('login' as const),
       email: Schema.string().description('用户名。').required(),
       password: Schema.string().description('密码。').role('secret').required(),
+      endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
+    }),
+    Schema.object({
+      type: Schema.const('naifu' as const),
+      token: Schema.string().description('授权令牌。').role('secret'),
+      endpoint: Schema.string().description('API 服务器地址。').required(),
     }),
   ] as const),
   Schema.object({
@@ -75,11 +83,10 @@ export const Config = Schema.intersect([
     allowAnlas: Schema.boolean().default(true).description('是否允许使用点数。禁用后部分功能 (图片增强和手动设置某些参数) 将无法使用。'),
     basePrompt: Schema.string().description('默认的附加标签。').default('masterpiece, best quality'),
     forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
-    endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
     requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute * 0.5),
     recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
     maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 以禁用此功能)。').default(0),
-  }),
+  }).description('功能设置'),
 ] as const) as Schema<Config>
 
 function errorHandler(session: Session, err: Error) {
@@ -252,14 +259,17 @@ export function apply(ctx: Context, config: Config) {
       }
 
       try {
-        const art = await ctx.http.axios(config.endpoint + '/ai/generate-image', {
+        const path = config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
+        const art = await ctx.http.axios(config.endpoint + path, {
           method: 'POST',
           timeout: config.requestTimeout,
           headers: {
             ...headers,
             authorization: 'Bearer ' + token,
           },
-          data: { model, input, parameters },
+          data: config.type === 'naifu'
+            ? { ...parameters, prompt: input }
+            : { model, input, parameters },
         }).then(res => {
           return res.data.substr(27, res.data.length)
         })

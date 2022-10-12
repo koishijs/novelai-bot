@@ -128,12 +128,12 @@ export interface Subscription {
 }
 
 export async function login(ctx: Context) {
-  if (ctx.config.type !== 'login') {
+  if (ctx.config.type === 'token') {
     await ctx.http.get<Subscription>(ctx.config.endpoint + '/user/subscription', {
       headers: { authorization: 'Bearer ' + ctx.config.token },
     }).catch(LoginError.catch({ 401: '.invalid-token' }))
     return ctx.config.token
-  } else {
+  } else if (ctx.config.type === 'login') {
     return ctx.http.post(ctx.config.endpoint + '/user/login', {
       key: await calcAccessKey(ctx.config.email, ctx.config.password),
     }).catch(LoginError.catch({ 401: '.invalid-password' })).then(res => res.accessToken)
