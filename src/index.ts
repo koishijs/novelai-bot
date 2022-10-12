@@ -96,6 +96,7 @@ function errorHandler(session: Session, err: Error) {
 export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh', require('./locales/zh'))
   ctx.i18n.define('zh-tw', require('./locales/zh-tw'))
+  ctx.i18n.define('en', require('./locales/en'))
 
   let forbidden: string[]
   const states: Dict<Set<string>> = Object.create(null)
