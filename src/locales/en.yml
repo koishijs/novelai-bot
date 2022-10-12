@@ -2,8 +2,8 @@ commands:
   novelai:
     description: Generate Images from Novel AI
     usage: |-
-      Enter command with English tags, e.g. blonde hair, red eyes, white dress, etc.
-      You can use tags like tags on Danbooru.
+      Enter /novelai with English prompt or tags, e.g. a girl in the forest, blonde hair, red eyes, white dress, etc.
+      You can also use comma separated tags like those on Danbooru.
       Star it: https://github.com/koishijs/novelai-bot
 
     options:
