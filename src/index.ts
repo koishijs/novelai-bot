@@ -140,6 +140,7 @@ export function apply(ctx: Context, config: Config) {
     .option('strength', '-N <strength:number>', { hidden })
     .option('anatomy', '-a, --strict-anatomy', { value: true, hidden: () => ctx.config.anatomy })
     .option('anatomy', '-A, --loose-anatomy', { value: false, hidden: () => !ctx.config.anatomy })
+    .option('uc', '-u <uc:string>')
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
@@ -207,6 +208,7 @@ export function apply(ctx: Context, config: Config) {
       if (config.basePrompt) prompts.push(config.basePrompt)
       input = prompts.join(', ')
 
+      undesired.push(options.uc)
       const parameters: Dict = {
         seed,
         n_samples: 1,
