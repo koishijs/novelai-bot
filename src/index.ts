@@ -1,5 +1,6 @@
 import { Context, Dict, Logger, Quester, Schema, segment, Session, Time } from 'koishi'
 import { download, headers, login, LoginError, resizeInput } from './utils'
+import {} from '@koishijs/plugin-help'
 import getImageSize from 'image-size'
 
 export const reactive = true
@@ -204,7 +205,12 @@ export function apply(ctx: Context, config: Config) {
       }
 
       if (imgUrl) {
-        const image = Buffer.from(await download(ctx, imgUrl))
+        let image: Buffer
+        try {
+          image = Buffer.from(await download(ctx, imgUrl))
+        } catch (err) {
+          return session.text('.download-error')
+        }
         const size = getImageSize(image)
         Object.assign(parameters, {
           image: image.toString('base64'),

@@ -28,6 +28,7 @@ commands:
       waiting: 在画了在画了
       nickname: AI 画师
       invalid-size: 增强功能仅适用于被生成的图片。普通的 img2img 请直接使用「约稿」而不是「增强」。
+      download-error: 图片解析失败。
       unknown-error: 发生未知错误。
       response-error: 发生未知错误 ({0})。
       invalid-password: 邮箱或密码错误。

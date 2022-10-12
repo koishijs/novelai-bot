@@ -6,20 +6,30 @@ import {
 
 const MAX_OUTPUT_SIZE = 1048576
 const MAX_CONTENT_SIZE = 10485760
-const ALLOWED_TYPES = ['jpeg', 'png']
+const ALLOWED_TYPES = ['image/jpeg', 'image/png']
 
 export async function download(ctx: Context, url: string, headers = {}): Promise<ArrayBuffer> {
-  const head = await ctx.http.head(url, { headers })
-
-  if (+head['content-length'] > MAX_CONTENT_SIZE) {
-    throw new Error('file too large')
+  if (url.startsWith('data:')) {
+    const [, type, base64] = url.match(/^data:(image\/\w+);base64,(.*)$/)
+    if (!ALLOWED_TYPES.includes(type)) {
+      throw new Error('unsupported image type')
+    }
+    const binary = atob(base64)
+    const result = new Uint8Array(binary.length)
+    for (let i = 0; i < binary.length; i++) {
+      result[i] = binary.charCodeAt(i)
+    }
+    return result
+  } else {
+    const head = await ctx.http.head(url, { headers })
+    if (+head['content-length'] > MAX_CONTENT_SIZE) {
+      throw new Error('file too large')
+    }
+    if (ALLOWED_TYPES.includes(head['content-type'])) {
+      throw new Error('unsupported file type')
+    }
+    return ctx.http.get(url, { responseType: 'arraybuffer', headers })
   }
-
-  if (ALLOWED_TYPES.every(t => head['content-type'].includes(t))) {
-    throw new Error('unsupported file type')
-  }
-
-  return ctx.http.get(url, { responseType: 'arraybuffer', headers })
 }
 
 export async function calcAccessKey(email: string, password: string) {
