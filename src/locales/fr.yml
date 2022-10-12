@@ -22,14 +22,14 @@ commands:
     messages:
       expect-prompt: Attendrez-vous une description textuelle valide.
       expect-image: Attendrez-vous une image.
-      invalid-input: Invalid prompt, only English words can be used.
-      forbidden-word: Forbidden words in prompt.
-      concurrent-jobs: Please wait and retry later.
-      waiting: Request queued, please wait for generation
+      invalid-input: L'description textuelle n'est pas valide, vous ne pouvez utiliser que des mots anglais.
+      forbidden-word: L'description textuelle contient des mots prohibés.
+      concurrent-jobs: Veuillez attendre et réessayer plus tard
+      waiting: Votre demande est en cours de génération, veuillez patienter un moment.
       nickname: Novel AI
-      invalid-size: The Enhance mode can only be used for images generated. Use /novelai without enhance option if you are using normal img2img.
-      unknown-error: An unknown error occurred.
-      response-error: An unknown error occurred ({0}).
-      invalid-password: Incorrect email address or password.
-      invalid-token: The token is invalid or expired. Please contact your administrator.
-      unauthorized: The token is unauthorized, this happens while your account has no a valid subscription. Please contact your administrator.
+      invalid-size: Le mode d'amélioration de l'image ne peut être utilisé que pour les images générées. Si vous utilisez le mode de img2img, Utilisez « /novelai » sans l'option « --enhance ».
+      unknown-error: Une erreur inconnue s'est produite.
+      response-error: "Une erreur inconnue s'est produite : ({0})."
+      invalid-password: Le adresse e-mail ou mot de passe introduit est incorrect.
+      invalid-token: Le token est invalide ou a expiré. Veuillez contacter l'administrateur.
+      unauthorized: Le token n'est pas autorisé, peut-être que ce token n'a pas d'abonnement valide. Veuillez contacter l'administrateur.
