@@ -31,6 +31,7 @@ commands:
       download-error: 图片解析失败。
       unknown-error: 发生未知错误。
       response-error: 发生未知错误 ({0})。
+      request-timeout: 请求超时。
       invalid-password: 邮箱或密码错误。
       invalid-token: 令牌无效或已过期，请联系管理员。
       unauthorized: 令牌未授权，可能需要续费，请联系管理员。

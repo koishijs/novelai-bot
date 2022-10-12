@@ -88,6 +88,10 @@ function errorHandler(session: Session, err: Error) {
       return session.text('.unauthorized')
     } else if (err.response?.status) {
       return session.text('.response-error', [err.response.status])
+    } else if (err.code === 'ETIMEDOUT') {
+      return session.text('.request-timeout')
+    } else if (err.code) {
+      return session.text('.response-error', [err.code])
     }
   }
   logger.error(err)
