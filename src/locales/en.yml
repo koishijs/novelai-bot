@@ -28,8 +28,13 @@ commands:
       waiting: Request queued, please wait for generation
       nickname: Novel AI
       invalid-size: The Enhance mode can only be used for images generated. Use /novelai without enhance option if you are using normal img2img.
+      file-too-large: File is too large.
+      unsupported-file-type: Unsupported file type.
+      download-error: Parsing image failed.
       unknown-error: An unknown error occurred.
       response-error: An unknown error occurred ({0}).
+      request-failed: Request failed ({0}).
+      request-timeout: Request timeout.
       invalid-password: Incorrect email address or password.
       invalid-token: The token is invalid or expired. Please contact your administrator.
       unauthorized: The token is unauthorized, this happens while your account has no a valid subscription. Please contact your administrator.
