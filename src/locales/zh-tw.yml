@@ -28,9 +28,12 @@ commands:
       waiting: 少女繪畫中
       nickname: AI 繪師
       invalid-size: 增強功能僅適用於 Novel AI 生成圖。若要使用 img2img 功能請直接使用「約稿」而非「增強」。
+      file-too-large: 文件體積過大。
+      unsupported-file-type: 不支持的文件格式。
       download-error: 圖片解析失敗。
       unknown-error: 發生未知的錯誤。
       response-error: 發生未知的錯誤 ({0})。
+      request-failed: 請求失敗 ({0})。
       request-timeout: 請求超時。
       invalid-password: 電郵地址或密碼不正確。
       invalid-token: 令牌無效或已過期，請聯繫管理員。

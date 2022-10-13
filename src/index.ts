@@ -1,5 +1,5 @@
 import { Context, Dict, Logger, Quester, Schema, segment, Session, Time } from 'koishi'
-import { download, headers, login, LoginError, resizeInput } from './utils'
+import { download, headers, login, NetworkError, resizeInput } from './utils'
 import {} from '@koishijs/plugin-help'
 import getImageSize from 'image-size'
 
@@ -98,7 +98,7 @@ function errorHandler(session: Session, err: Error) {
     } else if (err.code === 'ETIMEDOUT') {
       return session.text('.request-timeout')
     } else if (err.code) {
-      return session.text('.response-error', [err.code])
+      return session.text('.request-failed', [err.code])
     }
   }
   logger.error(err)
@@ -178,8 +178,8 @@ export function apply(ctx: Context, config: Config) {
       try {
         token = await getToken()
       } catch (err) {
-        if (err instanceof LoginError) {
-          return session.text(err.message, [err.code])
+        if (err instanceof NetworkError) {
+          return session.text(err.message, err.params)
         }
         logger.error(err)
         return session.text('.unknown-error')
@@ -220,8 +220,13 @@ export function apply(ctx: Context, config: Config) {
         try {
           image = Buffer.from(await download(ctx, imgUrl))
         } catch (err) {
+          if (err instanceof NetworkError) {
+            return session.text(err.message, err.params)
+          }
+          logger.error(err)
           return session.text('.download-error')
         }
+
         const size = getImageSize(image)
         Object.assign(parameters, {
           image: image.toString('base64'),
