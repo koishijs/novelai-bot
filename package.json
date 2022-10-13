@@ -32,7 +32,8 @@
     "description": {
       "en": "Generate images by [NovelAI](https://novelai.net/)",
       "zh": "基于 [NovelAI](https://novelai.net/) 的画图插件",
-      "zh-TW": "基於 [NovelAI](https://novelai.net/) 的畫圖插件"
+      "zh-TW": "基於 [NovelAI](https://novelai.net/) 的畫圖插件",
+      "fr": "Générer des images sur [Novel AI](https://novelai.net)"
     }
   },
   "keywords": [
