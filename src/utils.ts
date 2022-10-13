@@ -3,6 +3,7 @@ import {
   crypto_generichash, crypto_pwhash,
   crypto_pwhash_ALG_ARGON2ID13, crypto_pwhash_SALTBYTES, ready,
 } from 'libsodium-wrappers'
+import { Subscription } from './types'
 
 const MAX_OUTPUT_SIZE = 1048576
 const MAX_CONTENT_SIZE = 10485760
@@ -85,46 +86,6 @@ export class NetworkError extends Error {
     }
     throw e
   }
-}
-
-export interface Perks {
-  maxPriorityActions: number
-  startPriority: number
-  contextTokens: number
-  moduleTrainingSteps: number
-  unlimitedMaxPriority: boolean
-  voiceGeneration: boolean
-  imageGeneration: boolean
-  unlimitedImageGeneration: boolean
-  unlimitedImageGenerationLimits: {
-    resolution: number
-    maxPrompts: number
-  }[]
-}
-
-export interface PaymentProcessorData {
-  c: string
-  n: number
-  o: string
-  p: number
-  r: string
-  s: string
-  t: number
-  u: string
-}
-
-export interface TrainingStepsLeft {
-  fixedTrainingStepsLeft: number
-  purchasedTrainingSteps: number
-}
-
-export interface Subscription {
-  tier: number
-  active: boolean
-  expiresAt: number
-  perks: Perks
-  paymentProcessorData: PaymentProcessorData
-  trainingStepsLeft: TrainingStepsLeft
 }
 
 export async function login(ctx: Context): Promise<string> {

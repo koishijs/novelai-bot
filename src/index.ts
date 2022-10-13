@@ -184,6 +184,15 @@ export function apply(ctx: Context, config: Config) {
         return session.text('.invalid-input')
       }
 
+      // extract negative prompts
+      const undesired = [lowQuality]
+      if (options.anatomy ?? config.anatomy) undesired.push(badAnatomy)
+      const capture = input.match(/^negative prompt: ([\s\S]+)/m)
+      if (capture) {
+        input = input.slice(0, capture.index)
+        undesired.push(capture[1])
+      }
+
       // remove forbidden words
       input = input.split(/, /g).filter((word) => {
         word = word.replace(/[^a-z0-9]+/g, ' ').trim()
@@ -220,8 +229,6 @@ export function apply(ctx: Context, config: Config) {
 
       const model = modelMap[options.model]
       const orient = orientMap[options.orient]
-      const undesired = [lowQuality]
-      if (options.anatomy ?? config.anatomy) undesired.push(badAnatomy)
       const seed = options.seed || Math.round(new Date().getTime() / 1000)
       session.send(session.text('.waiting'))
 
