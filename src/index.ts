@@ -105,15 +105,30 @@ function errorHandler(session: Session, err: Error) {
   return session.text('.unknown-error')
 }
 
+interface Forbidden {
+  pattern: string
+  strict: boolean
+}
+
 export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh', require('./locales/zh'))
   ctx.i18n.define('zh-tw', require('./locales/zh-tw'))
 
-  let forbidden: string[]
+  let forbidden: Forbidden[]
   const states: Dict<Set<string>> = Object.create(null)
 
   ctx.accept(['forbidden'], (config) => {
-    forbidden = config.forbidden.trim().toLowerCase().split(/\W+/g).filter(Boolean)
+    forbidden = config.forbidden.trim()
+      .toLowerCase()
+      .replace(/，/g, ',')
+      .split(/(?:,\s*|\s*\n\s*)/g)
+      .filter(Boolean)
+      .map((pattern: string) => {
+        const strict = pattern.endsWith('!')
+        if (strict) pattern = pattern.slice(0, -1)
+        pattern = pattern.replace(/[^a-z0-9]+/g, ' ').trim()
+        return { pattern, strict }
+      })
   }, { immediate: true })
 
   let tokenTask: Promise<string> = null
@@ -169,10 +184,18 @@ export function apply(ctx: Context, config: Config) {
         return session.text('.invalid-input')
       }
 
-      const words = input.split(/\W+/g).filter(word => forbidden.includes(word))
-      if (words.length) {
-        return session.text('.forbidden-word', [words.join(', ')])
-      }
+      // remove forbidden words
+      input = input.split(/, /g).filter((word) => {
+        word = word.replace(/[^a-z0-9]+/g, ' ').trim()
+        for (const { pattern, strict } of forbidden) {
+          if (strict && word.split(/\W+/g).includes(pattern)) {
+            return false
+          } else if (!strict && word.includes(pattern)) {
+            return false
+          }
+        }
+        return true
+      }).join(', ')
 
       let token: string
       try {
