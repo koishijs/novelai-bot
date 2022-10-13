@@ -1,6 +1,6 @@
 commands:
   novelai:
-    description: Générer des images à Novel AI
+    description: Générer des images sur Novel AI
     usage: |-
       Entrez /novelai avec une description textuelle (Prompt) ou des balises. Par ex. a girl in the forest, blonde hair, red eyes, white dress.
       Vous pouvez utiliser des balises séparées par des virgules, comme sur Danbooru.
@@ -33,6 +33,8 @@ commands:
       download-error: Erreur d'analyse syntaxique de l'image
       unknown-error: Une erreur inconnue s'est produite.
       response-error: "Une erreur inconnue s'est produite : ({0})."
+      request-failed: La demande a échoué.
+      request-timeout: Délai d'attente de la demande dépassé.
       invalid-password: Le adresse e-mail ou mot de passe introduit est incorrect.
       invalid-token: Le token est invalide ou a expiré. Veuillez contacter l'administrateur.
       unauthorized: Le token n'est pas autorisé, peut-être que ce token n'a pas d'abonnement valide. Veuillez contacter l'administrateur.
