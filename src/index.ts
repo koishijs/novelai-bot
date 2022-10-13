@@ -114,6 +114,7 @@ export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh', require('./locales/zh'))
   ctx.i18n.define('zh-tw', require('./locales/zh-tw'))
   ctx.i18n.define('en', require('./locales/en'))
+  ctx.i18n.define('fr', require('./locales/fr'))
 
   let forbidden: Forbidden[]
   const states: Dict<Set<string>> = Object.create(null)

@@ -1,0 +1,40 @@
+commands:
+  novelai:
+    description: Générer des images sur Novel AI
+    usage: |-
+      Entrez « /novelai » avec une description textuelle (prompt) ou des balises. Par ex. a girl in the forest, blonde hair, red eyes, white dress.
+      Vous pouvez utiliser des balises séparées par des virgules, comme sur Danbooru.
+      Donnez-lui une étoile : https://github.com/koishijs/novelai-bot
+
+    options:
+      enhance: Mode d'amélioration de l'image
+      model: Définir le modèle pour génération (safe, nai, furry)
+      orient: Définir l'orientation de l'image (portrait, landscape, square)
+      sampler: Définir l'échantillonneur (k_euler_ancestral, k_euler, k_lms, plms, ddim)
+      anatomy.true: Filtrer les images anatomiquement incorrectes
+      anatomy.false: Autoriser les images anatomiquement incorrectes
+      seed: Définir une graine aléatoire
+      steps: Définir les étapes de l'itération
+      scale: Définir CFG Scale
+      strength: Définir l'intensité de débruitage
+      noise: Définir l'intensité du bruit
+
+    messages:
+      expect-prompt: Attendrez-vous une description textuelle valide.
+      expect-image: Attendrez-vous une image.
+      invalid-input: L'description textuelle n'est pas valide, vous ne pouvez utiliser que des mots anglais.
+      forbidden-word: L'description textuelle contient des mots prohibés.
+      concurrent-jobs: Veuillez attendre et réessayer plus tard
+      waiting: Votre demande est en cours de génération, veuillez patienter un moment.
+      nickname: Novel AI
+      invalid-size: Le mode d'amélioration de l'image peut être utilisé seulement pour les images générées. Si vous utilisez le mode de img2img, Utilisez « /novelai » sans l'option « --enhance ».
+      file-too-large: Le fichier est trop important.
+      unsupported-file-type: Format de fichier non reconnu.
+      download-error: Erreur d'analyse syntaxique de l'image
+      unknown-error: Une erreur inconnue s'est produite.
+      response-error: "Une erreur inconnue s'est produite : ({0})."
+      request-failed: La demande a échoué.
+      request-timeout: Délai d'attente de la demande dépassé.
+      invalid-password: Le adresse e-mail ou mot de passe introduit est incorrect.
+      invalid-token: Le token est invalide ou a expiré. Veuillez contacter l'administrateur.
+      unauthorized: Le token n'est pas autorisé, peut-être que ce token n'a pas d'abonnement valide. Veuillez contacter l'administrateur.
