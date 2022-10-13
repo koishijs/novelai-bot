@@ -28,8 +28,13 @@ commands:
       waiting: 在画了在画了
       nickname: AI 画师
       invalid-size: 增强功能仅适用于被生成的图片。普通的 img2img 请直接使用「约稿」而不是「增强」。
+      file-too-large: 文件体积过大。
+      unsupported-file-type: 不支持的文件格式。
+      download-error: 图片解析失败。
       unknown-error: 发生未知错误。
       response-error: 发生未知错误 ({0})。
+      request-failed: 请求失败 ({0})。
+      request-timeout: 请求超时。
       invalid-password: 邮箱或密码错误。
       invalid-token: 令牌无效或已过期，请联系管理员。
       unauthorized: 令牌未授权，可能需要续费，请联系管理员。
