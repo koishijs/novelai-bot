@@ -2,7 +2,7 @@ commands:
   novelai:
     description: Générer des images sur Novel AI
     usage: |-
-      Entrez /novelai avec une description textuelle (Prompt) ou des balises. Par ex. a girl in the forest, blonde hair, red eyes, white dress.
+      Entrez « /novelai » avec une description textuelle (prompt) ou des balises. Par ex. a girl in the forest, blonde hair, red eyes, white dress.
       Vous pouvez utiliser des balises séparées par des virgules, comme sur Danbooru.
       Donnez-lui une étoile : https://github.com/koishijs/novelai-bot
 
