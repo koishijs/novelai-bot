@@ -28,6 +28,9 @@ commands:
       waiting: Votre demande est en cours de génération, veuillez patienter un moment.
       nickname: Novel AI
       invalid-size: Le mode d'amélioration de l'image ne peut être utilisé que pour les images générées. Si vous utilisez le mode de img2img, Utilisez « /novelai » sans l'option « --enhance ».
+      file-too-large: Le fichier est trop important.
+      unsupported-file-type: Format de fichier non reconnu.
+      download-error: Erreur d'analyse syntaxique de l'image
       unknown-error: Une erreur inconnue s'est produite.
       response-error: "Une erreur inconnue s'est produite : ({0})."
       invalid-password: Le adresse e-mail ou mot de passe introduit est incorrect.
