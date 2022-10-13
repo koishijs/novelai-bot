@@ -187,9 +187,9 @@ export function apply(ctx: Context, config: Config) {
       // extract negative prompts
       const undesired = [lowQuality]
       if (options.anatomy ?? config.anatomy) undesired.push(badAnatomy)
-      const capture = input.match(/^negative prompt: ([\s\S]+)/m)
+      const capture = input.match(/(?:^|,\s*)negative prompts?:([\s\S]+)/m)
       if (capture) {
-        input = input.slice(0, capture.index)
+        input = input.slice(0, capture.index).trim()
         undesired.push(capture[1])
       }
 
