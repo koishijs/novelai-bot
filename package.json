@@ -20,7 +20,7 @@
   "bugs": {
     "url": "https://github.com/koishijs/koishi-plugin-novelai/issues"
   },
-  "homepage": "https://github.com/koishijs/koishi-plugin-novelai",
+  "homepage": "https://bot.novelai.dev",
   "scripts": {
     "build": "atsc -b",
     "docs:dev": "vitepress dev docs",

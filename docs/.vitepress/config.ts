@@ -41,6 +41,10 @@ export default defineConfig({
       message: `Released under the MIT License.`,
       copyright: 'Copyright © 2022-present Shigma & Ninzore',
     },
+
+    editLink: {
+      pattern: 'https://github.com/koishijs/novelai-bot/edit/master/docs/:path',
+    },
   },
 
   vite: {
