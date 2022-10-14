@@ -236,7 +236,11 @@ export function apply(ctx: Context, config: Config) {
 
       const prompts = []
       if (input) prompts.push(input)
-      if (config.basePrompt) prompts.push(config.basePrompt)
+
+      // Only append base prompt when `input` did not include it.
+      if (config.basePrompt && !config.basePrompt.split(/[,\s]+/).every((word) => prompt.includes(word))) {
+        prompts.push(config.basePrompt)
+      }
       input = prompts.join(', ')
 
       const parameters: Dict = {
