@@ -238,7 +238,7 @@ export function apply(ctx: Context, config: Config) {
       if (input) prompts.push(input)
 
       // Only append base prompt when `input` did not include it.
-      if (config.basePrompt && !config.basePrompt.split(/[,\s]+/).every((word) => prompt.includes(word))) {
+      if (config.basePrompt && !config.basePrompt.split(/[,\s]+/).every((word) => input.includes(word))) {
         prompts.push(config.basePrompt)
       }
       input = prompts.join(', ')
