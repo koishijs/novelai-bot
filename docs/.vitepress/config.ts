@@ -24,6 +24,12 @@ export default defineConfig({
         { text: '部署到公网', link: '/advanced/server' },
       ],
     }, {
+      text: 'FAQ',
+      items: [
+        { text: '插件相关', link: '/faq/network' },
+        { text: '适配器相关', link: '/faq/adapter' },
+      ],
+    }, {
       text: '更多',
       items: [
         { text: 'Koishi', link: 'https://koishi.chat' },
