@@ -126,7 +126,8 @@ export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('fr', require('./locales/fr'))
 
   let forbidden: Forbidden[]
-  const states: Dict<Set<string>> = Object.create(null)
+  const tasks: Dict<Set<string>> = Object.create(null)
+  const globalTasks = new Set<string>()
 
   ctx.accept(['forbidden'], (config) => {
     forbidden = config.forbidden.trim()
@@ -235,21 +236,10 @@ export function apply(ctx: Context, config: Config) {
         return session.text('.unknown-error')
       }
 
-      const id = Math.random().toString(36).slice(2)
-      if (config.maxConcurrency) {
-        states[session.cid] ||= new Set()
-        if (states[session.cid].size >= config.maxConcurrency) {
-          return session.text('.concurrent-jobs')
-        } else {
-          states[session.cid].add(id)
-        }
-      }
-
       const model = modelMap[options.model]
       const orient = orientMap[options.orient]
       // seed can be up to 2^32
       const seed = options.seed || Math.floor(Math.random() * Math.pow(2, 32))
-      session.send(session.text('.waiting'))
 
       const parameters: Dict = {
         seed,
@@ -307,6 +297,21 @@ export function apply(ctx: Context, config: Config) {
         })
       }
 
+      const id = Math.random().toString(36).slice(2)
+      globalTasks.add(id)
+      if (config.maxConcurrency) {
+        const store = tasks[session.cid] ||= new Set()
+        if (store.size >= config.maxConcurrency) {
+          return session.text('.concurrent-jobs')
+        } else {
+          store.add(id)
+        }
+      }
+
+      session.send(globalTasks.size > 1
+        ? session.text('.pending', [globalTasks.size - 1])
+        : session.text('.waiting'))
+
       try {
         const path = config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
         const art = await ctx.http.axios(trimSlash(config.endpoint) + path, {
@@ -347,7 +352,8 @@ export function apply(ctx: Context, config: Config) {
       } catch (err) {
         return errorHandler(session, err)
       } finally {
-        states[session.cid]?.delete(id)
+        tasks[session.cid]?.delete(id)
+        globalTasks.delete(id)
       }
     })
 
