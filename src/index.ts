@@ -206,7 +206,7 @@ export function apply(ctx: Context, config: Config) {
       }
 
       // remove forbidden words
-      input = input.split(/, /g).filter((word) => {
+      const words = input.split(/, /g).filter((word) => {
         word = word.replace(/[^a-z0-9]+/g, ' ').trim()
         for (const { pattern, strict } of forbidden) {
           if (strict && word.split(/\W+/g).includes(pattern)) {
@@ -216,7 +216,14 @@ export function apply(ctx: Context, config: Config) {
           }
         }
         return true
-      }).join(', ')
+      })
+
+      // append base prompt when input does not include it
+      for (let tag of config.basePrompt.split(/,\s*/g)) {
+        tag = tag.trim().toLowerCase()
+        if (tag && !words.includes(tag)) words.push(tag)
+      }
+      input = words.join(', ')
 
       let token: string
       try {
@@ -243,11 +250,6 @@ export function apply(ctx: Context, config: Config) {
       const orient = orientMap[options.orient]
       const seed = options.seed || Math.round(new Date().getTime() / 1000)
       session.send(session.text('.waiting'))
-
-      const prompts = []
-      if (input) prompts.push(input)
-      if (config.basePrompt) prompts.push(config.basePrompt)
-      input = prompts.join(', ')
 
       const parameters: Dict = {
         seed,
