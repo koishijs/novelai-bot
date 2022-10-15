@@ -1,4 +1,4 @@
-import { Context, Dict, Logger, Quester, Schema, segment, Session, Time } from 'koishi'
+import { Context, Dict, Logger, Quester, Schema, segment, Session, Time, trimSlash } from 'koishi'
 import { download, getImageSize, login, NetworkError, resizeInput } from './utils'
 import {} from '@koishijs/plugin-help'
 
@@ -309,7 +309,7 @@ export function apply(ctx: Context, config: Config) {
 
       try {
         const path = config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
-        const art = await ctx.http.axios(config.endpoint + path, {
+        const art = await ctx.http.axios(trimSlash(config.endpoint) + path, {
           method: 'POST',
           timeout: config.requestTimeout,
           headers: {
