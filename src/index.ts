@@ -247,7 +247,8 @@ export function apply(ctx: Context, config: Config) {
 
       const model = modelMap[options.model]
       const orient = orientMap[options.orient]
-      const seed = options.seed || Math.floor(Math.random() * Math.pow(2, 32)) // seed can be up to 2^32
+      // seed can be up to 2^32
+      const seed = options.seed || Math.floor(Math.random() * Math.pow(2, 32))
       session.send(session.text('.waiting'))
 
       const parameters: Dict = {
@@ -324,6 +325,8 @@ export function apply(ctx: Context, config: Config) {
           // data:
           return res.data.slice(27)
         })
+
+        if (!art.trim()) return session.text('.empty-response')
 
         const attrs = {
           userId: session.userId,
