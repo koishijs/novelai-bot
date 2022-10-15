@@ -1,5 +1,5 @@
 import { Context, Dict, Logger, Quester, Schema, segment, Session, Time } from 'koishi'
-import { download, headers, login, NetworkError, resizeInput } from './utils'
+import { download, login, NetworkError, resizeInput } from './utils'
 import {} from '@koishijs/plugin-help'
 import getImageSize from 'image-size'
 
@@ -44,6 +44,7 @@ export interface Config {
   basePrompt?: string
   forbidden?: string
   endpoint?: string
+  headers?: Dict<string>
   requestTimeout?: number
   recallTimeout?: number
   maxConcurrency?: number
@@ -62,17 +63,26 @@ export const Config = Schema.intersect([
       type: Schema.const('token' as const),
       token: Schema.string().description('授权令牌。').role('secret').required(),
       endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
+      headers: Schema.dict(String).description('要附加的额外请求头。').default({
+        'referer': 'https://novelai.net/',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+      }),
     }),
     Schema.object({
       type: Schema.const('login' as const),
       email: Schema.string().description('用户名。').required(),
       password: Schema.string().description('密码。').role('secret').required(),
       endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
+      headers: Schema.dict(String).description('要附加的额外请求头。').default({
+        'referer': 'https://novelai.net/',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+      }),
     }),
     Schema.object({
       type: Schema.const('naifu' as const),
       token: Schema.string().description('授权令牌。').role('secret'),
       endpoint: Schema.string().description('API 服务器地址。').required(),
+      headers: Schema.dict(String).description('要附加的额外请求头。'),
     }),
   ] as const),
   Schema.object({

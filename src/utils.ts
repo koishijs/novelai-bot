@@ -62,14 +62,6 @@ export async function calcEncryptionKey(email: string, password: string) {
     'base64')
 }
 
-export const headers = {
-  authority: 'api.novelai.net',
-  path: '/ai/generate-image',
-  'content-type': 'application/json',
-  referer: 'https://novelai.net/',
-  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
-}
-
 export class NetworkError extends Error {
   constructor(message: string, public params = {}) {
     super(message)
