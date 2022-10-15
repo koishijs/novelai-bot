@@ -1,7 +1,6 @@
 import { Context, Dict, Logger, Quester, Schema, segment, Session, Time } from 'koishi'
-import { download, login, NetworkError, resizeInput } from './utils'
+import { download, getImageSize, login, NetworkError, resizeInput } from './utils'
 import {} from '@koishijs/plugin-help'
-import getImageSize from 'image-size'
 
 export const reactive = true
 export const name = 'novelai'
@@ -54,7 +53,7 @@ export const Config = Schema.intersect([
   Schema.object({
     type: Schema.union([
       Schema.const('token' as const).description('授权令牌'),
-      Schema.const('login' as const).description('账号密码'),
+      ...process.env.KOISHI_ENV === 'browser' ? [] : [Schema.const('login' as const).description('账号密码')],
       Schema.const('naifu' as const).description('NAIFU'),
     ] as const).description('登录方式'),
   }).description('登录设置'),
@@ -260,9 +259,9 @@ export function apply(ctx: Context, config: Config) {
       }
 
       if (imgUrl) {
-        let image: Buffer
+        let image: [ArrayBuffer, string]
         try {
-          image = Buffer.from(await download(ctx, imgUrl))
+          image = await download(ctx, imgUrl)
         } catch (err) {
           if (err instanceof NetworkError) {
             return session.text(err.message, err.params)
@@ -271,9 +270,9 @@ export function apply(ctx: Context, config: Config) {
           return session.text('.download-error')
         }
 
-        const size = getImageSize(image)
+        const size = getImageSize(image[0])
         Object.assign(parameters, {
-          image: image.toString('base64'),
+          image: image[1],
           scale: options.scale ?? 11,
           steps: options.steps ?? 50,
         })

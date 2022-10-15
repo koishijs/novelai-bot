@@ -1,13 +1,16 @@
 {
   "name": "koishi-plugin-novelai",
   "description": "Generate images by NovelAI",
-  "version": "1.7.7",
+  "version": "1.8.6",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
     "lib",
     "dist"
   ],
+  "browser": {
+    "libsodium-wrappers": false
+  },
   "author": "Ninzore <cillerpro@gmail.com>",
   "maintainers": [
     "Shigma <shigma10826@gmail.com>"
