@@ -326,10 +326,10 @@ export function apply(ctx: Context, config: Config) {
         })
 
         const attrs = {
-          userId: session.selfId,
-          nickname: session.text('.nickname'),
+          userId: session.userId,
+          nickname: session.author?.nickname || session.username,
         }
-        const ids = await session.send(segment('message', { forward: true }, [
+        const ids = await session.send(segment('figure', [
           segment('message', attrs, `seed = ${seed}`),
           segment('message', attrs, `prompt = ${input}`),
           segment('message', attrs, segment.image('base64://' + art)),
