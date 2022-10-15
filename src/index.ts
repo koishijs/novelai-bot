@@ -199,7 +199,7 @@ export function apply(ctx: Context, config: Config) {
       // extract negative prompts
       const undesired = [lowQuality]
       if (options.anatomy ?? config.anatomy) undesired.push(badAnatomy)
-      const capture = input.match(/(?:^|,\s*)negative prompts?:([\s\S]+)/m)
+      const capture = input.match(/(?:,?\s*)negative prompts?:([\s\S]+)/m)
       if (capture) {
         input = input.slice(0, capture.index).trim()
         undesired.push(capture[1])
@@ -311,14 +311,17 @@ export function apply(ctx: Context, config: Config) {
           method: 'POST',
           timeout: config.requestTimeout,
           headers: {
-            ...headers,
+            ...config.headers,
             authorization: 'Bearer ' + token,
           },
           data: config.type === 'naifu'
             ? { ...parameters, prompt: input }
             : { model, input, parameters },
-        }).then(res => {
-          return res.data.substr(27, res.data.length)
+        }).then((res) => {
+          // event: newImage
+          // id: 1
+          // data:
+          return res.data.slice(27)
         })
 
         const attrs = {
