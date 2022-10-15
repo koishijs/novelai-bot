@@ -1,5 +1,5 @@
 import { Context, Dict, Logger, Quester, Schema, segment, Session, Time } from 'koishi'
-import { download, headers, login, NetworkError, resizeInput } from './utils'
+import { download, login, NetworkError, resizeInput } from './utils'
 import {} from '@koishijs/plugin-help'
 import getImageSize from 'image-size'
 
@@ -44,6 +44,7 @@ export interface Config {
   basePrompt?: string
   forbidden?: string
   endpoint?: string
+  headers?: Dict<string>
   requestTimeout?: number
   recallTimeout?: number
   maxConcurrency?: number
@@ -62,17 +63,26 @@ export const Config = Schema.intersect([
       type: Schema.const('token' as const),
       token: Schema.string().description('授权令牌。').role('secret').required(),
       endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
+      headers: Schema.dict(String).description('要附加的额外请求头。').default({
+        'referer': 'https://novelai.net/',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+      }),
     }),
     Schema.object({
       type: Schema.const('login' as const),
       email: Schema.string().description('用户名。').required(),
       password: Schema.string().description('密码。').role('secret').required(),
       endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
+      headers: Schema.dict(String).description('要附加的额外请求头。').default({
+        'referer': 'https://novelai.net/',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+      }),
     }),
     Schema.object({
       type: Schema.const('naifu' as const),
       token: Schema.string().description('授权令牌。').role('secret'),
       endpoint: Schema.string().description('API 服务器地址。').required(),
+      headers: Schema.dict(String).description('要附加的额外请求头。'),
     }),
   ] as const),
   Schema.object({
@@ -83,7 +93,7 @@ export const Config = Schema.intersect([
     allowAnlas: Schema.boolean().default(true).description('是否允许使用点数。禁用后部分功能 (图片增强和手动设置某些参数) 将无法使用。'),
     basePrompt: Schema.string().description('默认的附加标签。').default('masterpiece, best quality'),
     forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
-    requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute * 0.5),
+    requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute),
     recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
     maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 以禁用此功能)。').default(0),
   }).description('功能设置'),
@@ -189,7 +199,7 @@ export function apply(ctx: Context, config: Config) {
       // extract negative prompts
       const undesired = [lowQuality]
       if (options.anatomy ?? config.anatomy) undesired.push(badAnatomy)
-      const capture = input.match(/(?:^|,\s*)negative prompts?:([\s\S]+)/m)
+      const capture = input.match(/(?:,?\s*)negative prompts?:([\s\S]+)/m)
       if (capture) {
         input = input.slice(0, capture.index).trim()
         undesired.push(capture[1])
@@ -305,14 +315,17 @@ export function apply(ctx: Context, config: Config) {
           method: 'POST',
           timeout: config.requestTimeout,
           headers: {
-            ...headers,
+            ...config.headers,
             authorization: 'Bearer ' + token,
           },
           data: config.type === 'naifu'
             ? { ...parameters, prompt: input }
             : { model, input, parameters },
-        }).then(res => {
-          return res.data.substr(27, res.data.length)
+        }).then((res) => {
+          // event: newImage
+          // id: 1
+          // data:
+          return res.data.slice(27)
         })
 
         const attrs = {

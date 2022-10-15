@@ -1,4 +1,4 @@
-# koishi-plugin-novelai
+# [koishi-plugin-novelai](https://bot.novelai.dev)
 
 [![downloads](https://img.shields.io/npm/dm/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
 [![npm](https://img.shields.io/npm/v/koishi-plugin-novelai?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-novelai)
@@ -32,7 +32,7 @@
 
 ## 使用教程
 
-搭建教程、使用方法、参数配置、常见问题请见：<https://novelai.koishi.chat>
+搭建教程、使用方法、参数配置、常见问题请见：<https://bot.novelai.dev>
 
 ## License
 
