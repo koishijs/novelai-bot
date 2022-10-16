@@ -66,7 +66,7 @@ negative prompts: loli
 ```
 
 ::: tip
-novelai-bot 同时支持 novelai 格式和 stable diffusion 格式。可以直接把 stable diffusion 的 prompts 拿来用。
+novelai-bot 同时支持 novelai 格式和 stable diffusion webui 格式。可以直接把 stable diffusion webui 的 prompts 拿来用。
 :::
 
 ### 要素混合
