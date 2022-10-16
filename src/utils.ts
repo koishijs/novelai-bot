@@ -24,7 +24,12 @@ export function getImageSize(buffer: ArrayBuffer): Size {
 
 export function arrayBufferToBase64(buffer: ArrayBuffer) {
   if (process.env.KOISHI_ENV === 'browser') {
-    return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+    let result = ''
+    const chunk = 8192
+    for (let index = 0; index < buffer.byteLength; index += chunk) {
+      result += String.fromCharCode.apply(null, buffer.slice(index, index + chunk))
+    }
+    return btoa(result)
   } else {
     return Buffer.from(buffer).toString('base64')
   }
@@ -55,8 +60,7 @@ export async function download(ctx: Context, url: string, headers = {}): Promise
       throw new NetworkError('.unsupported-file-type')
     }
     const buffer = await ctx.http.get(url, { responseType: 'arraybuffer', headers })
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)))
-    return [buffer, base64]
+    return [buffer, arrayBufferToBase64(buffer)]
   }
 }
 
