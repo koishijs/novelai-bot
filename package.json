@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-novelai",
   "description": "Generate images by NovelAI",
-  "version": "1.9.4",
+  "version": "1.9.7",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -9,6 +9,7 @@
     "dist"
   ],
   "browser": {
+    "image-size": false,
     "libsodium-wrappers": false
   },
   "author": "Ninzore <cillerpro@gmail.com>",

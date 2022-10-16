@@ -61,7 +61,7 @@ export const Config = Schema.intersect([
     Schema.object({
       type: Schema.const('token' as const),
       token: Schema.string().description('授权令牌。').role('secret').required(),
-      endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
+      endpoint: Schema.string().description('API 服务器地址。').default('https://backend-production-svc.novelai.net'),
       headers: Schema.dict(String).description('要附加的额外请求头。').default({
         'referer': 'https://novelai.net/',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
@@ -71,7 +71,7 @@ export const Config = Schema.intersect([
       type: Schema.const('login' as const),
       email: Schema.string().description('用户名。').required(),
       password: Schema.string().description('密码。').role('secret').required(),
-      endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
+      endpoint: Schema.string().description('API 服务器地址。').default('https://backend-production-svc.novelai.net'),
       headers: Schema.dict(String).description('要附加的额外请求头。').default({
         'referer': 'https://novelai.net/',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
@@ -150,6 +150,7 @@ export function apply(ctx: Context, config: Config) {
   const hidden = () => !config.allowAnlas
 
   const cmd = ctx.command('novelai <prompts:text>')
+    .alias('nai')
     .shortcut('画画', { fuzzy: true })
     .shortcut('畫畫', { fuzzy: true })
     .shortcut('约稿', { fuzzy: true })
@@ -298,7 +299,6 @@ export function apply(ctx: Context, config: Config) {
       }
 
       const id = Math.random().toString(36).slice(2)
-      globalTasks.add(id)
       if (config.maxConcurrency) {
         const store = tasks[session.cid] ||= new Set()
         if (store.size >= config.maxConcurrency) {
@@ -311,6 +311,7 @@ export function apply(ctx: Context, config: Config) {
       session.send(globalTasks.size > 1
         ? session.text('.pending', [globalTasks.size - 1])
         : session.text('.waiting'))
+      globalTasks.add(id)
 
       try {
         const path = config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
