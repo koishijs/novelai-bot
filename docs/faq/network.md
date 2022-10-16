@@ -12,6 +12,16 @@
 
 如果偶尔发生无需在意。如果总是发生请尝试调高 `requestTimeout` 的数值或者配置 `proxyAgent`。
 
-### 请求失败 (code)
+### 未知错误 401
 
-看下 code 是几开头，如果是 4 开头可以提交 issue 或者在交流群反馈，如果是 5 开头说明服务器炸了。
+请确认 `type` 是否设置为 `token`。
+
+将 `type` 切换成 `login` 后重载，再次切换成 `token` 重载可以解决此问题。
+
+### 未知错误 404
+
+请确认 `endpoint` 是否正确，以及版本是否是最新。
+
+### 未知错误 503
+
+请尝试将 `endpoint` 中的 `api` 替换成 `backend-production-svc`。
