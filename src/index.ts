@@ -61,7 +61,7 @@ export const Config = Schema.intersect([
     Schema.object({
       type: Schema.const('token' as const),
       token: Schema.string().description('授权令牌。').role('secret').required(),
-      endpoint: Schema.string().description('API 服务器地址。').default('https://backend-production-svc.novelai.net'),
+      endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
       headers: Schema.dict(String).description('要附加的额外请求头。').default({
         'referer': 'https://novelai.net/',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
@@ -71,7 +71,7 @@ export const Config = Schema.intersect([
       type: Schema.const('login' as const),
       email: Schema.string().description('用户名。').required(),
       password: Schema.string().description('密码。').role('secret').required(),
-      endpoint: Schema.string().description('API 服务器地址。').default('https://backend-production-svc.novelai.net'),
+      endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
       headers: Schema.dict(String).description('要附加的额外请求头。').default({
         'referer': 'https://novelai.net/',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
@@ -209,6 +209,7 @@ export function apply(ctx: Context, config: Config) {
       // remove forbidden words
       const words = input.split(/, /g).filter((word) => {
         word = word.replace(/[^a-z0-9]+/g, ' ').trim()
+        if (!word) return false
         for (const { pattern, strict } of forbidden) {
           if (strict && word.split(/\W+/g).includes(pattern)) {
             return false

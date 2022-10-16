@@ -24,4 +24,4 @@
 
 ### 未知错误 503
 
-请尝试将 `endpoint` 中的 `api` 替换成 `backend-production-svc`。
+请尝试将 `endpoint` 中的 `api` 替换成 `backend-production-svc` 再试试。
