@@ -34,22 +34,26 @@
 增强 [图片] koishi
 ```
 
-## 关键词 (prompts)
+## 关键词 (prompt)
 
-使用关键词描述你想要的图像。关键词需要为英文，多个关键词之间用逗号分隔。
+使用关键词描述你想要的图像。关键词需要为英文，多个关键词之间用逗号分隔。每一个关键词也可以由多个单词组成，单词之间可以用空格或下划线分隔。例如：
 
-### 负面关键词 (negative prompts)
+```
+约稿 long hair, from_above, 1girl
+```
 
-在关键词后添加`negative prompts:`以添加负面关键词，避免生成不需要的内容。例如：
+::: tip
+novelai-bot 同时兼容 novelai 和大部分 stable diffusion webui 的语法。
+:::
+
+### 负面关键词
+
+在关键词后添加 `negative prompt:` 以添加负面关键词，避免生成不需要的内容。例如：
 
 ```
 约稿 girl
-negative prompts: loli
+negative prompt: loli
 ```
-
-### 顺序
-
-关键词的顺序会对生成结果产生影响。越重要的词应该放到越前面。
 
 ### 影响因子
 
@@ -66,7 +70,7 @@ negative prompts: loli
 ```
 
 ::: tip
-novelai-bot 同时支持 novelai 格式和 stable diffusion webui 格式。可以直接把 stable diffusion webui 的 prompts 拿来用。
+除了影响因子外，关键词的顺序也会对生成结果产生影响。越重要的词应该放到越前面。
 :::
 
 ### 要素混合
