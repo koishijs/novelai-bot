@@ -23,9 +23,9 @@
 
 以下图片均使用本插件在聊天平台生成：
 
-| ![example](https://novelai-gallery.vercel.app/69ff89485ee83344868446d9c2b445590cea859d.png) | ![example](https://novelai-gallery.vercel.app/91a9b0a1c3abad3a515efaa4befe27a64aa7c4b8.png) | ![example](https://novelai-gallery.vercel.app/d0e3dbcbdfba07e435c7c84b4de47cd99c4918c0.png) | ![example](https://novelai-gallery.vercel.app/40e5341a66c0fb97e51ef3d23e51c8150a0f3613.png) |
+| ![example](https://shiki.momobako.com:444/static/69ff89485ee83344868446d9c2b445590cea859d.png) | ![example](https://shiki.momobako.com:444/static/91a9b0a1c3abad3a515efaa4befe27a64aa7c4b8.png) | ![example](https://shiki.momobako.com:444/static/d0e3dbcbdfba07e435c7c84b4de47cd99c4918c0.png) | ![example](https://shiki.momobako.com:444/static/40e5341a66c0fb97e51ef3d23e51c8150a0f3613.png) |
 |:-:|:-:|:-:|:-:|
-| ![example](https://novelai-gallery.vercel.app/2e631c1944b9579b2c004481c9edff9ac1784330.png) |
+| ![example](https://shiki.momobako.com:444/static/2e631c1944b9579b2c004481c9edff9ac1784330.png) |
 
 ## 快速搭建
 
