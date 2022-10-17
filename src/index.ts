@@ -39,7 +39,7 @@ export interface Config {
   orient?: Orient
   sampler?: Sampler
   anatomy?: boolean
-  allowAnlas?: boolean
+  allowAnlas?: boolean | number
   basePrompt?: string
   forbidden?: string
   endpoint?: string
@@ -89,7 +89,11 @@ export const Config = Schema.intersect([
     orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
     sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
     anatomy: Schema.boolean().default(true).description('是否过滤不合理构图。'),
-    allowAnlas: Schema.boolean().default(true).description('是否允许使用点数。禁用后部分功能 (图片增强和手动设置某些参数) 将无法使用。'),
+    allowAnlas: Schema.union([
+      Schema.const(true).description('允许'),
+      Schema.const(false).description('禁止'),
+      Schema.natural().description('权限等级').default(1),
+    ]).default(true).description('是否允许使用点数。禁用后部分功能 (图片增强和手动设置某些参数) 将无法使用。'),
     basePrompt: Schema.string().description('默认的附加标签。').default('masterpiece, best quality'),
     forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
     requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute),
@@ -147,10 +151,17 @@ export function apply(ctx: Context, config: Config) {
   const getToken = () => tokenTask ||= login(ctx)
   ctx.accept(['token', 'type', 'email', 'password'], () => tokenTask = null)
 
-  const hidden = () => !config.allowAnlas
+  const hidden = (session: Session<'authority'>) => {
+    if (typeof config.allowAnlas === 'boolean') {
+      return !config.allowAnlas
+    } else {
+      return session.user.authority < config.allowAnlas
+    }
+  }
 
   const cmd = ctx.command('novelai <prompts:text>')
     .alias('nai')
+    .userFields(['authority'])
     .shortcut('画画', { fuzzy: true })
     .shortcut('畫畫', { fuzzy: true })
     .shortcut('约稿', { fuzzy: true })
@@ -172,7 +183,7 @@ export function apply(ctx: Context, config: Config) {
       if (!input?.trim()) return session.execute('help novelai')
 
       let imgUrl: string
-      if (config.allowAnlas) {
+      if (!hidden(session)) {
         input = segment.transform(input, {
           image(attrs) {
             imgUrl = attrs.url
