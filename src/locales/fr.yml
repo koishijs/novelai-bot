@@ -24,8 +24,13 @@ commands:
       expect-image: Attendrez-vous une image.
       invalid-input: L'description textuelle n'est pas valide, vous ne pouvez utiliser que des mots anglais.
       forbidden-word: L'description textuelle contient des mots prohibés.
-      concurrent-jobs: Veuillez attendre et réessayer plus tard
-      waiting: Votre demande est en cours de génération, veuillez patienter un moment.
+      concurrent-jobs@random:
+        - Trop occupé pour répondre à votre demande...
+        - "Courte sieste :zzz:"
+        - (*~*) Pas le temps d'en dessiner un nouveau.
+      waiting@random:
+        - Votre demande est en cours de génération, veuillez patienter un moment.
+        - Monet et Da Vinci, quel style convient le mieux à cette image ?
       nickname: Novel AI
       invalid-size: Le mode d'amélioration de l'image peut être utilisé seulement pour les images générées. Si vous utilisez le mode de img2img, Utilisez « /novelai » sans l'option « --enhance ».
       file-too-large: Le fichier est trop important.
@@ -33,7 +38,8 @@ commands:
       download-error: Erreur d'analyse syntaxique de l'image
       unknown-error: Une erreur inconnue s'est produite.
       response-error: "Une erreur inconnue s'est produite : ({0})."
-      request-failed: La demande a échoué.
+      empty-response: Le serveur répond avec une image invalide.
+      request-failed: "La demande a échoué : ({0})."
       request-timeout: Délai d'attente de la demande dépassé.
       invalid-password: Le adresse e-mail ou mot de passe introduit est incorrect.
       invalid-token: Le token est invalide ou a expiré. Veuillez contacter l'administrateur.
