@@ -44,6 +44,7 @@ export interface Config {
   forbidden?: string
   endpoint?: string
   headers?: Dict<string>
+  maxRetryCount?: number
   requestTimeout?: number
   recallTimeout?: number
   maxConcurrency?: number
@@ -96,13 +97,14 @@ export const Config = Schema.intersect([
     ]).default(true).description('是否允许使用点数。禁用后部分功能 (图片增强和手动设置某些参数) 将无法使用。'),
     basePrompt: Schema.string().description('默认的附加标签。').default('masterpiece, best quality'),
     forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
+    maxRetryCount: Schema.natural().description('连接失败时最大的重试次数。').default(3),
     requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute),
     recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
     maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 以禁用此功能)。').default(0),
   }).description('功能设置'),
 ] as const) as Schema<Config>
 
-function errorHandler(session: Session, err: Error) {
+function handleError(session: Session, err: Error) {
   if (Quester.isAxiosError(err)) {
     if (err.response?.status === 402) {
       return session.text('.unauthorized')
@@ -323,50 +325,66 @@ export function apply(ctx: Context, config: Config) {
       session.send(globalTasks.size > 1
         ? session.text('.pending', [globalTasks.size - 1])
         : session.text('.waiting'))
+
       globalTasks.add(id)
-
-      try {
-        const path = config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
-        const art = await ctx.http.axios(trimSlash(config.endpoint) + path, {
-          method: 'POST',
-          timeout: config.requestTimeout,
-          headers: {
-            ...config.headers,
-            authorization: 'Bearer ' + token,
-          },
-          data: config.type === 'naifu'
-            ? { ...parameters, prompt: input }
-            : { model, input, parameters },
-        }).then((res) => {
-          // event: newImage
-          // id: 1
-          // data:
-          return res.data.slice(27)
-        })
-
-        if (!art.trim()) return session.text('.empty-response')
-
-        const attrs = {
-          userId: session.userId,
-          nickname: session.author?.nickname || session.username,
-        }
-        const ids = await session.send(segment('figure', [
-          segment('message', attrs, `seed = ${seed}`),
-          segment('message', attrs, `prompt = ${input}`),
-          segment('message', attrs, segment.image('base64://' + art)),
-        ]))
-        if (config.recallTimeout) {
-          ctx.setTimeout(() => {
-            for (const id of ids) {
-              session.bot.deleteMessage(session.channelId, id)
-            }
-          }, config.recallTimeout)
-        }
-      } catch (err) {
-        return errorHandler(session, err)
-      } finally {
+      const cleanUp = () => {
         tasks[session.cid]?.delete(id)
         globalTasks.delete(id)
+      }
+
+      const path = config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
+      const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
+        method: 'POST',
+        timeout: config.requestTimeout,
+        headers: {
+          ...config.headers,
+          authorization: 'Bearer ' + token,
+        },
+        data: config.type === 'naifu'
+          ? { ...parameters, prompt: input }
+          : { model, input, parameters },
+      }).then((res) => {
+        // event: newImage
+        // id: 1
+        // data:
+        return res.data.slice(27)
+      })
+
+      let base64: string, count = 0
+      while (true) {
+        try {
+          base64 = await request()
+          cleanUp()
+          break
+        } catch (err) {
+          if (Quester.isAxiosError(err)) {
+            if (err.code && err.code !== 'ETIMEDOUT' && ++count < config.maxRetryCount) {
+              continue
+            }
+          }
+          cleanUp()
+          return handleError(session, err)
+        }
+      }
+
+      if (!base64.trim()) return session.text('.empty-response')
+
+      const attrs = {
+        userId: session.userId,
+        nickname: session.author?.nickname || session.username,
+      }
+      const ids = await session.send(segment('figure', [
+        segment('message', attrs, `seed = ${seed}`),
+        segment('message', attrs, `prompt = ${input}`),
+        segment('message', attrs, segment.image('base64://' + base64)),
+      ]))
+
+      if (config.recallTimeout) {
+        ctx.setTimeout(() => {
+          for (const id of ids) {
+            session.bot.deleteMessage(session.channelId, id)
+          }
+        }, config.recallTimeout)
       }
     })
 
