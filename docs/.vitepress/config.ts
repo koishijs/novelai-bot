@@ -34,7 +34,7 @@ export default defineConfig({
       items: [
         { text: 'Koishi', link: 'https://koishi.chat' },
         { text: 'Koishi Play', link: 'https://play.koishi.chat' },
-        { text: 'Prompt Wiki', link: 'https://prompt-wiki.vercel.app' },
+        { text: 'NovelAI.dev', link: 'https://novelai.dev' },
       ],
     }],
 
