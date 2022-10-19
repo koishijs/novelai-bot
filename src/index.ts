@@ -39,6 +39,7 @@ export interface Config {
   orient?: Orient
   sampler?: Sampler
   anatomy?: boolean
+  output?: 'minimal' | 'normal' | 'verbose'
   allowAnlas?: boolean | number
   basePrompt?: string
   forbidden?: string
@@ -90,6 +91,11 @@ export const Config = Schema.intersect([
     orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
     sampler: Schema.union(samplers).description('默认的采样器。').default('k_euler_ancestral'),
     anatomy: Schema.boolean().default(true).description('是否过滤不合理构图。'),
+    output: Schema.union([
+      Schema.const('minimal' as const).description('只发送图片'),
+      Schema.const('normal' as const).description('发送图片和关键信息'),
+      Schema.const('verbose' as const).description('发送全部信息'),
+    ]).description('输出方式。').default('normal'),
     allowAnlas: Schema.union([
       Schema.const(true).description('允许'),
       Schema.const(false).description('禁止'),
@@ -369,15 +375,32 @@ export function apply(ctx: Context, config: Config) {
 
       if (!base64.trim()) return session.text('.empty-response')
 
-      const attrs = {
-        userId: session.userId,
-        nickname: session.author?.nickname || session.username,
+      function getContent() {
+        if (config.output === 'minimal') return segment.image('base64://' + base64)
+        const attrs = {
+          userId: session.userId,
+          nickname: session.author?.nickname || session.username,
+        }
+        const result = segment('figure')
+        const params = [`seed = ${seed}`]
+        if (config.output === 'verbose') {
+          params.push(
+            `model = ${options.model}`,
+            `sampler = ${options.sampler}`,
+            `steps = ${options.steps}`,
+            `scale = ${options.scale}`,
+          )
+        }
+        result.children.push(segment('message', attrs, params.join('\n')))
+        result.children.push(segment('message', attrs, `prompt = ${input}`))
+        if (config.output === 'verbose') {
+          result.children.push(segment('message', attrs, `undesired = ${undesired.join(', ')}`))
+        }
+        result.children.push(segment('message', attrs, segment.image('base64://' + base64)))
+        return result
       }
-      const ids = await session.send(segment('figure', [
-        segment('message', attrs, `seed = ${seed}`),
-        segment('message', attrs, `prompt = ${input}`),
-        segment('message', attrs, segment.image('base64://' + base64)),
-      ]))
+
+      const ids = await session.send(getContent())
 
       if (config.recallTimeout) {
         ctx.setTimeout(() => {
