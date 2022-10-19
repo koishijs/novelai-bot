@@ -32,7 +32,7 @@ commands:
         - Votre demande est en cours de génération, veuillez patienter un moment.
         - Monet et Da Vinci, quel style convient le mieux à cette image ?
       pending@plural:
-        - D'accord
+        - D'accord.
         - D'accord, mais attendez que je complète celui-ci.
         - >_< Il y a {0} travaux en cours.
       nickname: Novel AI
