@@ -187,6 +187,7 @@ export function apply(ctx: Context, config: Config) {
     .option('strength', '-N <strength:number>', { hidden })
     .option('anatomy', '-a, --strict-anatomy', { value: true, hidden: () => ctx.config.anatomy })
     .option('anatomy', '-A, --loose-anatomy', { value: false, hidden: () => !ctx.config.anatomy })
+    .option('undesired', '-u <undesired>')
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
@@ -213,8 +214,8 @@ export function apply(ctx: Context, config: Config) {
 
       input = input.toLowerCase()
         .replace(/[,，]/g, ', ')
-        .replace(/（/g, '(')
-        .replace(/）/g, ')')
+        .replace(/[（(]/g, '{')
+        .replace(/[)）]/g, '}')
         .replace(/\s+/g, ' ')
 
       if (/[^\s\w"'“”‘’.,:|()\[\]{}-]/.test(input)) {
@@ -224,10 +225,10 @@ export function apply(ctx: Context, config: Config) {
       // extract negative prompts
       const undesired = [lowQuality]
       if (options.anatomy ?? config.anatomy) undesired.push(badAnatomy)
-      const capture = input.match(/(?:,?\s*)negative prompts?:([\s\S]+)/m)
+      const capture = input.match(/(,\s*|\s+)(-u\s+|negative prompts?:)([\s\S]+)/m)
       if (capture) {
         input = input.slice(0, capture.index).trim()
-        undesired.push(capture[1])
+        undesired.push(capture[3])
       }
 
       // remove forbidden words
