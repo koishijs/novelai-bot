@@ -39,7 +39,7 @@ export interface Config {
   orient?: Orient
   sampler?: Sampler
   anatomy?: boolean
-  output?: 'minimal' | 'normal' | 'verbose'
+  output?: 'minimal' | 'default' | 'verbose'
   allowAnlas?: boolean | number
   basePrompt?: string
   forbidden?: string
@@ -93,9 +93,9 @@ export const Config = Schema.intersect([
     anatomy: Schema.boolean().default(true).description('是否过滤不合理构图。'),
     output: Schema.union([
       Schema.const('minimal' as const).description('只发送图片'),
-      Schema.const('normal' as const).description('发送图片和关键信息'),
+      Schema.const('default' as const).description('发送图片和关键信息'),
       Schema.const('verbose' as const).description('发送全部信息'),
-    ]).description('输出方式。').default('normal'),
+    ]).description('输出方式。').default('default'),
     allowAnlas: Schema.union([
       Schema.const(true).description('允许'),
       Schema.const(false).description('禁止'),

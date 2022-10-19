@@ -77,6 +77,13 @@ API 服务器地址。如果你搭建了私服，可以将此项设置为你的�
 
 默认情况下是否过滤不良构图。
 
+### output
+
+- 类型：`'minimal' | 'default' | 'verbose'`
+- 默认值：`'default'`
+
+输出方式。`minimal` 表示只发送图片，`default` 表示发送图片和关键信息，`verbose` 表示发送全部信息。
+
 ### allowAnlas
 
 - 类型：`boolean`
