@@ -33,7 +33,7 @@ commands:
         - Monet and Da Vinci, whose style is better for this?
       pending@plural:
         - Sure.
-        - Sure, but please wait for me to complete this one before
+        - Sure, but please wait for me to complete this one before.
         - Bruh, there are {0} jobs pending!
       nickname: Novel AI
       invalid-size: The Enhance mode can only be used for images generated. Use /novelai without enhance option if you are using normal img2img.
