@@ -29,7 +29,7 @@ commands:
         - "Brb power nap :zzz:"
         - (*~*) Have no time to draw a new one.
       waiting@random:
-        - The illustrator starts painting
+        - The illustrator starts painting.
         - Monet and Da Vinci, whose style is better for this?
       pending@plural:
         - Sure.
