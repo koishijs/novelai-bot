@@ -24,8 +24,17 @@ commands:
       expect-image: Expect an image.
       invalid-input: Invalid prompt, only English words can be used.
       forbidden-word: Forbidden words in prompt.
-      concurrent-jobs: Please wait and retry later.
-      waiting: Request queued, please wait for generation
+      concurrent-jobs@random:
+        - Too busy to handle your request...
+        - "Brb power nap :zzz:"
+        - (*~*) Have no time to draw a new one.
+      waiting@random:
+        - The illustrator starts painting.
+        - Monet and Da Vinci, whose style is better for this?
+      pending@plural:
+        - Sure.
+        - Sure, but please wait for me to complete this one before.
+        - Bruh, there are {0} jobs pending!
       nickname: Novel AI
       invalid-size: The Enhance mode can only be used for images generated. Use /novelai without enhance option if you are using normal img2img.
       file-too-large: File is too large.
@@ -33,6 +42,7 @@ commands:
       download-error: Parsing image failed.
       unknown-error: An unknown error occurred.
       response-error: An unknown error occurred ({0}).
+      empty-response: The server didn't return a valid image.
       request-failed: Request failed ({0}).
       request-timeout: Request timeout.
       invalid-password: Incorrect email address or password.
