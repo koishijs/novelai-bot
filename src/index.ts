@@ -211,7 +211,12 @@ export function apply(ctx: Context, config: Config) {
         delete options.steps
       }
 
-      input = input.toLowerCase().replace(/[,，]/g, ', ').replace(/\s+/g, ' ')
+      input = input.toLowerCase()
+        .replace(/[,，]/g, ', ')
+        .replace(/（/g, '(')
+        .replace(/）/g, ')')
+        .replace(/\s+/g, ' ')
+
       if (/[^\s\w"'“”‘’.,:|()\[\]{}-]/.test(input)) {
         return session.text('.invalid-input')
       }
