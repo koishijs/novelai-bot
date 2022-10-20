@@ -30,6 +30,7 @@ commands:
         - (*~*) Pas le temps d'en dessiner un nouveau.
       waiting@random:
         - Votre demande est en cours de génération, veuillez patienter un moment.
+        - L'illustrateur commence à peindre.
         - Monet et Da Vinci, quel style convient le mieux à cette image ?
       pending@plural:
         - D'accord.
