@@ -1,4 +1,5 @@
 import { Context, Dict, Logger, Quester, Schema, segment, Session, Time, trimSlash } from 'koishi'
+import { StableDiffusionWebuiRes, StableDiffusionWebuiReq } from './types'
 import { download, getImageSize, login, NetworkError, resizeInput } from './utils'
 import {} from '@koishijs/plugin-help'
 
@@ -31,7 +32,7 @@ const orients = Object.keys(orientMap) as Orient[]
 const samplers = ['k_euler_ancestral', 'k_euler', 'k_lms', 'plms', 'ddim'] as const
 
 export interface Config {
-  type: 'token' | 'login' | 'naifu'
+  type: 'token' | 'login' | 'naifu' | 'webui'
   token: string
   email: string
   password: string
@@ -85,6 +86,10 @@ export const Config = Schema.intersect([
       endpoint: Schema.string().description('API 服务器地址。').required(),
       headers: Schema.dict(String).description('要附加的额外请求头。'),
     }),
+    Schema.object({
+      type: Schema.const('webui' as const),
+      endpoint: Schema.string().description('WebUI 服务器地址。').required(),
+    })
   ] as const),
   Schema.object({
     model: Schema.union(models).description('默认的生成模型。').default('nai'),
@@ -344,7 +349,7 @@ export function apply(ctx: Context, config: Config) {
         globalTasks.delete(id)
       }
 
-      const path = config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
+      const path = config.type === 'weiui' ? '/sdapi/v1/txt2img' : config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
       const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
         method: 'POST',
         timeout: config.requestTimeout,
@@ -352,10 +357,15 @@ export function apply(ctx: Context, config: Config) {
           ...config.headers,
           authorization: 'Bearer ' + token,
         },
-        data: config.type === 'naifu'
+        data: config.type === 'webui'
+          ? { prompt: input, n_samples: parameters.n_samples, sampler_index: parameters.sampler, negative_prompt: parameters.uc, seed: parameters.seed } as StableDiffusionWebuiReq
+          : config.type === 'naifu'
           ? { ...parameters, prompt: input }
           : { model, input, parameters },
       }).then((res) => {
+        if (config.type === 'webui') {
+          return (res.data as StableDiffusionWebuiRes).images[0]
+        }
         // event: newImage
         // id: 1
         // data:
