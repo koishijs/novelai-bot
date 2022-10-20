@@ -4,10 +4,10 @@
 
 ### type
 
-- 类型：`'login' | 'token'`
+- 类型：`'login' | 'token' | 'naifu' | 'sd-webui'`
 - 默认值：`'token'`
 
-登录方式。`login` 表示使用账号密码登录，`token` 表示使用授权令牌登录。
+登录方式。`login` 表示使用账号密码登录，`token` 表示使用授权令牌登录。`naifu` 和 `sd-webui` 对应着其他类型的后端。
 
 ### email
 
@@ -44,8 +44,16 @@ console.log(JSON.parse(localStorage.session).auth_token)
 
 - 类型：`string`
 - 默认值：`'https://api.novelai.net'`
+- 当 `type` 为 `naifu` 或 `sd-webui` 时必填
 
 API 服务器地址。如果你搭建了私服，可以将此项设置为你的服务器地址。
+
+### headers
+
+- 类型：`Dict<string>`
+- 默认值：官服的 `Referer` 和 `User-Agent`
+
+要附加的额外请求头。如果你的 `endpoint` 是第三方服务器，你可能需要设置正确的请求头，否则请求可能会被拒绝。
 
 ## 功能设置
 

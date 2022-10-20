@@ -10,7 +10,7 @@
 - 高级请求语法
 - 自定义违禁词表
 - 发送一段时间后自动撤回
-- 连接到私服 · NAIFU
+- 连接到私服 · NAIFU · [SD-WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 - img2img · 图片增强
 
 得益于 Koishi 的插件化机制，只需配合其他插件即可实现更多功能：
@@ -26,9 +26,9 @@
 
 以下图片均使用本插件在聊天平台生成：
 
-| ![example](https://shiki.momobako.com:444/static/69ff89485ee83344868446d9c2b445590cea859d.png) | ![example](https://shiki.momobako.com:444/static/91a9b0a1c3abad3a515efaa4befe27a64aa7c4b8.png) | ![example](https://shiki.momobako.com:444/static/d0e3dbcbdfba07e435c7c84b4de47cd99c4918c0.png) | ![example](https://shiki.momobako.com:444/static/40e5341a66c0fb97e51ef3d23e51c8150a0f3613.png) |
+| ![example](https://shiki.momobako.com:444/static/portrait/a11ty-f9drh.webp) | ![example](https://shiki.momobako.com:444/static/portrait/aaepw-4umze.webp) | ![example](https://shiki.momobako.com:444/static/portrait/ae4bk-32pk7.webp) | ![example](https://shiki.momobako.com:444/static/portrait/aoy1m-8evrd.webp) |
 |:-:|:-:|:-:|:-:|
-| ![example](https://shiki.momobako.com:444/static/2e631c1944b9579b2c004481c9edff9ac1784330.png) |
+| ![example](https://shiki.momobako.com:444/static/portrait/ap8ia-2yuco.webp) |
 
 ## 使用教程
 
