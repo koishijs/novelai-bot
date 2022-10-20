@@ -32,7 +32,7 @@ const orients = Object.keys(orientMap) as Orient[]
 const samplers = ['k_euler_ancestral', 'k_euler', 'k_lms', 'plms', 'ddim'] as const
 
 export interface Config {
-  type: 'token' | 'login' | 'naifu' | 'webui'
+  type: 'token' | 'login' | 'naifu' | 'sd-webui'
   token: string
   email: string
   password: string
@@ -87,8 +87,8 @@ export const Config = Schema.intersect([
       headers: Schema.dict(String).description('要附加的额外请求头。'),
     }),
     Schema.object({
-      type: Schema.const('webui' as const),
-      endpoint: Schema.string().description('WebUI 服务器地址。').required(),
+      type: Schema.const('sd-webui' as const),
+      endpoint: Schema.string().description('Stable Diffusion WebUI 服务器地址。').required(),
     })
   ] as const),
   Schema.object({
@@ -349,7 +349,7 @@ export function apply(ctx: Context, config: Config) {
         globalTasks.delete(id)
       }
 
-      const path = config.type === 'webui' ? '/sdapi/v1/txt2img' : config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
+      const path = config.type === 'sd-webui' ? '/sdapi/v1/txt2img' : config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
       const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
         method: 'POST',
         timeout: config.requestTimeout,
@@ -357,13 +357,13 @@ export function apply(ctx: Context, config: Config) {
           ...config.headers,
           authorization: 'Bearer ' + token,
         },
-        data: config.type === 'webui'
+        data: config.type === 'sd-webui'
           ? { prompt: input, n_samples: parameters.n_samples, sampler_index: parameters.sampler, negative_prompt: parameters.uc, seed: parameters.seed } as StableDiffusionWebuiReq
           : config.type === 'naifu'
           ? { ...parameters, prompt: input }
           : { model, input, parameters },
       }).then((res) => {
-        if (config.type === 'webui') {
+        if (config.type === 'sd-webui') {
           return (res.data as StableDiffusionWebuiRes).images[0]
         }
         // event: newImage
