@@ -6,6 +6,14 @@ import {
 import imageSize from 'image-size'
 import { Subscription } from './types'
 
+export function project(object: {}, mapping: {}) {
+  const result = {}
+  for (const key in mapping) {
+    result[key] = object[mapping[key]]
+  }
+  return result
+}
+
 export interface Size {
   width: number
   height: number

@@ -1,6 +1,6 @@
 import { Context, Dict, Logger, Quester, Schema, segment, Session, Time, trimSlash } from 'koishi'
-import { StableDiffusionWebuiRes, StableDiffusionWebuiReq } from './types'
-import { download, getImageSize, login, NetworkError, resizeInput } from './utils'
+import { StableDiffusionWebUI } from './types'
+import { download, getImageSize, login, NetworkError, project, resizeInput } from './utils'
 import {} from '@koishijs/plugin-help'
 
 export const reactive = true
@@ -57,7 +57,8 @@ export const Config = Schema.intersect([
     type: Schema.union([
       Schema.const('token' as const).description('授权令牌'),
       ...process.env.KOISHI_ENV === 'browser' ? [] : [Schema.const('login' as const).description('账号密码')],
-      Schema.const('naifu' as const).description('NAIFU'),
+      Schema.const('naifu' as const).description('naifu'),
+      Schema.const('sd-webui' as const).description('sd-webui'),
     ] as const).description('登录方式'),
   }).description('登录设置'),
   Schema.union([
@@ -88,8 +89,8 @@ export const Config = Schema.intersect([
     }),
     Schema.object({
       type: Schema.const('sd-webui' as const),
-      endpoint: Schema.string().description('Stable Diffusion WebUI 服务器地址。').required(),
-    })
+      endpoint: Schema.string().description('API 服务器地址。').required(),
+    }),
   ] as const),
   Schema.object({
     model: Schema.union(models).description('默认的生成模型。').default('nai'),
@@ -358,13 +359,21 @@ export function apply(ctx: Context, config: Config) {
           authorization: 'Bearer ' + token,
         },
         data: config.type === 'sd-webui'
-          ? { prompt: input, n_samples: parameters.n_samples, sampler_index: parameters.sampler, negative_prompt: parameters.uc, seed: parameters.seed } as StableDiffusionWebuiReq
+          ? {
+            prompt: input,
+            ...project(parameters, {
+              n_samples: 'n_samples',
+              seed: 'seed',
+              sampler_index: 'sampler',
+              negative_prompt: 'uc',
+            }),
+          }
           : config.type === 'naifu'
-          ? { ...parameters, prompt: input }
-          : { model, input, parameters },
+            ? { ...parameters, prompt: input }
+            : { model, input, parameters },
       }).then((res) => {
         if (config.type === 'sd-webui') {
-          return (res.data as StableDiffusionWebuiRes).images[0]
+          return (res.data as StableDiffusionWebUI.Response).images[0]
         }
         // event: newImage
         // id: 1
