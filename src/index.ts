@@ -349,7 +349,7 @@ export function apply(ctx: Context, config: Config) {
         globalTasks.delete(id)
       }
 
-      const path = config.type === 'weiui' ? '/sdapi/v1/txt2img' : config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
+      const path = config.type === 'webui' ? '/sdapi/v1/txt2img' : config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
       const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
         method: 'POST',
         timeout: config.requestTimeout,
