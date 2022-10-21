@@ -32,7 +32,6 @@ commands:
         - 少女繪畫中
         - 莫行開，我即時來畫！
       pending: 好酒沉甕底。您還需等我完成前面 {0} 個稿件。
-      nickname: AI 繪師
       invalid-size: 增強功能僅適用於 Novel AI 生成圖。若要使用 img2img 功能請直接使用「約稿」而非「增強」。
       file-too-large: 文件體積過大。
       unsupported-file-type: 不支持的文件格式。

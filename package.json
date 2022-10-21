@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-novelai",
   "description": "Generate images by NovelAI",
-  "version": "1.10.8",
+  "version": "1.10.9",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -61,7 +61,7 @@
     "koishi": "^4.9.6",
     "sass": "^1.55.0",
     "typescript": "^4.8.4",
-    "vitepress": "1.0.0-alpha.19"
+    "vitepress": "1.0.0-alpha.20"
   },
   "dependencies": {
     "image-size": "^1.0.2",

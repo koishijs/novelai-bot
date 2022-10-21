@@ -35,8 +35,7 @@ commands:
       pending@plural:
         - D'accord.
         - D'accord, mais attendez que je complète celui-ci.
-        - >_< Il y a {0} travaux en cours.
-      nickname: Novel AI
+        - '>_< Il y a {0} travaux en cours.'
       invalid-size: Le mode d'amélioration de l'image peut être utilisé seulement pour les images générées. Si vous utilisez le mode de img2img, Utilisez « /novelai » sans l'option « --enhance ».
       file-too-large: Le fichier est trop important.
       unsupported-file-type: Format de fichier non reconnu.
