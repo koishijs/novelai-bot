@@ -367,14 +367,41 @@ export function apply(ctx: Context, config: Config) {
           authorization: 'Bearer ' + token,
         },
         data: config.type === 'sd-webui'
+          // ? {
+          //   prompt: input,
+          //   ...project(parameters, {
+          //     n_samples: 'n_samples',
+          //     seed: 'seed',
+          //     sampler_index: 'sampler',
+          //     negative_prompt: 'uc',
+          //   }),
+          // }
           ? {
-            prompt: input,
-            ...project(parameters, {
-              n_samples: 'n_samples',
-              seed: 'seed',
-              sampler_index: 'sampler',
-              negative_prompt: 'uc',
-            }),
+            "enable_hr": false,
+            "denoising_strength": 0,
+            "firstphase_width": 0,
+            "firstphase_height": 0,
+            "prompt": input,
+            "seed": parameters.seed,
+            "subseed": -1,
+            "subseed_strength": 0,
+            "seed_resize_from_h": -1,
+            "seed_resize_from_w": -1,
+            "batch_size": 1,
+            "n_iter": 1,
+            "steps": parameters.steps,
+            "cfg_scale": parameters.scale,
+            "width": parameters.width,
+            "height": parameters.height,
+            "restore_faces": false,
+            "tiling": false,
+            "negative_prompt": parameters.nc,
+            "eta": 0,
+            "s_churn": 0,
+            "s_tmax": 0,
+            "s_tmin": 0,
+            "s_noise": 1,
+            "sampler_index": "Euler"
           }
           : config.type === 'naifu'
             ? { ...parameters, prompt: input }
