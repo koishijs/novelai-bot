@@ -1,6 +1,6 @@
 import { Context, Dict, Logger, Quester, Schema, segment, Session, Time, trimSlash } from 'koishi'
 import { StableDiffusionWebUI } from './types'
-import { download, getImageSize, login, NetworkError, project, resizeInput } from './utils'
+import { download, getImageSize, login, NetworkError, project, resizeInput, samplersMapN2S } from './utils'
 import {} from '@koishijs/plugin-help'
 
 export const reactive = true
@@ -369,11 +369,15 @@ export function apply(ctx: Context, config: Config) {
         data: config.type === 'sd-webui'
           ? {
             prompt: input,
+            sampler_index: samplersMapN2S(parameters.sampler),
             ...project(parameters, {
               n_samples: 'n_samples',
               seed: 'seed',
-              sampler_index: 'sampler',
               negative_prompt: 'uc',
+              cfg_scale: 'scale',
+              steps: 'steps',
+              width: 'width',
+              height: 'height',
             }),
           }
           : config.type === 'naifu'
