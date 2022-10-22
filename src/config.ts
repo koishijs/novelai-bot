@@ -214,16 +214,23 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
     return ['.invalid-input']
   }
 
+  const negative = []
+  const appendToList = (words: string[], input: string) => {
+    for (let tag of input.split(/,\s*/g)) {
+      tag = tag.trim().toLowerCase()
+      if (tag && !words.includes(tag)) words.push(tag)
+    }
+  }
+
   // extract negative prompts
-  const undesired = [config.negativePrompt]
   const capture = input.match(/(,\s*|\s+)(-u\s+|negative prompts?:)\s*([\s\S]+)/m)
   if (capture?.[3]) {
     input = input.slice(0, capture.index).trim()
-    undesired.push(capture[3])
+    appendToList(negative, capture[3])
   }
 
   // remove forbidden words
-  const words = input.split(/, /g).filter((word) => {
+  const positive = input.split(/,\s*/g).filter((word) => {
     word = word.replace(/[^a-z0-9]+/g, ' ').trim()
     if (!word) return false
     for (const { pattern, strict } of forbidden) {
@@ -236,11 +243,7 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
     return true
   })
 
-  // append base prompt when input does not include it
-  for (let tag of config.basePrompt.split(/,\s*/g)) {
-    tag = tag.trim().toLowerCase()
-    if (tag && !words.includes(tag)) words.push(tag)
-  }
-  input = words.join(', ')
-  return [null, input, undesired.join(', ')]
+  appendToList(positive, config.basePrompt)
+  appendToList(negative, config.negativePrompt)
+  return [null, positive.join(', '), negative.join(', ')]
 }
