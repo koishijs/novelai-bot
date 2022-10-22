@@ -9,10 +9,8 @@ commands:
     options:
       enhance: Image Enhance Mode
       model: Set Model for Generation
-      orient: Set Image Orientation
+      viewport: Set Image Orientation
       sampler: Set Sampler
-      anatomy.true: Filter Anatomically Incorrect Images
-      anatomy.false: Allow Anatomically Incorrect Images
       seed: Set Random Seed
       steps: Set Iteration Steps
       scale: Set CFG Scale

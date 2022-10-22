@@ -9,10 +9,8 @@ commands:
     options:
       enhance: Mode d'amélioration de l'image
       model: Définir le modèle pour génération
-      orient: Définir l'orientation de l'image
+      viewport: Définir l'orientation de l'image
       sampler: Définir l'échantillonneur
-      anatomy.true: Filtrer les images anatomiquement incorrectes
-      anatomy.false: Autoriser les images anatomiquement incorrectes
       seed: Définir une graine aléatoire
       steps: Définir les étapes de l'itération
       scale: Définir CFG Scale

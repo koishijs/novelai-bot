@@ -9,10 +9,8 @@ commands:
     options:
       enhance: 圖片增強模式
       model: 設定生成模型
-      orient: 設定圖片方向
+      viewport: 設定圖片尺寸
       sampler: 設定取樣器
-      anatomy.true: 過濾不合理構圖
-      anatomy.false: 允許不合理構圖
       seed: 設置隨機種子
       steps: 設置迭代步數
       scale: 設置對輸入的服從度
