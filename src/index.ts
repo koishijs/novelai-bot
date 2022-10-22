@@ -1,6 +1,6 @@
 import { Context, Dict, Logger, Quester, Schema, segment, Session, Time, trimSlash } from 'koishi'
 import { StableDiffusionWebUI } from './types'
-import { download, getImageSize, login, NetworkError, project, resizeInput } from './utils'
+import { download, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
 import {} from '@koishijs/plugin-help'
 
 export const reactive = true
@@ -213,12 +213,23 @@ export function apply(ctx: Context, config: Config) {
   const getToken = () => tokenTask ||= login(ctx)
   ctx.accept(['token', 'type', 'email', 'password'], () => tokenTask = null)
 
-  const hidden = (session: Session<'authority'>) => {
+  const thirdParty = () => !['login', 'token'].includes(config.type)
+
+  const restricted = (session: Session<'authority'>) => {
+    if (thirdParty()) return false
     if (typeof config.allowAnlas === 'boolean') {
       return !config.allowAnlas
     } else {
       return session.user.authority < config.allowAnlas
     }
+  }
+
+  const viewport = (source: string, session: Session<'authority'>): Size => {
+    if (source in orientMap) return orientMap[source]
+    if (restricted(session)) throw new Error()
+    const cap = source.match(/^(\d+)[x×](\d+)$/)
+    if (!cap) throw new Error()
+    return { width: +cap[1], height: +cap[2] }
   }
 
   const cmd = ctx.command('novelai <prompts:text>')
@@ -230,21 +241,21 @@ export function apply(ctx: Context, config: Config) {
     .shortcut('約稿', { fuzzy: true })
     .shortcut('增强', { fuzzy: true, options: { enhance: true } })
     .shortcut('增強', { fuzzy: true, options: { enhance: true } })
-    .option('enhance', '-e', { hidden })
-    .option('model', '-m <model>', { type: models })
-    .option('orient', '-o <orient>', { type: orients })
+    .option('enhance', '-e', { hidden: restricted })
+    .option('model', '-m <model>', { type: models, hidden: thirdParty })
+    .option('viewport', '-o, -v <viewport>', { type: viewport })
     .option('sampler', '-s <sampler>')
     .option('seed', '-x <seed:number>')
-    .option('steps', '-t <step:number>', { hidden })
+    .option('steps', '-t <step:number>', { hidden: restricted })
     .option('scale', '-c <scale:number>')
-    .option('noise', '-n <noise:number>', { hidden })
-    .option('strength', '-N <strength:number>', { hidden })
+    .option('noise', '-n <noise:number>', { hidden: restricted })
+    .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('undesired', '-u <undesired>')
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
       let imgUrl: string
-      if (!hidden(session)) {
+      if (!restricted(session)) {
         input = segment.transform(input, {
           image(attrs) {
             imgUrl = attrs.url
@@ -315,8 +326,6 @@ export function apply(ctx: Context, config: Config) {
       }
 
       const model = modelMap[options.model]
-      const orient = orientMap[options.orient]
-      // seed can be up to 2^32
       const seed = options.seed || Math.floor(Math.random() * Math.pow(2, 32))
 
       const parameters: Dict = {
@@ -365,8 +374,8 @@ export function apply(ctx: Context, config: Config) {
         }
       } else {
         Object.assign(parameters, {
-          height: orient.height,
-          width: orient.width,
+          height: options.viewport.height,
+          width: options.viewport.width,
           scale: options.scale ?? 12,
           steps: options.steps ?? 28,
           noise: options.noise ?? 0.2,
@@ -493,7 +502,7 @@ export function apply(ctx: Context, config: Config) {
 
   ctx.accept(['model', 'orient', 'sampler'], (config) => {
     cmd._options.model.fallback = config.model
-    cmd._options.orient.fallback = config.orient
+    cmd._options.viewport.fallback = config.orient
     cmd._options.sampler.fallback = config.sampler
     cmd._options.sampler.type = config.type === 'sd-webui' ? Object.keys(sdSamplers) : naiSamplers
   }, { immediate: true })
