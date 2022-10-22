@@ -8,9 +8,9 @@ commands:
 
     options:
       enhance: 圖片增強模式
-      model: 設定生成模型 (safe, nai, furry)
-      orient: 設定圖片方向 (portrait, landscape, square)
-      sampler: 設定取樣器 (k_euler_ancestral, k_euler, k_lms, plms, ddim)
+      model: 設定生成模型
+      orient: 設定圖片方向
+      sampler: 設定取樣器
       anatomy.true: 過濾不合理構圖
       anatomy.false: 允許不合理構圖
       seed: 設置隨機種子

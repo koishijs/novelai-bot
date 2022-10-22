@@ -184,15 +184,3 @@ export function resizeInput(size: Size): Size {
     return { width, height }
   }
 }
-
-export function samplersMapN2S(sampler: string): string {
-  switch (sampler) {
-    case 'k_euler_ancestral': return 'Euler a'
-    case 'k_euler': return 'Euler'
-    case 'k_lms': return 'LMS'
-    case 'plms': return 'PLMS'
-    case 'ddim': return 'DDIM'
-  }
-
-  return 'Euler a'
-}
