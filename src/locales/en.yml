@@ -8,9 +8,9 @@ commands:
 
     options:
       enhance: Image Enhance Mode
-      model: Set Model for Generation (safe, nai, furry)
-      orient: Set Image Orientation (portrait, landscape, square)
-      sampler: Set Sampler (k_euler_ancestral, k_euler, k_lms, plms, ddim)
+      model: Set Model for Generation
+      orient: Set Image Orientation
+      sampler: Set Sampler
       anatomy.true: Filter Anatomically Incorrect Images
       anatomy.false: Allow Anatomically Incorrect Images
       seed: Set Random Seed
