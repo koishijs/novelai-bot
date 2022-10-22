@@ -203,14 +203,30 @@ export function parseForbidden(input: string) {
     })
 }
 
+const backslash = /@@__BACKSLASH__@@/g
+
 export function parseInput(input: string, config: Config, forbidden: Forbidden[]): string[] {
   input = input.toLowerCase()
-    .replace(/[,，]/g, ', ')
-    .replace(/[（(]/g, '{')
-    .replace(/[)）]/g, '}')
-    .replace(/\s+/g, ' ')
+    .replace(/\\\\/g, backslash.source)
+    .replace(/，/g, ',')
+    .replace(/（/g, '(')
+    .replace(/）/g, ')')
 
-  if (/[^\s\w"'“”‘’.,:|()\[\]{}-]/.test(input)) {
+  if (config.type === 'sd-webui') {
+    input = input
+      .replace(/(^|[^\\])\{/g, (_, $1) => $1 + '(')
+      .replace(/(^|[^\\])\}/g, (_, $1) => $1 + ')')
+  } else {
+    input = input
+      .replace(/(^|[^\\])\(/g, (_, $1) => $1 + '{')
+      .replace(/(^|[^\\])\)/g, (_, $1) => $1 + '}')
+  }
+
+  input = input
+    .replace(backslash, '\\')
+    .replace(/_/g, ' ')
+
+  if (/[^\s\w"'“”‘’.,:|\\()\[\]{}-]/.test(input)) {
     return ['.invalid-input']
   }
 
