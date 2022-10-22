@@ -273,17 +273,25 @@ export function apply(ctx: Context, config: Config) {
           nickname: session.author?.nickname || session.username,
         }
         const result = segment('figure')
-        const params = [`seed = ${seed}`]
+        const lines = [`seed = ${seed}`]
         if (config.output === 'verbose') {
-          params.push(
-            `model = ${options.model}`,
+          if (!thirdParty()) {
+            lines.push(`model = ${model}`)
+          }
+          lines.push(
             `sampler = ${options.sampler}`,
-            `steps = ${options.steps}`,
-            `scale = ${options.scale}`,
+            `steps = ${parameters.steps}`,
+            `scale = ${parameters.scale}`,
           )
+          if (parameters.image) {
+            lines.push(
+              `strength = ${parameters.strength}`,
+              `noise = ${parameters.noise}`,
+            )
+          }
         }
-        result.children.push(segment('message', attrs, params.join('\n')))
-        result.children.push(segment('message', attrs, `prompt = ${input}`))
+        result.children.push(segment('message', attrs, lines.join('\n')))
+        result.children.push(segment('message', attrs, `prompt = ${prompt}`))
         if (config.output === 'verbose') {
           result.children.push(segment('message', attrs, `undesired = ${uc}`))
         }
