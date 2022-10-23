@@ -49,9 +49,9 @@ export namespace sampler {
     'k_dpm_2_a': 'DPM2 a',
     'k_dpm_fast': 'DPM fast',
     'k_dpm_ad': 'DPM adaptive',
-    'k_lms_ka': 'LMS karras',
-    'k_dpm_2_ka': 'DPM2 karras',
-    'k_dpm_2_a_ka': 'DPM2 a karras',
+    'k_lms_ka': 'LMS Karras',
+    'k_dpm_2_ka': 'DPM2 Karras',
+    'k_dpm_2_a_ka': 'DPM2 a Karras',
     'ddim': 'DDIM',
     'plms': 'PLMS',
   }
