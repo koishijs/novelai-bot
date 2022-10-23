@@ -47,7 +47,7 @@ export namespace sampler {
     'k_heun': 'Heun',
     'k_dpm_2': 'DPM2',
     'k_dpm_2_a': 'DPM2 a',
-    'k_dpm_fast': 'DPM Fast',
+    'k_dpm_fast': 'DPM fast',
     'k_dpm_ad': 'DPM adaptive',
     'k_lms_ka': 'LMS karras',
     'k_dpm_2_ka': 'DPM2 karras',
