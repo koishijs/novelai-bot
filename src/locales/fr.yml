@@ -9,7 +9,7 @@ commands:
     options:
       enhance: Mode d'amélioration de l'image
       model: Définir le modèle pour génération
-      viewport: Définir la taille de l'image
+      resolution: Définir la taille de l'image
       sampler: Définir l'échantillonneur
       seed: Définir une graine aléatoire
       steps: Définir les étapes de l'itération

@@ -61,7 +61,7 @@ export function apply(ctx: Context, config: Config) {
     }
   }
 
-  const viewport = (source: string, session: Session<'authority'>): Size => {
+  const resolution = (source: string, session: Session<'authority'>): Size => {
     if (source in orientMap) return orientMap[source]
     if (restricted(session)) throw new Error()
     const cap = source.match(/^(\d+)[x×](\d+)$/)
@@ -80,7 +80,7 @@ export function apply(ctx: Context, config: Config) {
     .shortcut('增強', { fuzzy: true, options: { enhance: true } })
     .option('enhance', '-e', { hidden: restricted })
     .option('model', '-m <model>', { type: models, hidden: thirdParty })
-    .option('viewport', '-o, -v <viewport>', { type: viewport })
+    .option('resolution', '-o, -v <resolution>', { type: resolution })
     .option('sampler', '-s <sampler>')
     .option('seed', '-x <seed:number>')
     .option('steps', '-t <step:number>', { hidden: restricted })
@@ -176,8 +176,8 @@ export function apply(ctx: Context, config: Config) {
         }
       } else {
         Object.assign(parameters, {
-          height: options.viewport.height,
-          width: options.viewport.width,
+          height: options.resolution.height,
+          width: options.resolution.width,
           scale: options.scale ?? 12,
           steps: options.steps ?? 28,
           noise: options.noise ?? 0.2,
@@ -312,7 +312,7 @@ export function apply(ctx: Context, config: Config) {
 
   ctx.accept(['model', 'orient', 'sampler'], (config) => {
     cmd._options.model.fallback = config.model
-    cmd._options.viewport.fallback = config.orient
+    cmd._options.resolution.fallback = config.orient
     cmd._options.sampler.fallback = config.sampler
     cmd._options.sampler.type = Object.keys(config.type === 'sd-webui' ? sampler.sd : sampler.nai)
   }, { immediate: true })
