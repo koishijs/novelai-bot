@@ -210,7 +210,7 @@ export function apply(ctx: Context, config: Config) {
           parameters.sampler = sampler.sd2nai(options.sampler)
           return config.type === 'naifu'
             ? parameters
-            : { model, input, parameters: omit(parameters, ['prompt']) }
+            : { model, input: prompt, parameters: omit(parameters, ['prompt']) }
         }
 
         return {

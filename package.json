@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-novelai",
   "description": "Generate images by NovelAI",
-  "version": "1.11.4",
+  "version": "1.11.6",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -27,7 +27,7 @@
   "homepage": "https://bot.novelai.dev",
   "scripts": {
     "build": "atsc -b",
-    "docs:dev": "vitepress dev docs",
+    "docs:dev": "vitepress dev docs --open",
     "docs:build": "vitepress build docs",
     "docs:serve": "vitepress serve docs"
   },
