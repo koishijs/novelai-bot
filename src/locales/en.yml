@@ -9,7 +9,7 @@ commands:
     options:
       enhance: Image Enhance Mode
       model: Set Model for Generation
-      viewport: Set Image Orientation
+      viewport: Set Image Size
       sampler: Set Sampler
       seed: Set Random Seed
       steps: Set Iteration Steps
