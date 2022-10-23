@@ -9,7 +9,7 @@ commands:
     options:
       enhance: 圖片增強模式
       model: 設定生成模型
-      viewport: 設定圖片尺寸
+      resolution: 設定圖片尺寸
       sampler: 設定取樣器
       seed: 設置隨機種子
       steps: 設置迭代步數

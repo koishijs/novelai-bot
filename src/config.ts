@@ -72,7 +72,7 @@ export namespace sampler {
 export interface Options {
   enhance: boolean
   model: string
-  viewport: Size
+  resolution: Size
   sampler: string
   seed: string
   steps: number
