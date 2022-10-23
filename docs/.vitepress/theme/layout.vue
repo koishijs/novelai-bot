@@ -10,7 +10,8 @@ const { Layout } = DefaultTheme
     <template #aside-ads-after>
       <div class="sponsor">
         <p>如果您愿意支持我们，<br/>请扫描下方的二维码，<br/>我们将继续努力维护这个项目。</p>
-        <div class="image"></div>
+        <div class="image wechat"></div>
+        <div class="image alipay"></div>
       </div>
     </template>
   </layout>
@@ -35,11 +36,18 @@ const { Layout } = DefaultTheme
   transition: color 0.3s ease, background-color 0.3s ease;
 
   .image {
-    width: 9rem;
-    height: 9rem;
+    width: 8rem;
+    height: 8rem;
     background-size: contain;
-    background-image: url(https://shiki.momobako.com:444/static/sponsor/wechat.webp);
     background-color: inherit;
+
+    &.wechat {
+      background-image: url('https://cdn-shiki.momobako.com:444/static/sponsor/wechat.webp');
+    }
+
+    &.alipay {
+      background-image: url('https://cdn-shiki.momobako.com:444/static/sponsor/alipay.webp');
+    }
   }
 }
 
