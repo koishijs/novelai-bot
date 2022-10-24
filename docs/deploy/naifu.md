@@ -91,7 +91,7 @@ sudo apt install python3
 双击打开 `run.bat` 文件，或在终端中输入 `run.bat` 并按下回车，它会自动帮你启动 NAIFU。
 
 ::: tip
-对于 Linux 用户则是运行 `. run.sh`
+对于 Linux 用户则是运行 `./run.sh`
 :::
 
 当控制台界面显示 `Uvicorn running on http://0.0.0.0:6969` 时，说明 NAIFU 已经启动成功，你可以在浏览器中打开 `http://localhost:6969` 进行访问测试。
