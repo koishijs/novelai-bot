@@ -2,7 +2,7 @@
 
 NAIFU 是匿名网友打包的一套 [NovelAI](https://novelai.net/) 的前端与后端应用，通过它可以快速搭建一个第三方的 NovelAI 服务。
 
-:::tip
+::: tip
 由于 NAIFU 在传输过程中被多次修改，产生了许多不同的版本，各版本之间的部署方式可能不尽相同。本文档仅针对最初发布的版本进行说明。
 如果你发现了本文档对部署方式的描述与你所下载的 NAIFU 附带的说明文件不相符，请以你下载的版本为准。
 :::
@@ -91,13 +91,13 @@ sudo apt install python3
 
 双击打开 `run.bat` 文件，或在终端中输入 `run.bat` 并按下回车，它会自动帮你启动 NAIFU。
 
-:::tip
+::: tip
 对于 Linux 用户则是运行 `. run.sh`
 :::
 
 当控制台界面显示 `Uvicorn running on http://0.0.0.0:6969` 时，说明 NAIFU 已经启动成功，你可以在浏览器中打开 `http://localhost:6969` 进行访问测试。
 
-:::tip
+::: tip
 如果你运行 NAIFU 的电脑和你的浏览器不在同一台电脑上，你需要将 `localhost` 改为电脑的 IP 地址。
 :::
 
@@ -105,7 +105,7 @@ sudo apt install python3
 
 打开 Koishi 控制台，进入`插件配置` -> `novelai`，将 `type` 更改为 `NAIFU`，并将 `endpoint` 改为上述的地址，然后点击重载配置。
 
-:::tip
+::: tip
 如果你在启动 NAIFU 时指定了访问令牌，则在此处填入它。
 :::
 
