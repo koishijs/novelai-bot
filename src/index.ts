@@ -218,7 +218,7 @@ export function apply(ctx: Context, config: Config) {
           init_images: parameters.image ? [parameters.image] : undefined,
           ...project(parameters, {
             prompt: 'prompt',
-            n_samples: 'n_samples',
+            batch_size: 'n_samples',
             seed: 'seed',
             negative_prompt: 'uc',
             cfg_scale: 'scale',
