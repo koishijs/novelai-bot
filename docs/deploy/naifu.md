@@ -3,8 +3,7 @@
 NAIFU 是匿名网友打包的一套 [NovelAI](https://novelai.net/) 的前端与后端应用，通过它可以快速搭建一个第三方的 NovelAI 服务。
 
 ::: tip
-由于 NAIFU 在传输过程中被多次修改，产生了许多不同的版本，各版本之间的部署方式可能不尽相同。本文档仅针对最初发布的版本进行说明。
-如果你发现了本文档对部署方式的描述与你所下载的 NAIFU 附带的说明文件不相符，请以你下载的版本为准。
+由于 NAIFU 在传输过程中被多次修改，产生了许多不同的版本，各版本之间的部署方式可能不尽相同。本文档仅针对最初发布的版本进行说明。如果你发现了本文档对部署方式的描述与你所下载的 NAIFU 附带的说明文件不相符，请以你下载的版本为准。
 :::
 
 ## 下载并解压 NAIFU
@@ -39,8 +38,7 @@ naifu/
 
 从 [Python 官网](https://www.python.org/downloads/) 下载 Python 3.8 或更高版本的安装包(msi 格式或 exe 格式)，安装时请勾选 `Add Python 3.x to PATH` 选项。
 
-鼠标右键单击开始菜单按钮，选择 `命令提示符`，在新开启的窗口中输入 `python --version` 并按下回车。
-如果出现类似如下的输出，则说明 Python 已经安装成功：
+鼠标右键单击开始菜单按钮，选择 `命令提示符`，在新开启的窗口中输入 `python --version` 并按下回车。如果出现类似如下的输出，则说明 Python 已经安装成功：
 
 ```text
 Python 3.10.6
@@ -55,6 +53,7 @@ Python 3.10.6
 ### 安装 Python
 
 在终端中输入 `python3 --version` 并按下回车。
+
 如果出现类似如下的输出，则说明 Python 已经安装成功：
 
 ```text
@@ -62,6 +61,7 @@ Python 3.10.6
 ```
 
 如果显示 `python` 命令不存在等错误，请根据你的发行版的安装方式进行安装。
+
 对于 Debian 或 Ubuntu 系列，则为：
 
 ```bash
@@ -82,8 +82,7 @@ sudo apt install python3
 
 ### 设定访问令牌 Token(可选)
 
-如果你想要将 NAIFU 公开于互联网上，我们推荐你为其设定一个访问令牌(即 Token)。
-你只需在 `run.bat` 中 `%PYTHON% -m uvicorn` 之前添加一行 `set TOKEN=你的令牌`。
+如果你想要将 NAIFU 公开于互联网上，我们推荐你为其设定一个访问令牌 (Token)。你只需在 `run.bat` 中 `%PYTHON% -m uvicorn` 之前添加一行 `set TOKEN=你的令牌`。
 
 如果你使用的是 Linux，则在 `run.sh` 中 `python3 -m uvicorn` 之前添加一行 `export TOKEN=你的令牌`。
 
