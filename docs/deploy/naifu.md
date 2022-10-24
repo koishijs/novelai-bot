@@ -36,7 +36,7 @@ naifu/
 
 ### 安装 Python
 
-从 [Python 官网](https://www.python.org/downloads/) 下载 Python 3.8 或更高版本的安装包(msi 格式或 exe 格式)，安装时请勾选 `Add Python 3.x to PATH` 选项。
+从 [Python 官网](https://www.python.org/downloads/)下载 Python 3.8 或更高版本的安装包 (msi 格式或 exe 格式)，安装时请勾选 `Add Python 3.x to PATH` 选项。
 
 鼠标右键单击开始菜单按钮，选择 `命令提示符`，在新开启的窗口中输入 `python --version` 并按下回车。如果出现类似如下的输出，则说明 Python 已经安装成功：
 
