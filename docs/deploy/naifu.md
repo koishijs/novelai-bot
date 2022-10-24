@@ -107,7 +107,7 @@ sudo apt install python3
 
 ## 配置 `koishi-plugin-novelai` 插件
 
-打开 Koishi 控制台，进入`插件配置` -> `novelai`，将 `type` 更改为 `NAIFU`，并将 `endpoint` 改为上述的地址，然后点击重载配置。
+打开 Koishi 控制台，点击「插件配置」并选择「novelai」插件，将 `type` 更改为 `naifu`，并将 `endpoint` 改为上述的地址，最后点击右上角的「重载配置」按钮。
 
 ::: tip
 如果你在启动 NAIFU 时指定了访问令牌，别忘了在 `token` 中进行配置。
