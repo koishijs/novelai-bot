@@ -33,11 +33,11 @@ naifu/
 └── taming/
 ```
 
-## 安装（Windows）
+## 安装 (Windows)
 
 ### 安装 Python
 
-从 [Python 官网](https://www.python.org/downloads/) 下载 Python 3.8 或更高版本的安装包（msi 格式或 exe 格式），安装时请勾选 `Add Python 3.x to PATH` 选项。
+从 [Python 官网](https://www.python.org/downloads/) 下载 Python 3.8 或更高版本的安装包(msi 格式或 exe 格式)，安装时请勾选 `Add Python 3.x to PATH` 选项。
 
 鼠标右键单击开始菜单按钮，选择 `命令提示符`，在新开启的窗口中输入 `python --version` 并按下回车。
 如果出现类似如下的输出，则说明 Python 已经安装成功：
@@ -50,7 +50,7 @@ Python 3.10.6
 
 双击打开 `setup.bat` 文件，它会自动帮你安装所需依赖，根据你的网络情况需要 1~10 分钟，请耐心等待安装完成。
 
-## 安装（Linux）
+## 安装 (Linux)
 
 ### 安装 Python
 
@@ -76,13 +76,13 @@ sudo apt install python3
 
 ### 指定模型文件
 
-如果你在第一步的下载中没有选择模型文件（models/animefull-final-pruned/model.ckpt），或者想要换一个模型，可以将其复制到 `models/animefull-final-pruned/` 文件夹下方，并改名为 `model.ckpt`。
+如果你在第一步的下载中没有选择模型文件 (`models/animefull-final-pruned/model.ckpt`)，或者想要换一个模型，可以将其复制到 `models/animefull-final-pruned/` 文件夹下方，并改名为 `model.ckpt`。
 
-或者，你可以修改 `run.bat` （对于 Linux 用户是 `run.sh`）文件，将 `MODEL_PATH=models/animefull-final-pruned` 一行改为你所放置的模型的路径，并且确保模型文件的名称是 `model.ckpt`。
+或者，你可以修改 `run.bat` (对于 Linux 用户是 `run.sh`) 文件，将 `MODEL_PATH=models/animefull-final-pruned` 一行改为你所放置的模型的路径，并且确保模型文件的名称是 `model.ckpt`。
 
-### 设定访问令牌 Token（可选）
+### 设定访问令牌 Token(可选)
 
-如果你想要将 NAIFU 公开于互联网上，我们推荐你为其设定一个访问令牌（即 Token）。
+如果你想要将 NAIFU 公开于互联网上，我们推荐你为其设定一个访问令牌(即 Token)。
 你只需在 `run.bat` 中 `%PYTHON% -m uvicorn` 之前添加一行 `set TOKEN=你的令牌`。
 
 如果你使用的是 Linux，则在 `run.sh` 中 `python3 -m uvicorn` 之前添加一行 `export TOKEN=你的令牌`。
