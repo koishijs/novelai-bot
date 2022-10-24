@@ -122,8 +122,8 @@ export const Config = Schema.intersect([
         }),
         Schema.object({
           type: Schema.const('login'),
-          email: Schema.string().description('用户名。').required(),
-          password: Schema.string().description('密码。').role('secret').required(),
+          email: Schema.string().description('账号邮箱。').required(),
+          password: Schema.string().description('账号密码。').role('secret').required(),
         }),
       ]),
       Schema.object({
