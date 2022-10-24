@@ -224,11 +224,23 @@ export function apply(ctx: Context, config: Config) {
             steps: 'steps',
             width: 'width',
             height: 'height',
+            // img2img parameters
+            init_images: 'image',
+            denoising_strength: 'strength',
           }),
         }
       }
 
-      const path = config.type === 'sd-webui' ? '/sdapi/v1/txt2img' : config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
+      const path = (() => {
+        switch (config.type) {
+          case 'sd-webui':
+            return parameters.image ? '/sdapi/v1/img2img' : '/sdapi/v1/txt2img'
+          case 'naifu':
+            return '/generate-stream'
+          default:
+            return '/ai/generate-image'
+        }
+      })()
       const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
         method: 'POST',
         timeout: config.requestTimeout,
