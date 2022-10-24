@@ -215,6 +215,7 @@ export function apply(ctx: Context, config: Config) {
 
         return {
           sampler_index: sampler.sd[options.sampler],
+          init_images: parameters.image ? [parameters.image] : undefined,
           ...project(parameters, {
             prompt: 'prompt',
             n_samples: 'n_samples',
@@ -225,7 +226,6 @@ export function apply(ctx: Context, config: Config) {
             width: 'width',
             height: 'height',
             // img2img parameters
-            init_images: 'image',
             denoising_strength: 'strength',
           }),
         }
