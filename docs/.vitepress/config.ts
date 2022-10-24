@@ -15,6 +15,11 @@ export default defineConfig({
         { text: '配置项', link: '/config' },
       ],
     }, {
+      text: '部署',
+      items: [
+        { text: '部署 NAIFU', link: '/deploy/naifu' },
+      ],
+    }, {
       text: '进阶',
       items: [
         { text: '配置文件', link: '/advanced/config' },
@@ -42,7 +47,7 @@ export default defineConfig({
       { icon: 'discord', link: 'https://discord.com/invite/xfxYwmd284' },
       { icon: 'github', link: 'https://github.com/koishijs/novelai-bot' }
     ],
-  
+
     footer: {
       message: `Released under the MIT License.`,
       copyright: 'Copyright © 2022-present Shigma & Ninzore',
