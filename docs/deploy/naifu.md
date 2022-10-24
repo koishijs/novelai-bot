@@ -117,5 +117,5 @@ sudo apt install python3
 
 ### NAIFU 下载地址
 
-- 原版磁力链接：magnet:?xt=urn:btih:4a4b483d4a5840b6e1fee6b0ca1582c979434e4d&dn=naifu&tr=udp%3a%2f%2ftracker.opentrackr.org%3a1337%2fannounce
+- [磁力链接 (原版)](magnet:?xt=urn:btih:4a4b483d4a5840b6e1fee6b0ca1582c979434e4d&dn=naifu&tr=udp%3a%2f%2ftracker.opentrackr.org%3a1337%2fannounce)
 - 百度网盘：https://pan.baidu.com/s/1AoQgHf5UJuXB2qDtQkOVeQ?pwd=RA00 提取码：RA00
