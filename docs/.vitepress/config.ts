@@ -15,6 +15,11 @@ export default defineConfig({
         { text: '配置项', link: '/config' },
       ],
     }, {
+      text: '部署',
+      items: [
+        { text: '部署 NAIFU', link: '/advanced/naifu' },
+      ],
+    }, {
       text: '进阶',
       items: [
         { text: '配置文件', link: '/advanced/config' },
@@ -22,7 +27,6 @@ export default defineConfig({
         { text: '上下文过滤', link: '/advanced/filter' },
         { text: '自定义回复', link: '/advanced/i18n' },
         { text: '部署到公网', link: '/advanced/server' },
-        { text: '部署 NAIFU', link: '/advanced/naifu' },
       ],
     }, {
       text: 'FAQ',
