@@ -84,7 +84,7 @@ sudo apt install python3
 
 或者，你可以修改 `run.bat` (对于 Linux 用户是 `run.sh`) 文件，将 `MODEL_PATH=models/animefull-final-pruned` 一行改为你所放置的模型的路径，并且确保模型文件的名称是 `model.ckpt`。
 
-### 设定访问令牌 Token(可选)
+### 设定访问令牌 (可选)
 
 如果你想要将 NAIFU 公开于互联网上，我们推荐你为其设定一个访问令牌 (Token)。你只需在 `run.bat` 中 `%PYTHON% -m uvicorn` 之前添加一行 `set TOKEN=你的令牌`。
 
