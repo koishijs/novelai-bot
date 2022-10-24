@@ -17,7 +17,7 @@ export default defineConfig({
     }, {
       text: '部署',
       items: [
-        { text: '部署 NAIFU', link: '/advanced/naifu' },
+        { text: '部署 NAIFU', link: '/delivery/naifu' },
       ],
     }, {
       text: '进阶',
