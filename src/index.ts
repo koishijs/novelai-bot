@@ -61,12 +61,18 @@ export function apply(ctx: Context, config: Config) {
     }
   }
 
+  const checkLength = (length: number) => length % 64 === 0 && length > 0
+
   const resolution = (source: string, session: Session<'authority'>): Size => {
     if (source in orientMap) return orientMap[source]
     if (restricted(session)) throw new Error()
     const cap = source.match(/^(\d+)[x×](\d+)$/)
     if (!cap) throw new Error()
-    return { width: +cap[1], height: +cap[2] }
+    const width = +cap[1], height = +cap[2]
+    if (!checkLength(width) || !checkLength(height) || width + height > 1280) {
+      throw new Error('commands.novelai.messages.invalid-resolution')
+    }
+    return { width, height }
   }
 
   const cmd = ctx.command('novelai <prompts:text>')
@@ -205,32 +211,6 @@ export function apply(ctx: Context, config: Config) {
         globalTasks.delete(id)
       }
 
-      function getPostData() {
-        if (config.type !== 'sd-webui') {
-          parameters.sampler = sampler.sd2nai(options.sampler)
-          return config.type === 'naifu'
-            ? parameters
-            : { model, input: prompt, parameters: omit(parameters, ['prompt']) }
-        }
-
-        return {
-          sampler_index: sampler.sd[options.sampler],
-          init_images: parameters.image ? [parameters.image] : undefined,
-          ...project(parameters, {
-            prompt: 'prompt',
-            batch_size: 'n_samples',
-            seed: 'seed',
-            negative_prompt: 'uc',
-            cfg_scale: 'scale',
-            steps: 'steps',
-            width: 'width',
-            height: 'height',
-            // img2img parameters
-            denoising_strength: 'strength',
-          }),
-        }
-      }
-
       const path = (() => {
         switch (config.type) {
           case 'sd-webui':
@@ -241,6 +221,31 @@ export function apply(ctx: Context, config: Config) {
             return '/ai/generate-image'
         }
       })()
+
+      const data = (() => {
+        if (config.type !== 'sd-webui') {
+          parameters.sampler = sampler.sd2nai(options.sampler)
+          if (config.type === 'naifu') return parameters
+          return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
+        }
+
+        return {
+          sampler_index: sampler.sd[options.sampler],
+          init_images: parameters.image && [parameters.image],
+          ...project(parameters, {
+            prompt: 'prompt',
+            batch_size: 'n_samples',
+            seed: 'seed',
+            negative_prompt: 'uc',
+            cfg_scale: 'scale',
+            steps: 'steps',
+            width: 'width',
+            height: 'height',
+            denoising_strength: 'strength',
+          }),
+        }
+      })()
+
       const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
         method: 'POST',
         timeout: config.requestTimeout,
@@ -248,7 +253,7 @@ export function apply(ctx: Context, config: Config) {
           ...config.headers,
           authorization: 'Bearer ' + token,
         },
-        data: getPostData(),
+        data,
       }).then((res) => {
         if (config.type === 'sd-webui') {
           return (res.data as StableDiffusionWebUI.Response).images[0]
