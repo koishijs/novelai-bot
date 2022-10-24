@@ -22,6 +22,7 @@ export default defineConfig({
         { text: '上下文过滤', link: '/advanced/filter' },
         { text: '自定义回复', link: '/advanced/i18n' },
         { text: '部署到公网', link: '/advanced/server' },
+        { text: '部署 NAIFU', link: '/advanced/naifu' },
       ],
     }, {
       text: 'FAQ',
@@ -42,7 +43,7 @@ export default defineConfig({
       { icon: 'discord', link: 'https://discord.com/invite/xfxYwmd284' },
       { icon: 'github', link: 'https://github.com/koishijs/novelai-bot' }
     ],
-  
+
     footer: {
       message: `Released under the MIT License.`,
       copyright: 'Copyright © 2022-present Shigma & Ninzore',
