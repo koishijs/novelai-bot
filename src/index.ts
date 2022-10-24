@@ -215,20 +215,32 @@ export function apply(ctx: Context, config: Config) {
 
         return {
           sampler_index: sampler.sd[options.sampler],
+          init_images: parameters.image ? [parameters.image] : undefined,
           ...project(parameters, {
             prompt: 'prompt',
-            n_samples: 'n_samples',
+            batch_size: 'n_samples',
             seed: 'seed',
             negative_prompt: 'uc',
             cfg_scale: 'scale',
             steps: 'steps',
             width: 'width',
             height: 'height',
+            // img2img parameters
+            denoising_strength: 'strength',
           }),
         }
       }
 
-      const path = config.type === 'sd-webui' ? '/sdapi/v1/txt2img' : config.type === 'naifu' ? '/generate-stream' : '/ai/generate-image'
+      const path = (() => {
+        switch (config.type) {
+          case 'sd-webui':
+            return parameters.image ? '/sdapi/v1/img2img' : '/sdapi/v1/txt2img'
+          case 'naifu':
+            return '/generate-stream'
+          default:
+            return '/ai/generate-image'
+        }
+      })()
       const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
         method: 'POST',
         timeout: config.requestTimeout,
