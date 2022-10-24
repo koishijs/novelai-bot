@@ -17,20 +17,20 @@ NAIFU 是匿名网友打包的一套 [NovelAI](https://novelai.net/) 的前端�
 
 ```text
 naifu/
- |- clip/
- |- hydra_node/
- |- k_diffusion/
- |- ldm/
- |- main.py
- |- models/
- |- README.txt
- |- requirements.txt
- |- run.bat
- |- run.sh
- |- setup.bat
- |- setup.sh
- |- static/
- |- taming/
+├── clip/
+├── hydra_node/
+├── k_diffusion/
+├── ldm/
+├── main.py
+├── models/
+├── README.txt
+├── requirements.txt
+├── run.bat
+├── run.sh
+├── setup.bat
+├── setup.sh
+├── static/
+└── taming/
 ```
 
 ## 安装（Windows）
