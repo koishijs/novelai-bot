@@ -22,14 +22,14 @@ naifu/
 ├── ldm/
 ├── main.py
 ├── models/
+|── taming/
+├── static/
 ├── README.txt
 ├── requirements.txt
 ├── run.bat
 ├── run.sh
 ├── setup.bat
-├── setup.sh
-├── static/
-└── taming/
+└── setup.sh
 ```
 
 ## 安装 (Windows)
