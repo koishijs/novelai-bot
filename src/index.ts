@@ -140,7 +140,11 @@ export function apply(ctx: Context, config: Config) {
         prompt,
         n_samples: 1,
         uc,
-        ucPreset: 0,
+        // 0: low quality + bad anatomy
+        // 1: low quality
+        // 2: none
+        ucPreset: 2,
+        qualityToggle: false,
       }
 
       if (imgUrl) {
@@ -184,10 +188,8 @@ export function apply(ctx: Context, config: Config) {
         Object.assign(parameters, {
           height: options.resolution.height,
           width: options.resolution.width,
-          scale: options.scale ?? 12,
+          scale: options.scale ?? 11,
           steps: options.steps ?? 28,
-          noise: options.noise ?? 0.2,
-          strength: options.strength ?? 0.7,
         })
       }
 
@@ -329,7 +331,7 @@ export function apply(ctx: Context, config: Config) {
 
   ctx.accept(['model', 'orient', 'sampler'], (config) => {
     cmd._options.model.fallback = config.model
-    cmd._options.resolution.fallback = config.orient
+    cmd._options.resolution.fallback = orientMap[config.orient]
     cmd._options.sampler.fallback = config.sampler
     cmd._options.sampler.type = Object.keys(config.type === 'sd-webui' ? sampler.sd : sampler.nai)
   }, { immediate: true })

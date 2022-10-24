@@ -13,16 +13,10 @@ export const orientMap = {
   square: { height: 640, width: 640 },
 } as const
 
-const lowQuality = [
-  'nsfw, text, cropped, jpeg artifacts, signature, watermark, username, blurry',
-  'lowres, polar lores, worst quality, low quality, normal quality',
-].join(', ')
-
-const badAnatomy = [
-  'bad anatomy, error, long neck, cross-eyed, mutation, deformed',
-  'bad hands, bad feet, malformed limbs, fused fingers, mutated hands',
-  'missing fingers, fewer digits, to many fingers, extra fingers, extra digit, extra limbs, extra arms, extra legs',
-  'poorly drawn hands, poorly drawn face, poorly drawn limbs',
+const ucPreset = [
+  'nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers',
+  'extra digit, fewer digits, cropped, worst quality, low quality',
+  'normal quality, jpeg artifacts, signature, watermark, username, blurry',
 ].join(', ')
 
 type Model = keyof typeof modelMap
@@ -175,7 +169,7 @@ export const Config = Schema.intersect([
       Schema.const('verbose').description('发送全部信息'),
     ]).description('输出方式。').default('default'),
     basePrompt: Schema.string().role('textarea').description('默认附加的标签。').default('masterpiece, best quality'),
-    negativePrompt: Schema.string().role('textarea').description('默认附加的反向标签。').default([lowQuality, badAnatomy].join(', ')),
+    negativePrompt: Schema.string().role('textarea').description('默认附加的反向标签。').default(ucPreset),
     forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
     maxRetryCount: Schema.natural().description('连接失败时最大的重试次数。').default(3),
     requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute),
