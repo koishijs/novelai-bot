@@ -86,9 +86,10 @@ sudo apt install python3
 
 ### 设定访问令牌 (可选)
 
-如果你想要将 NAIFU 公开于互联网上，我们推荐你为其设定一个访问令牌 (Token)。你只需在 `run.bat` 中 `%PYTHON% -m uvicorn` 之前添加一行 `set TOKEN=你的令牌`。
+如果你想要将 NAIFU 公开于互联网上，我们推荐你为其设定一个访问令牌 (Token)。
 
-如果你使用的是 Linux，则在 `run.sh` 中 `python3 -m uvicorn` 之前添加一行 `export TOKEN=你的令牌`。
+- Windows：在 `run.bat` 中 `%PYTHON% -m uvicorn` 之前添加一行 `set TOKEN=你的令牌`
+- Linux：在 `run.sh` 中 `python3 -m uvicorn` 之前添加一行 `export TOKEN=你的令牌`
 
 ### 启动
 
