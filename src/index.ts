@@ -69,7 +69,7 @@ export function apply(ctx: Context, config: Config) {
     const cap = source.match(/^(\d+)[x×](\d+)$/)
     if (!cap) throw new Error()
     const width = +cap[1], height = +cap[2]
-    if (!checkLength(width) || !checkLength(height) || width + height > 1280) {
+    if (!checkLength(width) || !checkLength(height)) {
       throw new Error('commands.novelai.messages.invalid-resolution')
     }
     return { width, height }
