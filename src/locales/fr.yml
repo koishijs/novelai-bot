@@ -35,7 +35,7 @@ commands:
         - D'accord, mais attendez que je complète celui-ci.
         - '>_< Il y a {0} travaux en cours.'
       invalid-size: Le mode d'amélioration de l'image peut être utilisé seulement pour les images générées. Si vous utilisez le mode de img2img, Utilisez « /novelai » sans l'option « --enhance ».
-      invalid-resolution: La taille de l'image n'est pas valide. La largeur et la hauteur de l'image doivent être des multiples de 64, et leur somme ne doit pas être supérieure à 1280.
+      invalid-resolution: La taille de l'image n'est pas valide. La largeur et la hauteur de l'image doivent être des multiples de 64.
       file-too-large: Le fichier est trop important.
       unsupported-file-type: Format de fichier non reconnu.
       download-error: Erreur d'analyse syntaxique de l'image
