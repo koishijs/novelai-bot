@@ -7,19 +7,19 @@ commands:
       快來給專案標星收藏吧：https://github.com/koishijs/novelai-bot
 
     options:
-      enhance: 圖片增強模式
+      enhance: 圖像增強模式
       model: 設定生成模型
-      resolution: 設定圖片尺寸
+      resolution: 設定圖像尺寸
       sampler: 設定取樣器
       seed: 設置隨機種子
       steps: 設置迭代步數
       scale: 設置對輸入的服從度
-      strength: 圖片修改幅度
-      noise: 圖片雜訊強度
+      strength: 圖像修改幅度
+      noise: 圖像雜訊強度
 
     messages:
       expect-prompt: 請輸入標籤。
-      expect-image: 請輸入圖片。
+      expect-image: 請輸入圖像。
       invalid-input: 僅接受英文輸入。
       forbidden-word: 輸入含有違禁詞。
       concurrent-jobs@random:
@@ -34,10 +34,10 @@ commands:
       invalid-resolution: 圖像尺寸無效。寬度與高度都須爲 64 的倍數，且寬高的總和不能超過 1280.
       file-too-large: 文件體積過大。
       unsupported-file-type: 不支持的文件格式。
-      download-error: 圖片解析失敗。
+      download-error: 圖像解析失敗。
       unknown-error: 發生未知的錯誤。
       response-error: 發生未知的錯誤 ({0})。
-      empty-response: 伺服器返回了空圖片，請稍後重試。
+      empty-response: 伺服器返回了空圖像，請稍後重試。
       request-failed: 請求失敗 ({0})，請稍後重試。
       request-timeout: 請求超時。
       invalid-password: 電郵地址或密碼不正確。
