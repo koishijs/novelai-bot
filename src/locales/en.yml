@@ -34,6 +34,7 @@ commands:
         - Sure, but please wait for me to complete this one before.
         - Bruh, there are {0} jobs pending!
       invalid-size: The Enhance mode can only be used for images generated. Use /novelai without enhance option if you are using normal img2img.
+      invalid-resolution: Invalid resolution for image generation. The width and height of image should be multiple of 64.
       file-too-large: File is too large.
       unsupported-file-type: Unsupported file type.
       download-error: Parsing image failed.
