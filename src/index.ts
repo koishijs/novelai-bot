@@ -1,7 +1,7 @@
 import { Context, Dict, Logger, omit, Quester, segment, Session, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler } from './config'
 import { StableDiffusionWebUI } from './types'
-import { download, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
+import { closestMultiple, download, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
 import {} from '@koishijs/plugin-help'
 
 export * from './config'
@@ -61,17 +61,13 @@ export function apply(ctx: Context, config: Config) {
     }
   }
 
-  const checkLength = (length: number) => length % 64 === 0 && length > 0
-
   const resolution = (source: string, session: Session<'authority'>): Size => {
     if (source in orientMap) return orientMap[source]
     if (restricted(session)) throw new Error()
     const cap = source.match(/^(\d+)[x×](\d+)$/)
     if (!cap) throw new Error()
-    const width = +cap[1], height = +cap[2]
-    if (!checkLength(width) || !checkLength(height)) {
-      throw new Error('commands.novelai.messages.invalid-resolution')
-    }
+    const width = closestMultiple(+cap[1])
+    const height = closestMultiple(+cap[2])
     return { width, height }
   }
 
@@ -86,7 +82,7 @@ export function apply(ctx: Context, config: Config) {
     .shortcut('增強', { fuzzy: true, options: { enhance: true } })
     .option('enhance', '-e', { hidden: restricted })
     .option('model', '-m <model>', { type: models, hidden: thirdParty })
-    .option('resolution', '-o, -v <resolution>', { type: resolution })
+    .option('resolution', '-o, -r <resolution>', { type: resolution })
     .option('sampler', '-s <sampler>')
     .option('seed', '-x <seed:number>')
     .option('steps', '-t <step:number>', { hidden: restricted })
@@ -159,13 +155,13 @@ export function apply(ctx: Context, config: Config) {
           return session.text('.download-error')
         }
 
-        const size = getImageSize(image[0])
         Object.assign(parameters, {
           image: image[1],
           scale: options.scale ?? 11,
           steps: options.steps ?? 50,
         })
         if (options.enhance) {
+          const size = getImageSize(image[0])
           if (size.width + size.height !== 1280) {
             return session.text('.invalid-size')
           }
@@ -176,15 +172,16 @@ export function apply(ctx: Context, config: Config) {
             strength: options.strength ?? 0.2,
           })
         } else {
-          const orient = resizeInput(size)
+          options.resolution ||= resizeInput(getImageSize(image[0]))
           Object.assign(parameters, {
-            height: orient.height,
-            width: orient.width,
+            height: options.resolution.height,
+            width: options.resolution.width,
             noise: options.noise ?? 0.2,
             strength: options.strength ?? 0.7,
           })
         }
       } else {
+        options.resolution ||= orientMap[config.orient]
         Object.assign(parameters, {
           height: options.resolution.height,
           width: options.resolution.width,
@@ -331,7 +328,6 @@ export function apply(ctx: Context, config: Config) {
 
   ctx.accept(['model', 'orient', 'sampler'], (config) => {
     cmd._options.model.fallback = config.model
-    cmd._options.resolution.fallback = orientMap[config.orient]
     cmd._options.sampler.fallback = config.sampler
     cmd._options.sampler.type = Object.keys(config.type === 'sd-webui' ? sampler.sd : sampler.nai)
   }, { immediate: true })
