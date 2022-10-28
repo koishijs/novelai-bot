@@ -34,6 +34,15 @@
 增强 [图片] koishi
 ```
 
+### 引用图片回复
+
+考虑到某些平台并不支持在一条消息中同时出现图片和文本，我们也允许通过引用回复的方式触发 img2img 和 enhance 功能。例如：
+
+```
+> [图片]
+> [引用回复] 约稿/增强
+```
+
 ## 关键词 (prompt)
 
 使用关键词描述你想要的图像。关键词需要为英文，多个关键词之间用逗号分隔。每一个关键词也可以由多个单词组成，单词之间可以用空格或下划线分隔。例如：
@@ -108,7 +117,7 @@ negative prompt: loli
 ### 设置分辨率 (resolution)
 
 ::: warning
-此选项在传入图片时不可用。
+此选项在图片增强时不可用。
 :::
 
 可以用 `-r` 或 `--resolution` 更改图片方向，可选值包括：
@@ -121,14 +130,14 @@ negative prompt: loli
 约稿 -r landscape koishi
 ```
 
-当启用了 [allowAnlas](./config.md#allowAnlas) 后，你还可以使用一对数字指定图片的具体长宽：
+当启用了 [allowAnlas](./config.md#allowAnlas) 后，你还可以指定图片的具体长宽：
 
 ```
 约稿 -r 1024x1024 koishi
 ```
 
 ::: tip
-由于 Stable Diffusion 的限制，长宽都必须是 64 的倍数。
+由于 Stable Diffusion 的限制，输出图片的长宽都必须是 64 的倍数。当你输入的图片长宽不满足此条件时，我们会自动修改为接近此宽高比的合理数值。
 :::
 
 ### 切换采样器 (sampler)
