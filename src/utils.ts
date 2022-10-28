@@ -134,11 +134,10 @@ export async function login(ctx: Context): Promise<string> {
   }
 }
 
-export function closestMultiple(num: number, mult: number) {
-  const numInt = num
-  const floor = Math.floor(numInt / mult) * mult
-  const ceil = Math.ceil(numInt / mult) * mult
-  const closest = numInt - floor < ceil - numInt ? floor : ceil
+export function closestMultiple(num: number, mult = 64) {
+  const floor = Math.floor(num / mult) * mult
+  const ceil = Math.ceil(num / mult) * mult
+  const closest = num - floor < ceil - num ? floor : ceil
   if (Number.isNaN(closest)) return 0
   return closest <= 0 ? mult : closest
 }
@@ -159,14 +158,14 @@ export function resizeInput(size: Size): Size {
   const aspectRatio = width / height
   if (aspectRatio > 1) {
     const height = 512
-    const width = closestMultiple(height * aspectRatio, 64)
+    const width = closestMultiple(height * aspectRatio)
     // check that image is not too large
     if (width * height <= MAX_OUTPUT_SIZE) {
       return { width, height }
     }
   } else {
     const width = 512
-    const height = closestMultiple(width / aspectRatio, 64)
+    const height = closestMultiple(width / aspectRatio)
     // check that image is not too large
     if (width * height <= MAX_OUTPUT_SIZE) {
       return { width, height }
@@ -176,11 +175,11 @@ export function resizeInput(size: Size): Size {
   // if that fails set the higher size as 1024 and use aspect ratio to the other dimension
   if (aspectRatio > 1) {
     const width = 1024
-    const height = closestMultiple(width / aspectRatio, 64)
+    const height = closestMultiple(width / aspectRatio)
     return { width, height }
   } else {
     const height = 1024
-    const width = closestMultiple(height * aspectRatio, 64)
+    const width = closestMultiple(height * aspectRatio)
     return { width, height }
   }
 }
