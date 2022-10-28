@@ -26,6 +26,7 @@ const { Layout } = DefaultTheme
   align-items: center;
   padding: 24px;
   gap: 16px;
+  margin-top: 1rem;
   border-radius: 12px;
   min-height: 240px;
   line-height: 18px;

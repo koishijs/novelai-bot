@@ -105,21 +105,31 @@ negative prompt: loli
 约稿 -m furry koishi
 ```
 
-### 设置图片方向 (orient)
+### 设置分辨率 (resolution)
 
 ::: warning
 此选项在传入图片时不可用。
 :::
 
-可以用 `-o` 或 `--orient` 更改图片方向，可选值包括：
+可以用 `-r` 或 `--resolution` 更改图片方向，可选值包括：
 
 - `portrait`：768×512 (默认)
 - `square`：640×640
 - `landscape`：512×768
 
 ```
-约稿 -o landscape koishi
+约稿 -r landscape koishi
 ```
+
+当启用了 [allowAnlas](./config.md#allowAnlas) 后，你还可以使用一对数字指定图片的具体长宽：
+
+```
+约稿 -r 1024x1024 koishi
+```
+
+::: tip
+由于 Stable Diffusion 的限制，长宽都必须是 64 的倍数。
+:::
 
 ### 切换采样器 (sampler)
 

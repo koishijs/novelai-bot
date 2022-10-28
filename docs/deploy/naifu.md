@@ -93,11 +93,7 @@ sudo apt install python3
 
 ### 启动
 
-双击打开 `run.bat` 文件，或在终端中输入 `run.bat` 并按下回车，它会自动帮你启动 NAIFU。
-
-::: tip
-对于 Linux 用户则是运行 `./run.sh`
-:::
+双击打开 `run.bat` (对于 Linux 用户是 `run.sh`) 文件，或在终端中输入 `run.bat` 并按下回车，它会自动帮你启动 NAIFU。
 
 当控制台界面显示 `Uvicorn running on http://0.0.0.0:6969` 时，说明 NAIFU 已经启动成功，你可以在浏览器中打开 `http://localhost:6969` 进行访问测试。
 
@@ -105,7 +101,7 @@ sudo apt install python3
 如果你运行 NAIFU 的电脑和你的浏览器不在同一台电脑上，你需要将 `localhost` 改为电脑的 IP 地址。
 :::
 
-## 配置 `koishi-plugin-novelai` 插件
+## 配置 novelai 插件
 
 打开 Koishi 控制台，点击「插件配置」并选择「novelai」插件，将 `type` 更改为 `naifu`，并将 `endpoint` 改为上述的地址，最后点击右上角的「重载配置」按钮。
 
@@ -117,5 +113,5 @@ sudo apt install python3
 
 ### NAIFU 下载地址
 
-- [磁力链接 (原版)](magnet:?xt=urn:btih:4a4b483d4a5840b6e1fee6b0ca1582c979434e4d&dn=naifu&tr=udp%3a%2f%2ftracker.opentrackr.org%3a1337%2fannounce)
-- [百度网盘](https://pan.baidu.com/s/1AoQgHf5UJuXB2qDtQkOVeQ?pwd=RA00)，提取码：RA00
+- [磁力链接](magnet:?xt=urn:btih:4a4b483d4a5840b6e1fee6b0ca1582c979434e4d&dn=naifu&tr=udp%3a%2f%2ftracker.opentrackr.org%3a1337%2fannounce) (原版)
+- [百度网盘](https://pan.baidu.com/s/1AoQgHf5UJuXB2qDtQkOVeQ?pwd=RA00) (提取码：RA00)
