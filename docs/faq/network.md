@@ -34,4 +34,4 @@
 
 ### 未知错误 503
 
-如果你选择的 `type` 是 `login` 或 `token`，请尝试将 `endpoint` 中的 `api` 替换成 `backend-production-svc` 再试试。
+如果你使用 NovelAI 官网作为后端 (`login` 或 `token`)，请尝试将 `endpoint` 中的 `api` 替换成 `backend-production-svc` 再试试。
