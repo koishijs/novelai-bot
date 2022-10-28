@@ -8,11 +8,9 @@ const { Layout } = DefaultTheme
 <template>
   <layout>
     <template #aside-ads-after>
-      <div class="sponsor">
-        <p>如果您愿意支持我们，<br/>请扫描下方的二维码，<br/>我们将继续努力维护这个项目。</p>
-        <div class="image wechat"></div>
-        <div class="image alipay"></div>
-      </div>
+      <a class="sponsor" href="https://afdian.net/a/shigma" target="_blank">
+        点击这里支持作者
+      </a>
     </template>
   </layout>
 </template>
@@ -24,32 +22,15 @@ const { Layout } = DefaultTheme
   flex-flow: column;
   justify-content: center;
   align-items: center;
-  padding: 24px;
-  gap: 16px;
+  padding: 16px;
   margin-top: 1rem;
-  border-radius: 12px;
-  min-height: 240px;
-  line-height: 18px;
+  border-radius: 14px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   text-align: center;
+  cursor: pointer;
   background-color: var(--vp-c-bg-soft);
   transition: color 0.3s ease, background-color 0.3s ease;
-
-  .image {
-    width: 8rem;
-    height: 8rem;
-    background-size: contain;
-    background-color: inherit;
-
-    &.wechat {
-      background-image: url('https://cdn-shiki.momobako.com:444/static/sponsor/wechat.webp');
-    }
-
-    &.alipay {
-      background-image: url('https://cdn-shiki.momobako.com:444/static/sponsor/alipay.webp');
-    }
-  }
 }
 
 </style>
