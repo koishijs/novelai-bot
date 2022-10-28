@@ -22,6 +22,16 @@
 
 请确认 `endpoint` 是否正确，以及版本是否是最新。
 
+如果你选择的 `type` 是 `sd-webui`，你还需确认你使用的 `sd-webui` 是来自于 `AUTOMATIC1111` 的版本，**且在启动时添加了 `--api` 参数**。
+
+### 未知错误 422
+
+请更新插件版本。如插件版本已是最新，请尝试重置插件配置，并重新填写相应字段解决。
+
+### 未知错误 502
+
+如果你选择的 `type` 是 `sd-webui`，且采用了公网转发的方式提供服务 (即在启动的时候传递了 `--share` 或 `--ngrok` 参数)，请确认你运行 `sd-webui` 的机器的网络情况，及与上述隧道服务的服务器的连通情况。
+
 ### 未知错误 503
 
-请尝试将 `endpoint` 中的 `api` 替换成 `backend-production-svc` 再试试。
+如果你使用 NovelAI 官网作为后端 (`login` 或 `token`)，请尝试将 `endpoint` 中的 `api` 替换成 `backend-production-svc` 再试试。
