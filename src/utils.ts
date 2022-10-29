@@ -131,6 +131,8 @@ export async function login(ctx: Context): Promise<string> {
       timeout: 30000,
       key: await calcAccessKey(ctx.config.email, ctx.config.password),
     }).catch(NetworkError.catch({ 401: '.invalid-password' })).then(res => res.accessToken)
+  } else {
+    return ctx.config.token
   }
 }
 
