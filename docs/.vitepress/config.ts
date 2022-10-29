@@ -13,6 +13,7 @@ export default defineConfig({
         { text: '介绍', link: '/' },
         { text: '用法', link: '/usage' },
         { text: '配置项', link: '/config' },
+        { text: '更多资源', link: '/more' },
       ],
     }, {
       text: '部署',
