@@ -1,7 +1,7 @@
 import { Context, Dict, Logger, omit, Quester, segment, Session, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler } from './config'
 import { StableDiffusionWebUI } from './types'
-import { closestMultiple, download, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
+import { closestMultiple, download, getImageSize, login, NetworkError, project, resizeInput, Size, stripDataPrefix } from './utils'
 import {} from '@koishijs/plugin-help'
 
 export * from './config'
@@ -255,12 +255,12 @@ export function apply(ctx: Context, config: Config) {
         data,
       }).then((res) => {
         if (config.type === 'sd-webui') {
-          return (res.data as StableDiffusionWebUI.Response).images[0]
+          return stripDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
         }
         // event: newImage
         // id: 1
         // data:
-        return res.data.slice(27)
+        return res.data?.slice(27)
       })
 
       let base64: string, count = 0
