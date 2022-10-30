@@ -199,7 +199,7 @@ export function parseForbidden(input: string) {
 
 const backslash = /@@__BACKSLASH__@@/g
 
-export function parseInput(input: string, config: Config, forbidden: Forbidden[]): string[] {
+export function parseInput(input: string, config: Config, forbidden: Forbidden[], override: boolean): string[] {
   input = input.toLowerCase()
     .replace(/\\\\/g, backslash.source)
     .replace(/，/g, ',')
@@ -253,7 +253,10 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
     return true
   })
 
-  appendToList(positive, config.basePrompt)
-  appendToList(negative, config.negativePrompt)
+  if (!override) {
+    appendToList(positive, config.basePrompt)
+    appendToList(negative, config.negativePrompt)
+  }
+
   return [null, positive.join(', '), negative.join(', ')]
 }

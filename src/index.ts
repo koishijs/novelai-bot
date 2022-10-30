@@ -83,6 +83,7 @@ export function apply(ctx: Context, config: Config) {
     .option('enhance', '-e', { hidden: restricted })
     .option('model', '-m <model>', { type: models, hidden: thirdParty })
     .option('resolution', '-o, -r <resolution>', { type: resolution })
+    .option('override', '-O')
     .option('sampler', '-s <sampler>')
     .option('seed', '-x <seed:number>')
     .option('steps', '-t <step:number>', { hidden: restricted })
@@ -114,7 +115,7 @@ export function apply(ctx: Context, config: Config) {
         delete options.steps
       }
 
-      const [errPath, prompt, uc] = parseInput(input, config, forbidden)
+      const [errPath, prompt, uc] = parseInput(input, config, forbidden, options.override)
       if (errPath) return session.text(errPath)
 
       let token: string
