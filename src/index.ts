@@ -61,6 +61,12 @@ export function apply(ctx: Context, config: Config) {
     }
   }
 
+  const step = (source: string) => {
+    const value = +source
+    if (value * 0 === 0 && Math.floor(value) === value && value > 0 && value <= (config.maxSteps || Infinity)) return value
+    throw new Error()
+  }
+
   const resolution = (source: string, session: Session<'authority'>): Size => {
     if (source in orientMap) return orientMap[source]
     if (restricted(session)) throw new Error()
@@ -68,6 +74,9 @@ export function apply(ctx: Context, config: Config) {
     if (!cap) throw new Error()
     const width = closestMultiple(+cap[1])
     const height = closestMultiple(+cap[2])
+    if (Math.max(width, height) > (config.maxResolution || Infinity)) {
+      throw new Error()
+    }
     return { width, height }
   }
 
@@ -82,11 +91,11 @@ export function apply(ctx: Context, config: Config) {
     .shortcut('增強', { fuzzy: true, options: { enhance: true } })
     .option('enhance', '-e', { hidden: restricted })
     .option('model', '-m <model>', { type: models, hidden: thirdParty })
-    .option('resolution', '-o, -r <resolution>', { type: resolution })
+    .option('resolution', '-r <resolution>', { type: resolution })
     .option('override', '-O')
     .option('sampler', '-s <sampler>')
     .option('seed', '-x <seed:number>')
-    .option('steps', '-t <step:number>', { hidden: restricted })
+    .option('steps', '-t <step>', { type: step, hidden: restricted })
     .option('scale', '-c <scale:number>')
     .option('noise', '-n <noise:number>', { hidden: restricted })
     .option('strength', '-N <strength:number>', { hidden: restricted })
