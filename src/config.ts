@@ -77,12 +77,14 @@ export interface Options {
 
 export interface Config {
   type: 'token' | 'login' | 'naifu' | 'sd-webui'
-  token: string
-  email: string
-  password: string
+  token?: string
+  email?: string
+  password?: string
   model?: Model
   orient?: Orient
   sampler?: string
+  maxSteps?: number
+  maxResolution?: number
   anatomy?: boolean
   output?: 'minimal' | 'default' | 'verbose'
   allowAnlas?: boolean | number
@@ -150,32 +152,40 @@ export const Config = Schema.intersect([
     Schema.object({
       type: Schema.const('sd-webui'),
       sampler: sampler.createSchema(sampler.sd),
-    }).description('功能设置'),
+    }).description('参数设置'),
     Schema.object({
       type: Schema.const('naifu'),
       sampler: sampler.createSchema(sampler.nai),
-    }).description('功能设置'),
+    }).description('参数设置'),
     Schema.object({
       model: Schema.union(models).description('默认的生成模型。').default('nai'),
       sampler: sampler.createSchema(sampler.nai),
-    }).description('功能设置'),
+    }).description('参数设置'),
   ] as const),
 
   Schema.object({
     orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
+    maxSteps: Schema.natural().description('允许的最大迭代步数。').default(0),
+    maxResolution: Schema.natural().description('生成图片的最大尺寸。').default(0),
+  }),
+
+  Schema.object({
+    basePrompt: Schema.string().role('textarea').description('默认附加的标签。').default('masterpiece, best quality'),
+    negativePrompt: Schema.string().role('textarea').description('默认附加的反向标签。').default(ucPreset),
+    forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
+  }).description('输入设置'),
+
+  Schema.object({
     output: Schema.union([
       Schema.const('minimal').description('只发送图片'),
       Schema.const('default').description('发送图片和关键信息'),
       Schema.const('verbose').description('发送全部信息'),
     ]).description('输出方式。').default('default'),
-    basePrompt: Schema.string().role('textarea').description('默认附加的标签。').default('masterpiece, best quality'),
-    negativePrompt: Schema.string().role('textarea').description('默认附加的反向标签。').default(ucPreset),
-    forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
     maxRetryCount: Schema.natural().description('连接失败时最大的重试次数。').default(3),
     requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute),
     recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
     maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 以禁用此功能)。').default(0),
-  }),
+  }).description('高级设置'),
 ]) as Schema<Config>
 
 interface Forbidden {

@@ -55,7 +55,7 @@ API 服务器地址。如果你搭建了私服，可以将此项设置为你的�
 
 要附加的额外请求头。如果你的 `endpoint` 是第三方服务器，你可能需要设置正确的请求头，否则请求可能会被拒绝。
 
-## 功能设置
+## 参数设置
 
 ### model
 
@@ -78,19 +78,19 @@ API 服务器地址。如果你搭建了私服，可以将此项设置为你的�
 
 默认的采样器。
 
-### output
+### maxSteps
 
-- 类型：`'minimal' | 'default' | 'verbose'`
-- 默认值：`'default'`
+- 类型：`number`
 
-输出方式。`minimal` 表示只发送图片，`default` 表示发送图片和关键信息，`verbose` 表示发送全部信息。
+选项 `--steps` 的最大值。
 
-### allowAnlas
+### maxResolution
 
-- 类型：`boolean`
-- 默认值：`true`
+- 类型：`number`
 
-是否允许使用点数。禁用后部分功能 (如图片增强和步数设置) 将无法使用。
+选项 `--resolution` 中边长的最大值。
+
+## 输入设置
 
 ### basePrompt
 
@@ -120,6 +120,20 @@ API 服务器地址。如果你搭建了私服，可以将此项设置为你的�
 
 ## 高级设置
 
+### output
+
+- 类型：`'minimal' | 'default' | 'verbose'`
+- 默认值：`'default'`
+
+输出方式。`minimal` 表示只发送图片，`default` 表示发送图片和关键信息，`verbose` 表示发送全部信息。
+
+### allowAnlas
+
+- 类型：`boolean`
+- 默认值：`true`
+
+是否允许使用点数。禁用后部分功能 (如图片增强和步数设置) 将无法使用。
+
 ### requestTimeout
 
 - 类型：`number`
@@ -127,12 +141,12 @@ API 服务器地址。如果你搭建了私服，可以将此项设置为你的�
 
 当请求超过这个时间时会中止并提示超时。
 
-### recallTimeout
+<!-- ### recallTimeout
 
 - 类型：`number`
 - 默认值：`0`
 
-图片发送后自动撤回的时间 (设置为 `0` 禁用此功能)。
+图片发送后自动撤回的时间 (设置为 `0` 禁用此功能)。 -->
 
 ### maxConcurrency
 
