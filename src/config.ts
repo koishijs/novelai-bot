@@ -243,7 +243,7 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
   }
 
   // extract negative prompts
-  const capture = input.match(/(,\s*|\s+)(-u\s+|negative prompts?:)\s*([\s\S]+)/m)
+  const capture = input.match(/(,\s*|\s+)(-u\s+|--undesired\s+|negative prompts?:\s*)([\s\S]+)/m)
   if (capture?.[3]) {
     input = input.slice(0, capture.index).trim()
     appendToList(negative, capture[3])
