@@ -210,8 +210,8 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
-      session.send(globalTasks.size > 1
-        ? session.text('.pending', [globalTasks.size - 1])
+      session.send(globalTasks.size
+        ? session.text('.pending', [globalTasks.size])
         : session.text('.waiting'))
 
       globalTasks.add(id)
