@@ -218,12 +218,12 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
 
   if (config.type === 'sd-webui') {
     input = input
-      .replace(/(^|[^\\])\{/g, (_, $1) => $1 + '(')
-      .replace(/(^|[^\\])\}/g, (_, $1) => $1 + ')')
+      .split('\\{').map(s => s.replace(/\{/g, '(')).join('\\{')
+      .split('\\}').map(s => s.replace(/\}/g, ')')).join('\\}')
   } else {
     input = input
-      .replace(/(^|[^\\])\(/g, (_, $1) => $1 + '{')
-      .replace(/(^|[^\\])\)/g, (_, $1) => $1 + '}')
+      .split('\\(').map(s => s.replace(/\(/g, '{')).join('\\(')
+      .split('\\)').map(s => s.replace(/\)/g, '}')).join('\\)')
   }
 
   input = input
