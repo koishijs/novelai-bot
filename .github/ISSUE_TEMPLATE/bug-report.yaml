@@ -39,6 +39,18 @@ body:
         - Manually (node index.js)
     validations:
       required: true
+  - type: dropdown
+    id: backend
+    attributes:
+      label: Backend
+      description: 服务类型及登录方式
+      options:
+        - NovelAI (帐号密码)
+        - NovelAI (Token)
+        - NAIFU
+        - Stable Diffusion WebUI (AUTOMATIC1111)
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Versions
