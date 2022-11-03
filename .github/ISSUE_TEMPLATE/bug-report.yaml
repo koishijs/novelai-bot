@@ -63,7 +63,7 @@ body:
       description: 请填写相应的版本号。
       value: |
         - OS: <!-- e.g. Windows 10 -->
-        - Platform: <!-- e.g. Discord -->
+        - Adapter: <!-- e.g. Discord -->
         - Node version: <!-- e.g. 14.17.0 -->
         - Koishi version: <!-- e.g. 3.0.0 -->
     validations:
