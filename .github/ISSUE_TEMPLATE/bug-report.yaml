@@ -35,6 +35,7 @@ body:
         - Koishi Desktop
         - Koishi Android
         - Koishi CLI (koishi start)
+        - Containers (Docker, Kubernates, etc)
         - Manually (node index.js)
     validations:
       required: true
