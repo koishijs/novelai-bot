@@ -64,8 +64,8 @@ body:
       value: |
         - OS: <!-- e.g. Windows 10 -->
         - Adapter: <!-- e.g. Discord -->
-        - Node version: <!-- e.g. 14.17.0 -->
-        - Koishi version: <!-- e.g. 3.0.0 -->
+        - Node version: <!-- e.g. 18.12.0 -->
+        - Koishi version: <!-- e.g. 4.9.9 -->
     validations:
       required: true
   - type: textarea
