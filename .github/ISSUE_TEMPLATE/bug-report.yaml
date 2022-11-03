@@ -25,7 +25,13 @@ body:
   - type: textarea
     attributes:
       label: Screenshots
-      description: 请尽量详细地提供相关截图，可以是聊天记录、Koishi 日志和服务端（如 go-cqhttp）日志等。
+      description: 请尽量详细地提供相关截图，可以是聊天记录、Koishi 日志和服务端（如 go-cqhttp）日志等。文本的日志请复制到下方文本框。
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: 请将日志输出复制到此处。这个文本框的内容会自动渲染为代码，因此你不需要添加反引号 (`)。
+      render: shell
   - type: dropdown
     id: launcher
     attributes:
