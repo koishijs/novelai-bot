@@ -1,6 +1,6 @@
 # 部署 NAIFU
 
-NAIFU 是匿名网友打包的一套 [NovelAI](https://novelai.net/) 的前端与后端应用，通过它可以快速搭建一个第三方的 NovelAI 服务。
+[NAIFU](https://rentry.org/sdg_FAQ#naifu-novelai-model-backend-frontend) 是匿名网友打包的一套 [NovelAI](https://novelai.net/) 的前端与后端应用，通过它可以快速搭建一个第三方的 NovelAI 服务。
 
 ::: tip
 由于 NAIFU 在传输过程中被多次修改，产生了许多不同的版本，各版本之间的部署方式可能不尽相同。本文档仅针对最初发布的版本进行说明。如果你发现了本文档对部署方式的描述与你所下载的 NAIFU 附带的说明文件不相符，请以你下载的版本为准。
