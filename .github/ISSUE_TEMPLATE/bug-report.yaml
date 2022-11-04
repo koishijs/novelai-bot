@@ -1,0 +1,74 @@
+name: Bug Report
+description: 提交错误报告
+title: "Bug: "
+labels:
+  - bug
+body:
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      description: 请简明地表述 bug 是什么。
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: 请描述如何重现这个行为。
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: 请描述期望的行为。
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Screenshots
+      description: 请尽量详细地提供相关截图，可以是聊天记录、Koishi 日志和服务端 (如 go-cqhttp) 日志等。文本的日志请复制到下方文本框。
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: 请将日志输出复制到此处。这个文本框的内容会自动渲染为代码，因此你不需要添加反引号 (`)。
+      render: shell
+  - type: dropdown
+    id: launcher
+    attributes:
+      label: Launcher
+      description: 启动 Koishi 的方式
+      options:
+        - Koishi Desktop
+        - Koishi Android
+        - Koishi CLI (koishi start)
+        - Containers (Docker, Kubernates, etc)
+        - Manually (node index.js)
+    validations:
+      required: true
+  - type: dropdown
+    id: backend
+    attributes:
+      label: Backend
+      description: 服务类型及登录方式
+      options:
+        - NovelAI (帐号密码)
+        - NovelAI (Token)
+        - NAIFU
+        - Stable Diffusion WebUI (AUTOMATIC1111)
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Versions
+      description: 请填写相应的版本号。
+      value: |
+        - OS: <!-- e.g. Windows 10 -->
+        - Adapter: <!-- e.g. Discord -->
+        - Node version: <!-- e.g. 18.12.0 -->
+        - Koishi version: <!-- e.g. 4.9.9 -->
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: 请描述其他想要补充的信息。
