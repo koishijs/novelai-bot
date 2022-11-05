@@ -21,7 +21,7 @@ commands:
     messages:
       expect-prompt: 请输入标签。
       expect-image: 请输入图片。
-      invalid-input: 只接受英文输入。
+      latin-only: 只接受英文输入。
       too-many-words: 输入的单词数量过多。
       forbidden-word: 输入含有违禁词。
       concurrent-jobs@random:

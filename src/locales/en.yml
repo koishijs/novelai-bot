@@ -20,7 +20,7 @@ commands:
     messages:
       expect-prompt: Expect a prompt.
       expect-image: Expect an image.
-      invalid-input: Invalid prompt, only English words can be used.
+      latin-only: Invalid prompt, only English words can be used.
       forbidden-word: Forbidden words in prompt.
       concurrent-jobs@random:
         - Too busy to handle your request...
