@@ -5,6 +5,7 @@ import {
 } from 'libsodium-wrappers'
 import imageSize from 'image-size'
 import { Subscription } from './types'
+import emojiRegex from 'emoji-regex'
 
 export function project(object: {}, mapping: {}) {
   const result = {}
@@ -190,4 +191,8 @@ export function stripDataPrefix(base64: string) {
   // workaround for different gradio versions
   // https://github.com/koishijs/novelai-bot/issues/90
   return base64.replace(/^data:image\/[\w-]+;base64,/, '')
+}
+
+export function isEmoji(str: string) {
+  return emojiRegex().test(str)
 }

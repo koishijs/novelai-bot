@@ -1,5 +1,5 @@
 import { Dict, Schema, Time } from 'koishi'
-import { Size } from './utils'
+import { isEmoji, Size } from './utils'
 
 export const modelMap = {
   safe: 'safe-diffusion',
@@ -230,7 +230,7 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
     .replace(backslash, '\\')
     .replace(/_/g, ' ')
 
-  if (/[^\s\w"'“”‘’.,:|\\()\[\]{}-]/.test(input)) {
+  if ([...input.matchAll(/[^\s\w"'“”‘’.,:|\\()\[\]{}-]/g)].findIndex(match => !isEmoji(match[0])) !== -1) {
     return ['.invalid-input']
   }
 
