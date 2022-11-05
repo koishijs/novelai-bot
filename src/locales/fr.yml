@@ -20,7 +20,7 @@ commands:
     messages:
       expect-prompt: Attendrez-vous une description textuelle valide.
       expect-image: Attendrez-vous une image.
-      invalid-input: L'description textuelle n'est pas valide, vous ne pouvez utiliser que des mots anglais.
+      latin-only: L'description textuelle n'est pas valide, vous ne pouvez utiliser que des mots anglais.
       forbidden-word: L'description textuelle contient des mots prohibés.
       concurrent-jobs@random:
         - Trop occupé pour répondre à votre demande...

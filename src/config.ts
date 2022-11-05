@@ -86,6 +86,7 @@ export interface Config {
   maxWords?: number
   maxSteps?: number
   maxResolution?: number
+  latinOnly?: boolean
   anatomy?: boolean
   output?: 'minimal' | 'default' | 'verbose'
   allowAnlas?: boolean | number
@@ -166,6 +167,7 @@ export const Config = Schema.intersect([
 
   Schema.object({
     orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
+    latinOnly: Schema.boolean().description('是否只接受英文输入。').default(false),
     maxWords: Schema.natural().description('允许的最大单词数量。').default(0),
     maxSteps: Schema.natural().description('允许的最大迭代步数。').default(0),
     maxResolution: Schema.natural().description('生成图片的最大尺寸。').default(0),
@@ -232,8 +234,8 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
     .replace(backslash, '\\')
     .replace(/_/g, ' ')
 
-  if (/[^\s\w"'“”‘’.,:|\\()\[\]{}-]/.test(input)) {
-    return ['.invalid-input']
+  if (config.latinOnly && /[^\s\w"'“”‘’.,:|\\()\[\]{}-]/.test(input)) {
+    return ['.latin-only']
   }
 
   const negative = []
