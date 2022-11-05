@@ -83,6 +83,7 @@ export interface Config {
   model?: Model
   orient?: Orient
   sampler?: string
+  maxWords?: number
   maxSteps?: number
   maxResolution?: number
   anatomy?: boolean
@@ -165,6 +166,7 @@ export const Config = Schema.intersect([
 
   Schema.object({
     orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
+    maxWords: Schema.natural().description('允许的最大单词数量。').default(0),
     maxSteps: Schema.natural().description('允许的最大迭代步数。').default(0),
     maxResolution: Schema.natural().description('生成图片的最大尺寸。').default(0),
   }),
@@ -263,10 +265,18 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
     return true
   })
 
+  if (Math.max(getWordCount(positive), getWordCount(negative)) > (config.maxWords || Infinity)) {
+    return ['.too-many-words']
+  }
+
   if (!override) {
     appendToList(positive, config.basePrompt)
     appendToList(negative, config.negativePrompt)
   }
 
   return [null, positive.join(', '), negative.join(', ')]
+}
+
+function getWordCount(words: string[]) {
+  return words.join(' ').replace(/[^a-z0-9]+/g, ' ').trim().split(' ').length
 }
