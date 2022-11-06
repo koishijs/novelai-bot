@@ -1,7 +1,3 @@
-import DefaultTheme from 'vitepress/theme'
-// import Layout from './layout.vue'
+import { defineTheme } from '@koishijs/vitepress/client'
 
-export default {
-  ...DefaultTheme,
-  // Layout,
-}
+export default defineTheme({})

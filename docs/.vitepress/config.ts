@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitepress'
+import { defineConfig } from '@koishijs/vitepress'
 
 export default defineConfig({
   lang: 'zh-CN',
@@ -41,6 +41,7 @@ export default defineConfig({
         { text: 'Koishi', link: 'https://koishi.chat' },
         { text: 'Koishi Play', link: 'https://play.koishi.chat' },
         { text: 'NovelAI.dev', link: 'https://novelai.dev' },
+        { text: '支持作者', link: 'https://afdian.net/a/shigma' },
       ],
     }],
 
