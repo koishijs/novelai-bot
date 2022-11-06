@@ -30,7 +30,7 @@ plugins:
 
 要修改用户的权限等级，你需要配合 admin 插件使用：
 
-```
+```text
 auth 2 -u @user
 ```
 
