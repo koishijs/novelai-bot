@@ -75,7 +75,16 @@ export interface Options {
   strength: number
 }
 
-export interface Config {
+export interface PromptConfig {
+  basePrompt?: string
+  negativePrompt?: string
+  forbidden?: string
+  placement?: 'before' | 'after'
+  latinOnly?: boolean
+  maxWords?: number
+}
+
+export interface Config extends PromptConfig {
   type: 'token' | 'login' | 'naifu' | 'sd-webui'
   token?: string
   email?: string
@@ -83,16 +92,11 @@ export interface Config {
   model?: Model
   orient?: Orient
   sampler?: string
-  maxWords?: number
   maxSteps?: number
   maxResolution?: number
-  latinOnly?: boolean
   anatomy?: boolean
   output?: 'minimal' | 'default' | 'verbose'
   allowAnlas?: boolean | number
-  basePrompt?: string
-  negativePrompt?: string
-  forbidden?: string
   endpoint?: string
   headers?: Dict<string>
   maxRetryCount?: number
@@ -167,8 +171,6 @@ export const Config = Schema.intersect([
 
   Schema.object({
     orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
-    latinOnly: Schema.boolean().description('是否只接受英文输入。').default(false),
-    maxWords: Schema.natural().description('允许的最大单词数量。').default(0),
     maxSteps: Schema.natural().description('允许的最大迭代步数。').default(0),
     maxResolution: Schema.natural().description('生成图片的最大尺寸。').default(0),
   }),
@@ -177,6 +179,12 @@ export const Config = Schema.intersect([
     basePrompt: Schema.string().role('textarea').description('默认附加的标签。').default('masterpiece, best quality'),
     negativePrompt: Schema.string().role('textarea').description('默认附加的反向标签。').default(ucPreset),
     forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
+    placement: Schema.union([
+      Schema.const('before' as const).description('置于最前'),
+      Schema.const('after' as const).description('置于最后'),
+    ]).description('默认附加标签的位置。').default('after'),
+    latinOnly: Schema.boolean().description('是否只接受英文输入。').default(false),
+    maxWords: Schema.natural().description('允许的最大单词数量。').default(0),
   }).description('输入设置'),
 
   Schema.object({
@@ -240,9 +248,16 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
 
   const negative = []
   const appendToList = (words: string[], input: string) => {
-    for (let tag of input.split(/,\s*/g)) {
+    const tags = input.split(/,\s*/g)
+    if (config.placement === 'before') tags.reverse()
+    for (let tag of tags) {
       tag = tag.trim().toLowerCase()
-      if (tag && !words.includes(tag)) words.push(tag)
+      if (!tag || words.includes(tag)) continue
+      if (config.placement === 'before') {
+        words.unshift(tag)
+      } else {
+        words.push(tag)
+      }
     }
   }
 
