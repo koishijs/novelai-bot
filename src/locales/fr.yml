@@ -2,7 +2,7 @@ commands:
   novelai:
     description: Générer des images sur Novel AI
     usage: |-
-      Entrez « /novelai » avec une description textuelle (prompt) ou des balises. Par ex. a girl in the forest, blonde hair, red eyes, white dress.
+      Entrez « /novelai » avec les descriptions textuelles (anglais : prompt) ou des balises. Par ex. a girl in the forest, blonde hair, red eyes, white dress.
       Vous pouvez utiliser des balises séparées par des virgules, comme sur Danbooru.
       Donnez-lui une étoile : https://github.com/koishijs/novelai-bot
 
@@ -10,18 +10,20 @@ commands:
       enhance: Mode d'amélioration de l'image
       model: Définir le modèle pour génération
       resolution: Définir la taille de l'image
+      override: Remplacer les descriptions textuelles de base
       sampler: Définir l'échantillonneur
-      seed: Définir une graine aléatoire
+      seed: Définir la graine aléatoire
       steps: Définir les étapes de l'itération
       scale: Définir CFG Scale
       strength: Définir l'intensité de débruitage
       noise: Définir l'intensité du bruit
+      undesired: Définir les descriptions textuelles négatives
 
     messages:
-      expect-prompt: Attendrez-vous une description textuelle valide.
+      expect-prompt: Attendrez-vous les descriptions textuelles valides.
       expect-image: Attendrez-vous une image.
-      latin-only: L'description textuelle n'est pas valide, vous ne pouvez utiliser que des mots anglais.
-      forbidden-word: L'description textuelle contient des mots prohibés.
+      latin-only: Les descriptions textuelles ne sont pas valides, vous ne pouvez utiliser que des mots anglais.
+      forbidden-word: Les descriptions textuelles contient des mots prohibés.
       concurrent-jobs@random:
         - Trop occupé pour répondre à votre demande...
         - "Courte sieste :zzz:"
@@ -34,7 +36,7 @@ commands:
         - D'accord.
         - D'accord, mais attendez que je complète celui-ci.
         - '>_< Il y a {0} travaux en cours.'
-      invalid-size: Le mode d'amélioration de l'image peut être utilisé seulement pour les images générées. Si vous utilisez le mode de img2img, Utilisez « /novelai » sans l'option « --enhance ».
+      invalid-size: Le mode d'amélioration de l'image peut être utilisé seulement pour les images générées. Si vous utilisez le mode de img2img, utilisez « /novelai » sans l'option « --enhance ».
       invalid-resolution: La taille de l'image n'est pas valide. La largeur et la hauteur de l'image doivent être des multiples de 64.
       file-too-large: Le fichier est trop important.
       unsupported-file-type: Format de fichier non reconnu.
