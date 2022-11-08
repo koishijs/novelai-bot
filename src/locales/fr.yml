@@ -23,7 +23,7 @@ commands:
       expect-prompt: Attendrez-vous les descriptions textuelles valides.
       expect-image: Attendrez-vous une image.
       latin-only: Les descriptions textuelles ne sont pas valides, vous ne pouvez utiliser que des mots anglais.
-      forbidden-word: Les descriptions textuelles contient des mots prohibés.
+      forbidden-word: Les descriptions textuelles contiennent des mots prohibés.
       concurrent-jobs@random:
         - Trop occupé pour répondre à votre demande...
         - "Courte sieste :zzz:"
