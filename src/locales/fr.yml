@@ -10,12 +10,14 @@ commands:
       enhance: Mode d'amélioration de l'image
       model: Définir le modèle pour génération
       resolution: Définir la taille de l'image
+      override: Remplacer les descriptions textuelles de base
       sampler: Définir l'échantillonneur
       seed: Définir une graine aléatoire
       steps: Définir les étapes de l'itération
       scale: Définir CFG Scale
       strength: Définir l'intensité de débruitage
       noise: Définir l'intensité du bruit
+      undesired: Définir les descriptions textuelles négatives
 
     messages:
       expect-prompt: Attendrez-vous une description textuelle valide.
