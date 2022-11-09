@@ -38,6 +38,12 @@ export interface Subscription {
   trainingStepsLeft: TrainingStepsLeft
 }
 
+export interface ImageData {
+  buffer: ArrayBuffer
+  base64: string
+  dataUrl: string
+}
+
 export namespace StableDiffusionWebUI {
   export interface Request {
     prompt: string

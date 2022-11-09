@@ -1,6 +1,6 @@
 import { Context, Dict, Logger, omit, Quester, segment, Session, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler } from './config'
-import { StableDiffusionWebUI } from './types'
+import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, getImageSize, login, NetworkError, project, resizeInput, Size, stripDataPrefix } from './utils'
 import {} from '@koishijs/plugin-help'
 
@@ -152,9 +152,10 @@ export function apply(ctx: Context, config: Config) {
         ucPreset: 2,
         qualityToggle: false,
       }
+      
+      let image: ImageData
 
       if (imgUrl) {
-        let image: [buffer: ArrayBuffer, base64: string, dataUrl: string]
         try {
           image = await download(ctx, imgUrl)
         } catch (err) {
@@ -166,12 +167,11 @@ export function apply(ctx: Context, config: Config) {
         }
 
         Object.assign(parameters, {
-          image,
           scale: options.scale ?? 11,
           steps: options.steps ?? 50,
         })
         if (options.enhance) {
-          const size = getImageSize(image[0])
+          const size = getImageSize(image.buffer)
           if (size.width + size.height !== 1280) {
             return session.text('.invalid-size')
           }
@@ -182,7 +182,7 @@ export function apply(ctx: Context, config: Config) {
             strength: options.strength ?? 0.2,
           })
         } else {
-          options.resolution ||= resizeInput(getImageSize(image[0]))
+          options.resolution ||= resizeInput(getImageSize(image.buffer))
           Object.assign(parameters, {
             height: options.resolution.height,
             width: options.resolution.width,
@@ -223,7 +223,7 @@ export function apply(ctx: Context, config: Config) {
       const path = (() => {
         switch (config.type) {
           case 'sd-webui':
-            return parameters.image ? '/sdapi/v1/img2img' : '/sdapi/v1/txt2img'
+            return image ? '/sdapi/v1/img2img' : '/sdapi/v1/txt2img'
           case 'naifu':
             return '/generate-stream'
           default:
@@ -234,14 +234,14 @@ export function apply(ctx: Context, config: Config) {
       const data = (() => {
         if (config.type !== 'sd-webui') {
           parameters.sampler = sampler.sd2nai(options.sampler)
-          parameters.image = parameters.image[1] // NovelAI / NAIFU accepts bare base64 encoded image
+          parameters.image = image.base64 // NovelAI / NAIFU accepts bare base64 encoded image
           if (config.type === 'naifu') return parameters
           return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
         }
 
         return {
           sampler_index: sampler.sd[options.sampler],
-          init_images: parameters.image && [parameters.image[2]], // sd-webui accepts data URLs with base64 encoded image
+          init_images: image && [image.dataUrl], // sd-webui accepts data URLs with base64 encoded image
           ...project(parameters, {
             prompt: 'prompt',
             batch_size: 'n_samples',
