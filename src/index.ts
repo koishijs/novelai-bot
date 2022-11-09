@@ -232,9 +232,7 @@ export function apply(ctx: Context, config: Config) {
       const data = (() => {
         if (config.type !== 'sd-webui') {
           parameters.sampler = sampler.sd2nai(options.sampler)
-          if (image) {
-            parameters.image = image.base64 // NovelAI / NAIFU accepts bare base64 encoded image
-          }
+          parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
           if (config.type === 'naifu') return parameters
           return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
         }
