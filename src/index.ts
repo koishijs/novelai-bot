@@ -166,7 +166,7 @@ export function apply(ctx: Context, config: Config) {
         }
 
         Object.assign(parameters, {
-          image: image[1],
+          image,
           scale: options.scale ?? 11,
           steps: options.steps ?? 50,
         })
@@ -234,13 +234,14 @@ export function apply(ctx: Context, config: Config) {
       const data = (() => {
         if (config.type !== 'sd-webui') {
           parameters.sampler = sampler.sd2nai(options.sampler)
+          parameters.image = parameters.image[1] // NovelAI / NAIFU accepts bare base64 encoded image
           if (config.type === 'naifu') return parameters
           return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
         }
 
         return {
           sampler_index: sampler.sd[options.sampler],
-          init_images: parameters.image && [parameters.image],
+          init_images: parameters.image && [parameters.image[2]], // sd-webui accepts data URLs with base64 encoded image
           ...project(parameters, {
             prompt: 'prompt',
             batch_size: 'n_samples',

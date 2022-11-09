@@ -47,7 +47,7 @@ const MAX_OUTPUT_SIZE = 1048576
 const MAX_CONTENT_SIZE = 10485760
 const ALLOWED_TYPES = ['image/jpeg', 'image/png']
 
-export async function download(ctx: Context, url: string, headers = {}): Promise<[ArrayBuffer, string]> {
+export async function download(ctx: Context, url: string, headers = {}): Promise<[buffer: ArrayBuffer, base64: string, dataUrl: string]> {
   if (url.startsWith('data:')) {
     const [, type, base64] = url.match(/^data:(image\/\w+);base64,(.*)$/)
     if (!ALLOWED_TYPES.includes(type)) {
@@ -58,17 +58,19 @@ export async function download(ctx: Context, url: string, headers = {}): Promise
     for (let i = 0; i < binary.length; i++) {
       result[i] = binary.charCodeAt(i)
     }
-    return [result, base64]
+    return [result, base64, url]
   } else {
     const head = await ctx.http.head(url, { headers })
     if (+head['content-length'] > MAX_CONTENT_SIZE) {
       throw new NetworkError('.file-too-large')
     }
-    if (!ALLOWED_TYPES.includes(head['content-type'])) {
+    const mimetype = head['content-type']
+    if (!ALLOWED_TYPES.includes(mimetype)) {
       throw new NetworkError('.unsupported-file-type')
     }
     const buffer = await ctx.http.get(url, { responseType: 'arraybuffer', headers })
-    return [buffer, arrayBufferToBase64(buffer)]
+    const base64 = arrayBufferToBase64(buffer)
+    return [buffer, base64, `data:${mimetype};base64,${base64}`]
   }
 }
 
