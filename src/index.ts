@@ -154,7 +154,7 @@ export function apply(ctx: Context, config: Config) {
       }
 
       if (imgUrl) {
-        let image: [ArrayBuffer, string]
+        let image: [buffer: ArrayBuffer, base64: string, dataUrl: string]
         try {
           image = await download(ctx, imgUrl)
         } catch (err) {
