@@ -103,7 +103,7 @@ export function apply(ctx: Context, config: Config) {
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
-      let imgUrl: string
+      let imgUrl: string, image: ImageData
       if (!restricted(session)) {
         input = segment.transform(input, {
           image(attrs) {
@@ -152,8 +152,6 @@ export function apply(ctx: Context, config: Config) {
         ucPreset: 2,
         qualityToggle: false,
       }
-      
-      let image: ImageData
 
       if (imgUrl) {
         try {
