@@ -10,7 +10,20 @@
 
 ### Kook (开黑啦)
 
-- https://kook.top/6rGEDC
+- https://kook.top/9MxXht
+
+### Discord
+
+- https://discord.gg/w9uDYbBHnx
+
+### Telegram
+
+- https://t.me/+hhcuca5BUIs5YWM1
+
+### Matrix (一个开源可直连的聊天服务器)
+
+#### 测试中 注册后再次点击链接进入房间
+- https://matrix.elchapo.cn:65500/NovelAi/#/room/#naitest:matrix.elchapo.cn
 
 ## 优质作品
 
