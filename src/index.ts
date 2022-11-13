@@ -2,6 +2,7 @@ import { Context, Dict, Logger, omit, Quester, segment, Session, trimSlash } fro
 import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, getImageSize, login, NetworkError, project, resizeInput, Size, stripDataPrefix } from './utils'
+import {} from '@koishijs/translator'
 import {} from '@koishijs/plugin-help'
 
 export * from './config'
@@ -122,6 +123,14 @@ export function apply(ctx: Context, config: Config) {
       } else {
         delete options.enhance
         delete options.steps
+      }
+
+      if (config.translator && ctx.translator) {
+        try {
+          input = await ctx.translator.translate({ input, target: 'en' })
+        } catch (err) {
+          logger.warn(err)
+        }
       }
 
       const [errPath, prompt, uc] = parseInput(input, config, forbidden, options.override)
