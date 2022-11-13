@@ -81,6 +81,7 @@ export interface PromptConfig {
   forbidden?: string
   placement?: 'before' | 'after'
   latinOnly?: boolean
+  translator?: boolean
   maxWords?: number
 }
 
@@ -183,6 +184,7 @@ export const Config = Schema.intersect([
       Schema.const('before' as const).description('置于最前'),
       Schema.const('after' as const).description('置于最后'),
     ]).description('默认附加标签的位置。').default('after'),
+    translator: Schema.boolean().description('是否启用标签翻译。').default(true),
     latinOnly: Schema.boolean().description('是否只接受英文输入。').default(false),
     maxWords: Schema.natural().description('允许的最大单词数量。').default(0),
   }).description('输入设置'),
