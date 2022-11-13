@@ -85,6 +85,19 @@ export interface PromptConfig {
   maxWords?: number
 }
 
+export const PromptConfig: Schema<PromptConfig> = Schema.object({
+  basePrompt: Schema.string().role('textarea').description('默认附加的标签。').default('masterpiece, best quality'),
+  negativePrompt: Schema.string().role('textarea').description('默认附加的反向标签。').default(ucPreset),
+  forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
+  placement: Schema.union([
+    Schema.const('before' as const).description('置于最前'),
+    Schema.const('after' as const).description('置于最后'),
+  ]).description('默认附加标签的位置。').default('after'),
+  translator: Schema.boolean().description('是否启用自动翻译。').default(true),
+  latinOnly: Schema.boolean().description('是否只接受英文输入。').default(false),
+  maxWords: Schema.natural().description('允许的最大单词数量。').default(0),
+}).description('输入设置')
+
 export interface Config extends PromptConfig {
   type: 'token' | 'login' | 'naifu' | 'sd-webui'
   token?: string
@@ -176,18 +189,7 @@ export const Config = Schema.intersect([
     maxResolution: Schema.natural().description('生成图片的最大尺寸。').default(0),
   }),
 
-  Schema.object({
-    basePrompt: Schema.string().role('textarea').description('默认附加的标签。').default('masterpiece, best quality'),
-    negativePrompt: Schema.string().role('textarea').description('默认附加的反向标签。').default(ucPreset),
-    forbidden: Schema.string().role('textarea').description('违禁词列表。含有违禁词的请求将被拒绝。').default(''),
-    placement: Schema.union([
-      Schema.const('before' as const).description('置于最前'),
-      Schema.const('after' as const).description('置于最后'),
-    ]).description('默认附加标签的位置。').default('after'),
-    translator: Schema.boolean().description('是否启用标签翻译。').default(true),
-    latinOnly: Schema.boolean().description('是否只接受英文输入。').default(false),
-    maxWords: Schema.natural().description('允许的最大单词数量。').default(0),
-  }).description('输入设置'),
+  PromptConfig,
 
   Schema.object({
     output: Schema.union([
