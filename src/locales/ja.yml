@@ -4,7 +4,8 @@ commands:
     usage: |-
       コンマで区切られた英語タグを入力してください。例：1girl, red eyes, black hair。
       モデルに用いられるタグは Danbooru とほとんど同じです。
-      本プロジェクトのレポジトリに Star：https://github.com/koishijs/novelai-bot
+      本プロジェクトのレポジトリにスターを：https://github.com/koishijs/novelai-bot
+
 
     options:
       enhance: 向上 (enhance) モードを有効
@@ -13,10 +14,12 @@ commands:
       sampler: サンプラーを設定
       seed: シード値を設定
       steps: ステップ数を設定
-      scale: CFG スケールを設定
+      scale: CFG スケール値を設定
+
       strength: ノイズ除去強度を設定
       noise: ノイズ強度を設定
-      undesired: ネガティブ タグを設定
+      undesired: ネガティブ・タグを設定
+
 
     messages:
       expect-prompt: タグを入力してください。
@@ -39,7 +42,8 @@ commands:
       download-error: 画像のダウンロードが成功していません。
       unknown-error: 不明なエラーが発生しました。
       response-error: 不明なエラーが発生しました ({0})。
-      empty-response: サーバーが無効な画像を返されました、後で試しください。
+      empty-response: サーバーが無効な画像を返されました、後で試してください。
+
       request-failed: リクエストが失敗しました ({0})，後で試してください。
       request-timeout: リクエストがタイムアウトしました。
       invalid-password: メイルアドレスやパスワードが間違っています。
