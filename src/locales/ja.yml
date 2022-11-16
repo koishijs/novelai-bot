@@ -2,7 +2,7 @@ commands:
   novelai:
     description: AI で絵を描く
     usage: |-
-      コンマで区切られた英語タグを入力してください。例：1girl, red eyes, black hair。
+      コンマで区切られた英語の生成呪文 (プロンプト) を入力してください。例：1girl, red eyes, black hair。
       モデルに用いられるタグは Danbooru とほとんど同じです。
       本プロジェクトのレポジトリにスターを：https://github.com/koishijs/novelai-bot
 
