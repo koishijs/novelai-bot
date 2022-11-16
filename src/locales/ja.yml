@@ -22,7 +22,7 @@ commands:
 
 
     messages:
-      expect-prompt: タグを入力してください。
+      expect-prompt: 生成呪文を入力してください。
       expect-image: 画像を入力してください。
       latin-only: 英数字だけが入力可能。
       too-many-words: 入力したタグが多すぎる。
