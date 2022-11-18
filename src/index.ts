@@ -34,10 +34,10 @@ interface Forbidden {
 }
 
 export function apply(ctx: Context, config: Config) {
-  ctx.i18n.define('zh', require('./locales/zh'))
-  ctx.i18n.define('zh-tw', require('./locales/zh-tw'))
-  ctx.i18n.define('en', require('./locales/en'))
-  ctx.i18n.define('fr', require('./locales/fr'))
+  ctx.i18n.define('zh', require('./locales/zh-CN'))
+  ctx.i18n.define('zh-TW', require('./locales/zh-TW'))
+  ctx.i18n.define('en', require('./locales/en-US'))
+  ctx.i18n.define('fr', require('./locales/fr-FR'))
 
   let forbidden: Forbidden[]
   const tasks: Dict<Set<string>> = Object.create(null)
