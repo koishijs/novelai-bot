@@ -278,8 +278,7 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
 
   // remove forbidden words
   const positive = input.split(/,\s*/g).filter((word) => {
-    if(!word.trim()) return false
-    word = word.replace(/[^a-z0-9]+/g, ' ').trim()
+    word = word.replace(/[\x00-\x2f\x3a-\x40\x5b-\x60\x7b-7f]+/g, ' ').trim() // ascii except /a-zA-Z0-9/
     if (!word) return true
     for (const { pattern, strict } of forbidden) {
       if (strict && word.split(/\W+/g).includes(pattern)) {
