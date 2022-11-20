@@ -126,7 +126,7 @@ export function apply(ctx: Context, config: Config) {
         delete options.steps
       }
 
-      if (config.translator && ctx.translator && !options['disable-translate']) {
+      if (config.translator && ctx.translator && !options.noTranslator) {
         try {
           input = await ctx.translator.translate({ input, target: 'en' })
         } catch (err) {
