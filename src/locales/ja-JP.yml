@@ -6,7 +6,6 @@ commands:
       モデルに用いられるタグは Danbooru とほとんど同じです。
       興味があったら、レポジトリにスターを付けてください：https://github.com/koishijs/novelai-bot
 
-
     options:
       enhance: 向上 (enhance) モードを有効
       model: モデルを指定
