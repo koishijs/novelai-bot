@@ -350,4 +350,46 @@ export function apply(ctx: Context, config: Config) {
     cmd._options.sampler.fallback = config.sampler
     cmd._options.sampler.type = Object.keys(config.type === 'sd-webui' ? sampler.sd : sampler.nai)
   }, { immediate: true })
+
+  if (config.type === 'sd-webui') {
+    ctx
+      .command('.upscale')
+      .shortcut('放大', { fuzzy: true })
+      .option('scale', '-s <scale:number>')
+      .option('resolution', '-r <resolution>', { type: resolution })
+      .action(async ({ session, options }, input) => {
+        let imgUrl: string
+        segment.transform(input, {
+          image(attrs) {
+            imgUrl = attrs.url
+            return ''
+          },
+        })
+
+        if (!imgUrl) return session.text('.expect-image')
+        let image: ImageData
+        try {
+          image = await download(ctx, imgUrl)
+        } catch (err) {
+          if (err instanceof NetworkError) {
+            return session.text(err.message, err.params)
+          }
+          logger.error(err)
+          return session.text('.download-error')
+        }
+
+        const data = {
+          image: image.dataUrl,
+        }
+
+        const resp = await ctx.http.axios(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
+          method: 'POST',
+          timeout: config.requestTimeout,
+          headers: {
+            ...config.headers,
+          },
+          data,
+        })
+      })
+  }
 }
