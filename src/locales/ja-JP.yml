@@ -14,11 +14,9 @@ commands:
       seed: シード値を設定
       steps: ステップ数を設定
       scale: CFG スケール値を設定
-
       strength: ノイズ除去強度を設定
       noise: ノイズ強度を設定
       undesired: 反対呪文 (ネガティブプロンプト) を設定
-
 
     messages:
       expect-prompt: 生成呪文を入力してください。
