@@ -3,7 +3,7 @@ commands:
     description: AI で絵を描く
     usage: |-
       コンマで区切られた英語の生成呪文 (プロンプト) を入力してください。例：1girl, red eyes, black hair。
-      モデルに用いられるタグは Danbooru とほとんど同じです。
+      モデルに用いられる単語は Danbooru のタグとほとんど同じです。
       興味があったら、レポジトリにスターを付けてください：https://github.com/koishijs/novelai-bot
 
     options:
@@ -22,8 +22,8 @@ commands:
       expect-prompt: 生成呪文を入力してください。
       expect-image: 画像を入力してください。
       latin-only: 英数字だけが入力可能です。
-      too-many-words: 入力したタグが多すぎる。
-      forbidden-word: 一部の入力したタグが禁止されている。
+      too-many-words: 入力した単語が多すぎる。
+      forbidden-word: 一部の入力した単語が禁止されている。
       concurrent-jobs@random:
         - 後でね～今、猫の手も借りたいなの！
         - 描けるの、た、タブレットが起動できませんだから。
