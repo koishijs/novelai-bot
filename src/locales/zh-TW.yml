@@ -17,6 +17,7 @@ commands:
       scale: 設置對輸入的服從度
       strength: 圖像修改幅度
       noise: 圖像雜訊強度
+      noTranslator: 禁用自動翻譯
 
     messages:
       expect-prompt: 請輸入標籤。

@@ -17,6 +17,7 @@ commands:
       scale: Set CFG Scale
       strength: Set Denoising Strength
       noise: Set Noising Strength
+      noTranslator: Disable Auto Translation
 
     messages:
       expect-prompt: Expect a prompt.
