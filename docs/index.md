@@ -36,7 +36,7 @@
 
 给没有使用过 Koishi 的新人提供一份简单的快速搭建指南：
 
-1. 前往[这里](https://koishi.chat/manual/starter/desktop.html)下载 Koishi 桌面版
+1. 前往[这里](https://koishi.chat/manual/starter/windows.html)下载 Koishi 桌面版
 2. 启动桌面版，你将会看到一个控制台界面
 3. 点击左侧的「插件市场」，搜索「novelai」并点击「安装」
 4. 点击左侧的「插件配置」，选择「novelai」插件，并在以下两种方案中**任选一种**：

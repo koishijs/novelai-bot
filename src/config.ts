@@ -41,11 +41,15 @@ export namespace sampler {
     'k_heun': 'Heun',
     'k_dpm_2': 'DPM2',
     'k_dpm_2_a': 'DPM2 a',
+    'k_dpmpp_2s_a': 'DPM++ 2S a',
+    'k_dpmpp_2m': 'DPM++ 2M',
     'k_dpm_fast': 'DPM fast',
     'k_dpm_ad': 'DPM adaptive',
     'k_lms_ka': 'LMS Karras',
     'k_dpm_2_ka': 'DPM2 Karras',
     'k_dpm_2_a_ka': 'DPM2 a Karras',
+    'k_dpmpp_2s_a_ka': 'DPM++ 2S a Karras',
+    'k_dpmpp_2m_ka': 'DPM++ 2M Karras',
     'ddim': 'DDIM',
     'plms': 'PLMS',
   }
@@ -274,7 +278,7 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
 
   // remove forbidden words
   const positive = input.split(/,\s*/g).filter((word) => {
-    word = word.replace(/[^a-z0-9]+/g, ' ').trim()
+    word = word.replace(/[\x00-\x7f]/g, s => s.replace(/[^0-9a-zA-Z]/, ' ')).replace(/\s+/, ' ').trim()
     if (!word) return false
     for (const { pattern, strict } of forbidden) {
       if (strict && word.split(/\W+/g).includes(pattern)) {

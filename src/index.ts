@@ -34,10 +34,10 @@ interface Forbidden {
 }
 
 export function apply(ctx: Context, config: Config) {
-  ctx.i18n.define('zh', require('./locales/zh'))
-  ctx.i18n.define('zh-tw', require('./locales/zh-tw'))
-  ctx.i18n.define('en', require('./locales/en'))
-  ctx.i18n.define('fr', require('./locales/fr'))
+  ctx.i18n.define('zh', require('./locales/zh-CN'))
+  ctx.i18n.define('zh-TW', require('./locales/zh-TW'))
+  ctx.i18n.define('en', require('./locales/en-US'))
+  ctx.i18n.define('fr', require('./locales/fr-FR'))
 
   let forbidden: Forbidden[]
   const tasks: Dict<Set<string>> = Object.create(null)
@@ -101,6 +101,7 @@ export function apply(ctx: Context, config: Config) {
     .option('noise', '-n <noise:number>', { hidden: restricted })
     .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('undesired', '-u <undesired>')
+    .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
@@ -125,7 +126,7 @@ export function apply(ctx: Context, config: Config) {
         delete options.steps
       }
 
-      if (config.translator && ctx.translator) {
+      if (config.translator && ctx.translator && !options.noTranslator) {
         try {
           input = await ctx.translator.translate({ input, target: 'en' })
         } catch (err) {
