@@ -390,6 +390,9 @@ export function apply(ctx: Context, config: Config) {
           },
           data,
         })
+
+        const base64 = stripDataPrefix((resp.data as StableDiffusionWebUI.Response).images[0])
+        return segment.image('base64://' + base64)
       })
   }
 }
