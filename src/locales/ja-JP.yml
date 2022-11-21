@@ -4,27 +4,27 @@ commands:
     usage: |-
       コンマで区切られた英語の生成呪文 (プロンプト) を入力してください。例：1girl, red eyes, black hair。
       モデルに用いられるタグは Danbooru とほとんど同じです。
-      本プロジェクトのレポジトリにスターを：https://github.com/koishijs/novelai-bot
+      興味があったら、レポジトリにスターを付けてください：https://github.com/koishijs/novelai-bot
 
 
     options:
       enhance: 向上 (enhance) モードを有効
-      model: モデルを設定
+      model: モデルを指定
       resolution: 画像解像度を設定
-      sampler: サンプラーを設定
+      sampler: サンプラーを指定
       seed: シード値を設定
       steps: ステップ数を設定
       scale: CFG スケール値を設定
 
       strength: ノイズ除去強度を設定
       noise: ノイズ強度を設定
-      undesired: ネガティブ・タグを設定
+      undesired: 反対呪文 (ネガティブプロンプト) を設定
 
 
     messages:
       expect-prompt: 生成呪文を入力してください。
       expect-image: 画像を入力してください。
-      latin-only: 英数字だけが入力可能。
+      latin-only: 英数字だけが入力可能です。
       too-many-words: 入力したタグが多すぎる。
       forbidden-word: 一部の入力したタグが禁止されている。
       concurrent-jobs@random:
@@ -33,19 +33,18 @@ commands:
         - じゃ、まず絵を教えて。
       waiting@random:
         - 私はプロ絵師だから、どんな絵でも描けるの。
-        - 仕事してる…
-      pending: 仕事してるが、その前に {0} つの絵が完遂するべきだ。
-      invalid-size: 向上モードは生成された画像のみに用いられる。img2img を使いたければ、「--enhance」を追加せずにこのコマンドを実行してください。
+        - 仕事している…
+      pending: 仕事している前に {0} つの絵が完遂するべきです。
+      invalid-size: 向上モードは AI 生成画像のみに用いられる。img2img (指定画像から生成) を使いたければ、「--enhance」を追加せずにコマンドを再実行してください。
       invalid-resolution: 無効な解像度。幅と高さが64の倍数である必要があります。
       file-too-large: ファイルのサイズが大きすぎる。
       unsupported-file-type: ファイルのタイプがサポートされていません。
-      download-error: 画像のダウンロードが成功していません。
+      download-error: 画像のダウンロードに失敗しました。
       unknown-error: 不明なエラーが発生しました。
       response-error: 不明なエラーが発生しました ({0})。
       empty-response: サーバーが無効な画像を返されました、後で試してください。
-
       request-failed: リクエストが失敗しました ({0})，後で試してください。
       request-timeout: リクエストがタイムアウトしました。
-      invalid-password: メイルアドレスやパスワードが間違っています。
+      invalid-password: メールアドレスやパスワードが間違っています。
       invalid-token: トークンが無効または期間切れしました、管理者に連絡してください。
       unauthorized: トークンが認可されていない、または契約が期間切れてる、管理者に連絡してください。
