@@ -10,6 +10,7 @@ commands:
       enhance: 圖像增強模式
       model: 設定生成模型
       resolution: 設定圖像尺寸
+      override: 禁用預設標籤
       sampler: 設定取樣器
       seed: 設置隨機種子
       steps: 設置迭代步數
