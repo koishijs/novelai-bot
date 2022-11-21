@@ -17,6 +17,7 @@ commands:
       strength: 图片修改幅度
       noise: 图片噪声强度
       undesired: 排除标签
+      noTranslator: 禁用自动翻译
 
     messages:
       expect-prompt: 请输入标签。
