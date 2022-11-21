@@ -5,8 +5,13 @@ export default defineConfig({
   title: 'NovelAI Bot',
   description: '基于 NovelAI 的画图机器人',
 
+  head: [
+    ['link', { rel: 'icon', href: 'https://koishi.chat/logo.png' }],
+    ['link', { rel: 'manifest', href: 'https://koishi.chat/manifest.json' }],
+    ['meta', { name: 'theme-color', content: '#5546a3' }],
+  ],
+
   themeConfig: {
-    outline: [2, 3],
     sidebar: [{
       text: '指南',
       items: [
@@ -38,17 +43,16 @@ export default defineConfig({
     }, {
       text: '更多',
       items: [
-        { text: 'Koishi', link: 'https://koishi.chat' },
-        { text: 'Koishi Play', link: 'https://play.koishi.chat' },
+        { text: 'Koishi 官网', link: 'https://koishi.chat' },
         { text: 'NovelAI.dev', link: 'https://novelai.dev' },
         { text: '支持作者', link: 'https://afdian.net/a/shigma' },
       ],
     }],
 
-    socialLinks: [
-      { icon: 'discord', link: 'https://discord.com/invite/xfxYwmd284' },
-      { icon: 'github', link: 'https://github.com/koishijs/novelai-bot' }
-    ],
+    socialLinks: {
+      discord: 'https://discord.com/invite/xfxYwmd284',
+      github: 'https://github.com/koishijs/novelai-bot',
+    },
 
     footer: {
       message: `Released under the MIT License.`,
@@ -57,18 +61,6 @@ export default defineConfig({
 
     editLink: {
       pattern: 'https://github.com/koishijs/novelai-bot/edit/master/docs/:path',
-    },
-  },
-
-  vite: {
-    server: {
-      fs: {
-        strict: false,
-      },
-    },
-
-    resolve: {
-      dedupe: ['vue'],
     },
   },
 })
