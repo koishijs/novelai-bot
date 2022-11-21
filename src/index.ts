@@ -101,6 +101,7 @@ export function apply(ctx: Context, config: Config) {
     .option('noise', '-n <noise:number>', { hidden: restricted })
     .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('undesired', '-u <undesired>')
+    .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
@@ -125,7 +126,7 @@ export function apply(ctx: Context, config: Config) {
         delete options.steps
       }
 
-      if (config.translator && ctx.translator) {
+      if (config.translator && ctx.translator && !options.noTranslator) {
         try {
           input = await ctx.translator.translate({ input, target: 'en' })
         } catch (err) {
