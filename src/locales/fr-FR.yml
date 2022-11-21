@@ -18,6 +18,7 @@ commands:
       strength: Définir l'intensité de débruitage
       noise: Définir l'intensité du bruit
       undesired: Définir les descriptions textuelles négatives
+      noTranslator: Désactiver la traduction automatique
 
     messages:
       expect-prompt: Attendrez-vous les descriptions textuelles valides.
