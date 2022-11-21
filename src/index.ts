@@ -38,6 +38,7 @@ export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh-TW', require('./locales/zh-TW'))
   ctx.i18n.define('en', require('./locales/en-US'))
   ctx.i18n.define('fr', require('./locales/fr-FR'))
+  ctx.i18n.define('ja', require('./locales/ja-JP'))
 
   let forbidden: Forbidden[]
   const tasks: Dict<Set<string>> = Object.create(null)
