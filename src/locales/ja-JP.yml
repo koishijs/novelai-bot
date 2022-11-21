@@ -33,7 +33,7 @@ commands:
         - 仕事している…
       pending: 仕事している前に {0} つの絵が完遂するべきです。
       invalid-size: 向上モードは AI 生成画像のみに用いられる。img2img (指定画像から生成) を使いたければ、「--enhance」を追加せずにコマンドを再実行してください。
-      invalid-resolution: 無効な解像度。幅と高さが64の倍数である必要があります。
+      invalid-resolution: 無効な解像度。幅と高さが 64 の倍数である必要があります。
       file-too-large: ファイルのサイズが大きすぎる。
       unsupported-file-type: ファイルのタイプがサポートされていません。
       download-error: 画像のダウンロードに失敗しました。
@@ -43,5 +43,5 @@ commands:
       request-failed: リクエストが失敗しました ({0})，後で試してください。
       request-timeout: リクエストがタイムアウトしました。
       invalid-password: メールアドレスやパスワードが間違っています。
-      invalid-token: トークンが無効または期間切れしました、管理者に連絡してください。
-      unauthorized: トークンが認可されていない、または契約が期間切れてる、管理者に連絡してください。
+      invalid-token: 期間切れたまたは無効なトークンです。管理者に連絡してください。
+      unauthorized: アカウント契約が期間切れるか、トークンが認可されていません。管理者に連絡してください。
