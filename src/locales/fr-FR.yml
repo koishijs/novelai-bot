@@ -51,14 +51,3 @@ commands:
       invalid-password: Le adresse e-mail ou mot de passe introduit est incorrect.
       invalid-token: Le token est invalide ou a expiré. Veuillez contacter l'administrateur.
       unauthorized: Le token n'est pas autorisé, peut-être que ce token n'a pas d'abonnement valide. Veuillez contacter l'administrateur.
-
-  novelai.upscale:
-    description: Redimensionner l'image sur IA
-
-    options:
-      scale: Définir le pourcentage pour redimensionner l'image
-      resolution: Définir la taille pour redimensionner l'image
-
-    messages:
-      expect-image: Attendrez-vous une image.
-      download-error: Une erreur d'analyse syntaxique de l'image s'est produite.

@@ -48,14 +48,3 @@ commands:
       invalid-password: Incorrect email address or password.
       invalid-token: The token is invalid or expired. Please contact your administrator.
       unauthorized: The token is unauthorized, this happens while your account has no a valid subscription. Please contact your administrator.
-
-  novelai.upscale:
-    description: Upscale an image with AI
-
-    options:
-      scale: Set Scale Multiple
-      resolution: Set Resolution for Scale
-
-    messages:
-      expect-image: Expect an image.
-      download-error: Parsing image failed.
