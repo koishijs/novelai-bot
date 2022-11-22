@@ -10,6 +10,7 @@ commands:
       enhance: 图片增强模式
       model: 设定生成模型
       resolution: 设定图片尺寸
+      override: 禁用默认标签
       sampler: 设置采样器
       seed: 设置随机种子
       steps: 设置迭代步数

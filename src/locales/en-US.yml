@@ -10,12 +10,14 @@ commands:
       enhance: Image Enhance Mode
       model: Set Model for Generation
       resolution: Set Image Resolution
+      override: Disable Default Prompts
       sampler: Set Sampler
       seed: Set Random Seed
       steps: Set Iteration Steps
       scale: Set CFG Scale
       strength: Set Denoising Strength
       noise: Set Noising Strength
+      noTranslator: Disable Auto Translation
 
     messages:
       expect-prompt: Expect a prompt.
