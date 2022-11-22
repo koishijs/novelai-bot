@@ -82,7 +82,7 @@ export namespace StableDiffusionWebUI {
   }
 
   /**
-   * @see https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/master/modules/api/models.py#L122
+   * @see https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/828438b4a190759807f9054932cae3a8b880ddf1/modules/api/models.py#L122
    */
   export interface ExtraSingleImageRequest {
     image: string
