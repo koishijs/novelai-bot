@@ -1,5 +1,5 @@
 import { Context, Dict, Logger, omit, Quester, segment, Session, trimSlash } from 'koishi'
-import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler } from './config'
+import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler, sdUpscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, getImageSize, login, NetworkError, project, resizeInput, Size, stripDataPrefix } from './utils'
 import {} from '@koishijs/translator'
@@ -353,11 +353,12 @@ export function apply(ctx: Context, config: Config) {
   }, { immediate: true })
 
   if (config.type === 'sd-webui') {
-    ctx
+    const cmd = ctx
       .command('.upscale')
       .shortcut('放大', { fuzzy: true })
       .option('scale', '-s <scale:number>', { fallback: 2 })
       .option('resolution', '-r <resolution>', { type: resolution })
+      .option('upscaler', '-u <upscaler>')
       .action(async ({ session, options }, input) => {
         let imgUrl: string
         segment.transform(input, {
@@ -385,6 +386,7 @@ export function apply(ctx: Context, config: Config) {
           upscaling_resize: options.scale,
           upscaling_resize_h: options.resolution?.height,
           upscaling_resize_w: options.resolution?.width,
+          upscaler_1: options.upscaler,
         }
 
         const resp = await ctx.http.axios(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
@@ -399,5 +401,10 @@ export function apply(ctx: Context, config: Config) {
         const base64 = stripDataPrefix((resp.data as StableDiffusionWebUI.ExtraSingleImageResponse).image)
         return segment.image('base64://' + base64)
       })
+
+    ctx.accept(['upscaler'], (config) => {
+      cmd._options.upscaler.fallback = config.upscaler
+      cmd._options.upscaler.type = Object.keys(config.upscaler)
+    }, { immediate: true })
   }
 }

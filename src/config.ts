@@ -67,6 +67,19 @@ export namespace sampler {
   }
 }
 
+export const sdUpscalers = {
+  // built-in upscalers
+  none: 'None',
+  lanczos: 'Lanczos',
+  nearest: 'Nearest',
+  // third-party upscalers (might not be available)
+  esrgan: 'ESRGAN',
+  ldsr: 'LDSR',
+  realesrgan: 'RealESRGAN',
+  scunet: 'ScuNET',
+  swinir: 'SwinIR'
+} as const
+
 export interface Options {
   enhance: boolean
   model: string
@@ -115,6 +128,8 @@ export interface Config extends PromptConfig {
   anatomy?: boolean
   output?: 'minimal' | 'default' | 'verbose'
   allowAnlas?: boolean | number
+  enableUpscale?: boolean
+  upscaler?: string
   endpoint?: string
   headers?: Dict<string>
   maxRetryCount?: number
@@ -194,6 +209,17 @@ export const Config = Schema.intersect([
   }),
 
   PromptConfig,
+
+  Schema.union([
+    Schema.object({
+      type: Schema.const('sd-webui'),
+      enableUpscale: Schema.boolean().description('是否启用图片放大功能。').default(false),
+      upscaler: Schema
+        .union(Object.entries(sdUpscalers).map(([key, value]) => Schema.const(key).description(value)))
+        .description('图片放大算法。')
+        .default('lanzos'),
+    }),
+  ]),
 
   Schema.object({
     output: Schema.union([
