@@ -355,7 +355,7 @@ export function apply(ctx: Context, config: Config) {
     ctx
       .command('.upscale')
       .shortcut('放大', { fuzzy: true })
-      .option('scale', '-s <scale:number>')
+      .option('scale', '-s <scale:number>', { fallback: 2 })
       .option('resolution', '-r <resolution>', { type: resolution })
       .action(async ({ session, options }, input) => {
         let imgUrl: string
@@ -378,8 +378,12 @@ export function apply(ctx: Context, config: Config) {
           return session.text('.download-error')
         }
 
-        const data = {
+        const data: StableDiffusionWebUI.ExtraSingleImageRequest = {
           image: image.dataUrl,
+          resize_mode: !!options.resolution ? 1 : 0,
+          upscaling_resize: options.scale,
+          upscaling_resize_h: options.resolution?.height,
+          upscaling_resize_w: options.resolution?.width,
         }
 
         const resp = await ctx.http.axios(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
@@ -391,7 +395,7 @@ export function apply(ctx: Context, config: Config) {
           data,
         })
 
-        const base64 = stripDataPrefix((resp.data as StableDiffusionWebUI.Response).images[0])
+        const base64 = stripDataPrefix((resp.data as StableDiffusionWebUI.ExtraSingleImageResponse).image)
         return segment.image('base64://' + base64)
       })
   }
