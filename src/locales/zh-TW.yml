@@ -45,3 +45,14 @@ commands:
       invalid-password: 電郵地址或密碼不正確。
       invalid-token: 令牌無效或已過期，請聯繫管理員。
       unauthorized: 令牌未經授權，可能關聯帳戶需要續費，請聯繫管理員。
+
+  novelai.upscale:
+    description: AI 圖像放大
+
+    options:
+      scale: 設定放大倍數
+      resolution: 設定放大尺寸
+
+    messages:
+      expect-image: 請輸入圖像。
+      download-error: 圖像解析失敗。

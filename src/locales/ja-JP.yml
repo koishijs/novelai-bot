@@ -45,3 +45,14 @@ commands:
       invalid-password: メールアドレスやパスワードが間違っています。
       invalid-token: 期間切れたまたは無効なトークンです。管理者に連絡してください。
       unauthorized: アカウント契約が期間切れるか、トークンが認可されていません。管理者に連絡してください。
+
+  novelai.upscale:
+    description: AI で画像を拡大
+
+    options:
+      scale: 拡大倍率を設定
+      resolution: 画像解像度を設定
+
+    messages:
+      expect-image: 画像を入力してください。
+      download-error: 画像のダウンロードに失敗しました。
