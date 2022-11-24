@@ -103,6 +103,7 @@ export function apply(ctx: Context, config: Config) {
     .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
+    .option('iter', '-i <iterations:number>', { hidden: () => config.maxIteration <= 1 })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
@@ -240,21 +241,21 @@ export function apply(ctx: Context, config: Config) {
         }
       })()
 
-      const data = (() => {
+      const genData = (seedOffset = 0) => {
         if (config.type !== 'sd-webui') {
           parameters.sampler = sampler.sd2nai(options.sampler)
           parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
           if (config.type === 'naifu') return parameters
-          return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
+          return { model, input: prompt, seed: parameters.seed + seedOffset, parameters: omit(parameters, ['prompt', 'seed']) }
         }
 
         return {
           sampler_index: sampler.sd[options.sampler],
           init_images: image && [image.dataUrl], // sd-webui accepts data URLs with base64 encoded image
+          seed: parameters.seed + seedOffset,
           ...project(parameters, {
             prompt: 'prompt',
             batch_size: 'n_samples',
-            seed: 'seed',
             negative_prompt: 'uc',
             cfg_scale: 'scale',
             steps: 'steps',
@@ -263,83 +264,93 @@ export function apply(ctx: Context, config: Config) {
             denoising_strength: 'strength',
           }),
         }
-      })()
+      }
 
-      const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
-        method: 'POST',
-        timeout: config.requestTimeout,
-        headers: {
-          ...config.headers,
-          authorization: 'Bearer ' + token,
-        },
-        data,
-      }).then((res) => {
-        if (config.type === 'sd-webui') {
-          return stripDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
+      const iteractions = options.iter > 1 ? options.iter : 1
+
+      const messageIds: string[] = []
+      for (let offset = 0; offset < iteractions; offset++) {
+        const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
+          method: 'POST',
+          timeout: config.requestTimeout,
+          headers: {
+            ...config.headers,
+            authorization: 'Bearer ' + token,
+          },
+          data: genData(offset),
+        }).then((res) => {
+          if (config.type === 'sd-webui') {
+            return stripDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
+          }
+          // event: newImage
+          // id: 1
+          // data:
+          return res.data?.slice(27)
+        })
+
+        let base64: string, count = 0
+        while (true) {
+          try {
+            base64 = await request()
+            cleanUp()
+            break
+          } catch (err) {
+            if (Quester.isAxiosError(err)) {
+              if (err.code && err.code !== 'ETIMEDOUT' && ++count < config.maxRetryCount) {
+                continue
+              }
+            }
+            cleanUp()
+
+            await session.send(handleError(session, err))
+            continue
+          }
         }
-        // event: newImage
-        // id: 1
-        // data:
-        return res.data?.slice(27)
-      })
 
-      let base64: string, count = 0
-      while (true) {
-        try {
-          base64 = await request()
-          cleanUp()
-          break
-        } catch (err) {
-          if (Quester.isAxiosError(err)) {
-            if (err.code && err.code !== 'ETIMEDOUT' && ++count < config.maxRetryCount) {
-              continue
+        if (!base64.trim()) {
+          await session.send(session.text('.empty-response'))
+          continue
+        }
+
+        function getContent() {
+          if (config.output === 'minimal') return segment.image('base64://' + base64)
+          const attrs = {
+            userId: session.userId,
+            nickname: session.author?.nickname || session.username,
+          }
+          const result = segment('figure')
+          const lines = [`seed = ${seed}`]
+          if (config.output === 'verbose') {
+            if (!thirdParty()) {
+              lines.push(`model = ${model}`)
+            }
+            lines.push(
+              `sampler = ${options.sampler}`,
+              `steps = ${parameters.steps}`,
+              `scale = ${parameters.scale}`,
+            )
+            if (parameters.image) {
+              lines.push(
+                `strength = ${parameters.strength}`,
+                `noise = ${parameters.noise}`,
+              )
             }
           }
-          cleanUp()
-          return handleError(session, err)
+          result.children.push(segment('message', attrs, lines.join('\n')))
+          result.children.push(segment('message', attrs, `prompt = ${prompt}`))
+          if (config.output === 'verbose') {
+            result.children.push(segment('message', attrs, `undesired = ${uc}`))
+          }
+          result.children.push(segment('message', attrs, segment.image('base64://' + base64)))
+          return result
         }
+
+        messageIds.push(...await session.send(getContent()))
       }
 
-      if (!base64.trim()) return session.text('.empty-response')
-
-      function getContent() {
-        if (config.output === 'minimal') return segment.image('base64://' + base64)
-        const attrs = {
-          userId: session.userId,
-          nickname: session.author?.nickname || session.username,
-        }
-        const result = segment('figure')
-        const lines = [`seed = ${seed}`]
-        if (config.output === 'verbose') {
-          if (!thirdParty()) {
-            lines.push(`model = ${model}`)
-          }
-          lines.push(
-            `sampler = ${options.sampler}`,
-            `steps = ${parameters.steps}`,
-            `scale = ${parameters.scale}`,
-          )
-          if (parameters.image) {
-            lines.push(
-              `strength = ${parameters.strength}`,
-              `noise = ${parameters.noise}`,
-            )
-          }
-        }
-        result.children.push(segment('message', attrs, lines.join('\n')))
-        result.children.push(segment('message', attrs, `prompt = ${prompt}`))
-        if (config.output === 'verbose') {
-          result.children.push(segment('message', attrs, `undesired = ${uc}`))
-        }
-        result.children.push(segment('message', attrs, segment.image('base64://' + base64)))
-        return result
-      }
-
-      const ids = await session.send(getContent())
-
-      if (config.recallTimeout) {
+      if (messageIds.length && config.recallTimeout) {
         ctx.setTimeout(() => {
-          for (const id of ids) {
+          for (const id of messageIds) {
             session.bot.deleteMessage(session.channelId, id)
           }
         }, config.recallTimeout)

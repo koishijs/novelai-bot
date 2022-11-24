@@ -117,6 +117,7 @@ export interface Config extends PromptConfig {
   allowAnlas?: boolean | number
   endpoint?: string
   headers?: Dict<string>
+  maxIteration?: number
   maxRetryCount?: number
   requestTimeout?: number
   recallTimeout?: number
@@ -201,6 +202,7 @@ export const Config = Schema.intersect([
       Schema.const('default').description('发送图片和关键信息'),
       Schema.const('verbose').description('发送全部信息'),
     ]).description('输出方式。').default('default'),
+    maxIteration: Schema.natural().description('允许的最大请求次数 (设置为 1 以禁用同时请求多张图片)。').default(1),
     maxRetryCount: Schema.natural().description('连接失败时最大的重试次数。').default(3),
     requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute),
     recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
