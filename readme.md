@@ -9,6 +9,7 @@
 - 更改模型、采样器、图片尺寸
 - 高级请求语法
 - 自定义违禁词表
+- 中文关键词自动翻译
 - 发送一段时间后自动撤回
 - 连接到私服 · [NAIFU](https://bot.novelai.dev/deploy/naifu.html) · [SD-WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 - img2img · 图片增强
@@ -36,8 +37,15 @@
 
 ## License
 
-Released under the [MIT](./LICENSE) license.
+使用 [MIT](./LICENSE) 许可证发布。
 
-Copyright © 2022-present, Shigma & Ninzore
+```
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkoishijs%2Fnovelai-bot.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkoishijs%2Fnovelai-bot?ref=badge_large)

@@ -12,6 +12,27 @@ export default defineConfig({
   ],
 
   themeConfig: {
+    nav: [{
+      text: '更多',
+      items: [{
+        text: '关于我们',
+        items: [
+          { text: 'Koishi 官网', link: 'https://koishi.chat' },
+          { text: 'NovelAI.dev', link: 'https://novelai.dev' },
+          { text: '支持作者', link: 'https://afdian.net/a/shigma' },
+        ]
+      }, {
+        text: '友情链接',
+        items: [
+          { text: '法术解析', link: 'https://spell.novelai.dev' },
+          { text: '标签超市', link: 'https://tags.novelai.dev' },
+          { text: '绘世 Wiki', link: 'https://wiki.novelai.dev' },
+          { text: 'AiDraw', link: 'https://guide.novelai.dev' },
+          { text: 'MutsukiBot', link: 'https://nb.novelai.dev' },
+        ],
+      }],
+    }],
+
     sidebar: [{
       text: '指南',
       items: [
