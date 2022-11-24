@@ -218,8 +218,8 @@ export const Config = Schema.intersect([
         .union(Object.entries(sdUpscalers).map(([key, value]) => Schema.const(key).description(value)))
         .description('图片放大算法。')
         .default('lanzos'),
-    }),
-  ]),
+    }).description('图片放大'),
+  ] as const),
 
   Schema.object({
     output: Schema.union([
