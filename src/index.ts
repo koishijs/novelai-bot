@@ -352,9 +352,9 @@ export function apply(ctx: Context, config: Config) {
     cmd._options.sampler.type = Object.keys(config.type === 'sd-webui' ? sampler.sd : sampler.nai)
   }, { immediate: true })
 
-  if (config.type === 'sd-webui') {
-    const cmd = ctx
-      .command('.upscale')
+  if (config.type === 'sd-webui' && config.enableUpscale) {
+    const subcmd = cmd
+      .subcommand('.upscale')
       .shortcut('放大', { fuzzy: true })
       .option('scale', '-s <scale:number>', { fallback: 2 })
       .option('resolution', '-r <resolution>', { type: resolution })
@@ -386,25 +386,28 @@ export function apply(ctx: Context, config: Config) {
           upscaling_resize: options.scale,
           upscaling_resize_h: options.resolution?.height,
           upscaling_resize_w: options.resolution?.width,
-          upscaler_1: options.upscaler,
+          upscaler_1: sdUpscalers[options.upscaler],
+          upscaler_2: 'None',
+          upscale_first: false,
         }
 
-        const resp = await ctx.http.axios(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
-          method: 'POST',
-          timeout: config.requestTimeout,
-          headers: {
-            ...config.headers,
-          },
-          data,
-        })
-
-        const base64 = stripDataPrefix((resp.data as StableDiffusionWebUI.ExtraSingleImageResponse).image)
-        return segment.image('base64://' + base64)
+        try {
+          const resp = await ctx.http.axios(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
+            method: 'POST',
+            timeout: config.requestTimeout,
+            headers: {
+              ...config.headers,
+            },
+            data,
+          })
+          const base64 = stripDataPrefix((resp.data as StableDiffusionWebUI.ExtraSingleImageResponse).image)
+          return segment.image('base64://' + base64)
+        } catch (e) { console.log (e) }
       })
 
-    ctx.accept(['upscaler'], (config) => {
-      cmd._options.upscaler.fallback = config.upscaler
-      cmd._options.upscaler.type = Object.keys(config.upscaler)
-    }, { immediate: true })
+    // ctx.accept(['upscaler'], (config) => {
+    //   subcmd._options.upscaler.fallback = sdUpscalers[0]
+    //   subcmd._options.upscaler.type = Object.keys(sdUpscalers)
+    // }, { immediate: true })
   }
 }

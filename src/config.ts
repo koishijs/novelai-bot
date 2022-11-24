@@ -67,18 +67,24 @@ export namespace sampler {
   }
 }
 
-export const sdUpscalers = {
+export const sdUpscalers = [
   // built-in upscalers
-  none: 'None',
-  lanczos: 'Lanczos',
-  nearest: 'Nearest',
+  'None',
+  'Lanczos',
+  'Nearest',
   // third-party upscalers (might not be available)
-  esrgan: 'ESRGAN',
-  ldsr: 'LDSR',
-  realesrgan: 'RealESRGAN',
-  scunet: 'ScuNET',
-  swinir: 'SwinIR'
-} as const
+  'LDSR',
+  'ESRGAN_4x',
+  'R-ESRGAN General 4xV3',
+  'R-ESRGAN General WDN 4xV3',
+  'R-ESRGAN AnimeVideo',
+  'R-ESRGAN 4x+',
+  'R-ESRGAN 4x+ Anime6B',
+  'R-ESRGAN 2x+',
+  'ScuNET GAN',
+  'ScuNET PSNR',
+  'SwinIR 4x',
+] as const
 
 export interface Options {
   enhance: boolean
