@@ -103,7 +103,7 @@ export function apply(ctx: Context, config: Config) {
     .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
-    .option('iter', '-i <iterations:number>', { hidden: () => config.maxIteration <= 1 })
+    .option('iterations', '-i <iterations:number>', { hidden: () => config.maxIteration <= 1 })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
@@ -270,10 +270,10 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
-      const iteractions = options.iter > 1 ? options.iter : 1
+      const iterations = options.iterations > 1 ? options.iterations : 1
       const messageIds: string[] = []
 
-      for (let offset = 0; offset < iteractions; offset++) {
+      for (let offset = 0; offset < iterations; offset++) {
         const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
           method: 'POST',
           timeout: config.requestTimeout,
