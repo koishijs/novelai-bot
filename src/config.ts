@@ -92,7 +92,7 @@ export interface PromptConfig {
 export const PromptConfig: Schema<PromptConfig> = Schema.object({
   basePrompt: Schema.string().role('textarea').description('默认附加的标签。').default('masterpiece, best quality'),
   negativePrompt: Schema.string().role('textarea').description('默认附加的反向标签。').default(ucPreset),
-  forbidden: Schema.string().role('textarea').description('违禁词列表。将自动删除请求中的违禁词。').default(''),
+  forbidden: Schema.string().role('textarea').description('违禁词列表。请求中的违禁词将会被自动删除。').default(''),
   placement: Schema.union([
     Schema.const('before' as const).description('置于最前'),
     Schema.const('after' as const).description('置于最后'),
