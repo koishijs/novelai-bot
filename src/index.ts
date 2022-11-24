@@ -249,8 +249,9 @@ export function apply(ctx: Context, config: Config) {
         if (config.type !== 'sd-webui') {
           parameters.sampler = sampler.sd2nai(options.sampler)
           parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
+          parameters.seed = parameters.seed + seedOffset
           if (config.type === 'naifu') return parameters
-          return { model, input: prompt, seed: parameters.seed + seedOffset, parameters: omit(parameters, ['prompt', 'seed']) }
+          return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
         }
 
         return {
