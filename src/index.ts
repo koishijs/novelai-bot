@@ -107,7 +107,7 @@ export function apply(ctx: Context, config: Config) {
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
-      if (options.iter && options.iter > config.maxIteration) {
+      if (options.iterations && options.iterations > config.maxIteration) {
         return session.text('.exceed-max-iteration', [config.maxIteration])
       }
 
