@@ -319,8 +319,8 @@ export function apply(ctx: Context, config: Config) {
             nickname: session.author?.nickname || session.username,
           }
           const result = segment('figure')
-          const lines = [`seed = ${seed}`]
-          if (config.output === 'verbose') {
+          const lines = [`seed = ${seed + offset}`]
+          if (offset === 0 && config.output === 'verbose') {
             if (!thirdParty()) {
               lines.push(`model = ${model}`)
             }
@@ -337,9 +337,11 @@ export function apply(ctx: Context, config: Config) {
             }
           }
           result.children.push(segment('message', attrs, lines.join('\n')))
-          result.children.push(segment('message', attrs, `prompt = ${prompt}`))
-          if (config.output === 'verbose') {
-            result.children.push(segment('message', attrs, `undesired = ${uc}`))
+          if (offset === 0) {
+            result.children.push(segment('message', attrs, `prompt = ${prompt}`))
+            if (config.output === 'verbose') {
+              result.children.push(segment('message', attrs, `undesired = ${uc}`))
+            }
           }
           result.children.push(segment('message', attrs, segment.image('base64://' + base64)))
           return result
