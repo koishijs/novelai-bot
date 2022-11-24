@@ -6,6 +6,7 @@
 - 更改模型、采样器、图片尺寸
 - 高级请求语法
 - 自定义违禁词表
+- 中文关键词自动翻译
 - 发送一段时间后自动撤回
 - 连接到私服 · [NAIFU](./deploy/naifu.md) · [SD-WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 - img2img · 图片增强
@@ -17,7 +18,7 @@
 - 上下文管理 (限制在哪些群聊中哪些用户可以访问)
 - 多语言支持 (为使用不同语言的用户提供对应的回复)
 
-**所以所以快去给 [Koishi](https://github.com/koishijs/koishi) 点个 star 吧！**
+**所以快去给 [Koishi](https://github.com/koishijs/koishi) 点个 star 吧！**
 
 ## 效果展示
 

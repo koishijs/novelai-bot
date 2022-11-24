@@ -278,6 +278,7 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
 
   // remove forbidden words
   const positive = input.split(/,\s*/g).filter((word) => {
+    // eslint-disable-next-line no-control-regex
     word = word.replace(/[\x00-\x7f]/g, s => s.replace(/[^0-9a-zA-Z]/, ' ')).replace(/\s+/, ' ').trim()
     if (!word) return false
     for (const { pattern, strict } of forbidden) {
