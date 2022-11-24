@@ -107,6 +107,10 @@ export function apply(ctx: Context, config: Config) {
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
+      if (options.iter && options.iter > config.maxIteration) {
+        return session.text('.exceed-max-iteration', [config.maxIteration])
+      }
+
       let imgUrl: string, image: ImageData
       if (!restricted(session)) {
         input = segment.transform(input, {
@@ -267,8 +271,8 @@ export function apply(ctx: Context, config: Config) {
       }
 
       const iteractions = options.iter > 1 ? options.iter : 1
-
       const messageIds: string[] = []
+
       for (let offset = 0; offset < iteractions; offset++) {
         const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
           method: 'POST',
