@@ -55,6 +55,7 @@ commands:
     options:
       scale: 设置放大倍数
       resolution: 设定放大尺寸
+      crop: 是否裁剪以适应尺寸
       upscaler: 设置放大模型
       upscaler2: 设置放大模型 2
       upscaler2visibility: 设置放大模型 2 的可见度

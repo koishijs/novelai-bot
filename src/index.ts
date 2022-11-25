@@ -358,6 +358,7 @@ export function apply(ctx: Context, config: Config) {
       .shortcut('放大', { fuzzy: true })
       .option('scale', '-s <scale:number>', { fallback: 2 })
       .option('resolution', '-r <resolution>', { type: resolution })
+      .option('crop', '-c', { type: 'boolean', fallback: true })
       .option('upscaler', '-u <upscaler>')
       .option('upscaler2', '-p <upscaler2>')
       .option('upscaler2visibility', '-v <upscaler2visibility:number>')
@@ -394,6 +395,7 @@ export function apply(ctx: Context, config: Config) {
           upscaling_resize: options.scale,
           upscaling_resize_h: options.resolution?.height,
           upscaling_resize_w: options.resolution?.width,
+          upscaling_crop: options.crop,
           upscaler_1: options.upscaler,
           upscaler_2: options.upscaler2 ?? 'None',
           extras_upscaler_2_visibility: options.upscaler2visibility ?? 1,
