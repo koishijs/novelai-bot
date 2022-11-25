@@ -270,10 +270,10 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
-      const iterations = options.iterations > 1 ? options.iterations : 1
+      let iterations = options.iterations > 1 ? options.iterations : 1
       const messageIds: string[] = []
 
-      for (let offset = 0; offset < iterations; offset++, parameters.seed++) {
+      while (iterations--) {
         const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
           method: 'POST',
           timeout: config.requestTimeout,
@@ -324,7 +324,7 @@ export function apply(ctx: Context, config: Config) {
           }
           const result = segment('figure')
           const lines = [`seed = ${parameters.seed}`]
-          if (offset === 0 && config.output === 'verbose') {
+          if (config.output === 'verbose') {
             if (!thirdParty()) {
               lines.push(`model = ${model}`)
             }
@@ -341,17 +341,18 @@ export function apply(ctx: Context, config: Config) {
             }
           }
           result.children.push(segment('message', attrs, lines.join('\n')))
-          if (offset === 0) {
-            result.children.push(segment('message', attrs, `prompt = ${prompt}`))
-            if (config.output === 'verbose') {
-              result.children.push(segment('message', attrs, `undesired = ${uc}`))
-            }
+
+          result.children.push(segment('message', attrs, `prompt = ${prompt}`))
+          if (config.output === 'verbose') {
+            result.children.push(segment('message', attrs, `undesired = ${uc}`))
           }
           result.children.push(segment('message', attrs, segment.image('base64://' + base64)))
           return result
         }
 
         messageIds.push(...await session.send(getContent()))
+
+        parameters.seed++
       }
 
       if (messageIds.length && config.recallTimeout) {
