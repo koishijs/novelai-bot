@@ -24,17 +24,23 @@ commands:
       expect-image: Expect an image.
       latin-only: Invalid prompt, only English words can be used.
       forbidden-word: Forbidden words in prompt.
-      concurrent-jobs@random:
-        - Too busy to handle your request...
-        - "Brb power nap :zzz:"
-        - (*~*) Have no time to draw a new one.
-      waiting@random:
-        - The illustrator starts painting.
-        - Monet and Da Vinci, whose style is better for this?
-      pending@plural:
-        - Sure.
-        - Sure, but please wait for me to complete this one before.
-        - Bruh, there are {0} jobs pending!
+      concurrent-jobs: |-
+        <random>
+          <>Too busy to handle your request...</>
+          <>"Brb power nap :zzz:"</>
+          <>(*~*) Have no time to draw a new one.</>
+        </random>
+      waiting: |-
+        <random>
+          <>The illustrator starts painting.</>
+          <>Monet and Da Vinci, whose style is better for this?</>
+        </random>
+      pending: |-
+        <plural count={0}>
+          <>Sure.</>
+          <>Sure, but please wait for me to complete this one before.</>
+          <>Bruh, there are {0} jobs pending!</>
+        </plural>
       invalid-size: The Enhance mode can only be used for images generated. Use /novelai without enhance option if you are using normal img2img.
       invalid-resolution: Invalid resolution for image generation. The width and height of image should be multiple of 64.
       file-too-large: File is too large.
