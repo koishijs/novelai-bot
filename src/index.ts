@@ -103,7 +103,7 @@ export function apply(ctx: Context, config: Config) {
     .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
-    .option('iterations', '-i <iterations:number>', { hidden: () => config.maxIteration <= 1 })
+    .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIteration <= 1 })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
@@ -214,15 +214,14 @@ export function apply(ctx: Context, config: Config) {
         })
       }
 
-      const getRandomId = (count = 1) => [...Array(count).keys()].map(() => Math.random().toString(36).slice(2))
-
-      const ids = getRandomId()
+      const getRandomId = () => Math.random().toString(36).slice(2)
+      const iterations = Array(options.iterations).fill(0).map(getRandomId)
       if (config.maxConcurrency) {
         const store = tasks[session.cid] ||= new Set()
         if (store.size >= config.maxConcurrency) {
           return session.text('.concurrent-jobs')
         } else {
-          ids.forEach((id) => store.add(id))
+          iterations.forEach((id) => store.add(id))
         }
       }
 
@@ -230,7 +229,7 @@ export function apply(ctx: Context, config: Config) {
         ? session.text('.pending', [globalTasks.size])
         : session.text('.waiting'))
 
-      ids.forEach((id) => globalTasks.add(id))
+      iterations.forEach((id) => globalTasks.add(id))
       const cleanUp = (id: string) => {
         tasks[session.cid]?.delete(id)
         globalTasks.delete(id)
@@ -271,9 +270,6 @@ export function apply(ctx: Context, config: Config) {
           }),
         }
       }
-
-      let iterations = options.iterations > 1 ? options.iterations : 1
-      const messageIds: string[] = []
 
       const iterate = async () => {
         const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
@@ -337,7 +333,6 @@ export function apply(ctx: Context, config: Config) {
             }
           }
           result.children.push(segment('message', attrs, lines.join('\n')))
-
           result.children.push(segment('message', attrs, `prompt = ${prompt}`))
           if (config.output === 'verbose') {
             result.children.push(segment('message', attrs, `undesired = ${uc}`))
@@ -346,26 +341,25 @@ export function apply(ctx: Context, config: Config) {
           return result
         }
 
-        messageIds.push(...await session.send(getContent()))
-      }
-
-      while (iterations--) {
-        try {
-          await iterate()
-          cleanUp(ids.pop())
-          parameters.seed++
-        } catch (err) {
-          while (ids.length) cleanUp(ids.pop())
-          throw err
+        const messageIds = await session.send(getContent())
+        if (messageIds.length && config.recallTimeout) {
+          ctx.setTimeout(() => {
+            for (const id of messageIds) {
+              session.bot.deleteMessage(session.channelId, id)
+            }
+          }, config.recallTimeout)
         }
       }
 
-      if (messageIds.length && config.recallTimeout) {
-        ctx.setTimeout(() => {
-          for (const id of messageIds) {
-            session.bot.deleteMessage(session.channelId, id)
-          }
-        }, config.recallTimeout)
+      while (iterations.length) {
+        try {
+          await iterate()
+          cleanUp(iterations.pop())
+          parameters.seed++
+        } catch (err) {
+          iterations.forEach(cleanUp)
+          throw err
+        }
       }
     })
 
