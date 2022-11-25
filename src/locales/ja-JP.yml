@@ -5,11 +5,11 @@ commands:
       コンマで区切られた英語の生成呪文 (プロンプト) を入力してください。例：1girl, red eyes, black hair。
       モデルに用いられる単語は Danbooru のタグとほとんど同じです。
       興味があったら、レポジトリにスターを付けてください：https://github.com/koishijs/novelai-bot
-
     options:
       enhance: 向上 (enhance) モードを有効
       model: モデルを指定
       resolution: 画像解像度を設定
+      override: 禁用默认标签
       sampler: サンプラーを指定
       seed: シード値を設定
       steps: ステップ数を設定
@@ -17,8 +17,10 @@ commands:
       strength: ノイズ除去強度を設定
       noise: ノイズ強度を設定
       undesired: 反対呪文 (ネガティブプロンプト) を設定
-
+      noTranslator: 禁用自动翻译
+      iterations: 设置绘制次数
     messages:
+      exceed-max-iteration: 超过最大绘制次数。
       expect-prompt: 生成呪文を入力してください。
       expect-image: 画像を入力してください。
       latin-only: 英数字だけが入力可能です。
@@ -26,14 +28,14 @@ commands:
       forbidden-word: 一部の入力した単語が禁止されている。
       concurrent-jobs: |-
         <random>
-          <>後でね～今、猫の手も借りたいなの！</>
-          <>描けるの、た、タブレットが起動できませんだから。</>
-          <>じゃ、まず絵を教えて。</>
+        <>後でね～今、猫の手も借りたいなの！</>
+        <>描けるの、た、タブレットが起動できませんだから。</>
+        <>じゃ、まず絵を教えて。</>
         </random>
       waiting: |-
         <random>
-          <>私はプロ絵師だから、どんな絵でも描けるの。</>
-          <>仕事している…</>
+        <>私はプロ絵師だから、どんな絵でも描けるの。</>
+        <>仕事している…</>
         </random>
       pending: 仕事している前に {0} つの絵が完遂するべきです。
       invalid-size: 向上モードは AI 生成画像のみに用いられる。img2img (指定画像から生成) を使いたければ、「--enhance」を追加せずにコマンドを再実行してください。
