@@ -19,8 +19,10 @@ commands:
       noise: 图片噪声强度
       undesired: 排除标签
       noTranslator: 禁用自动翻译
+      iterations: 设置绘制次数
 
     messages:
+      exceed-max-iteration: 超过最大绘制次数。
       expect-prompt: 请输入标签。
       expect-image: 请输入图片。
       latin-only: 只接受英文输入。
