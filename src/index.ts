@@ -355,7 +355,7 @@ export function apply(ctx: Context, config: Config) {
           cleanUp(ids.pop())
           parameters.seed++
         } catch (err) {
-          cleanUp(ids.pop())
+          while (ids.length) cleanUp(ids.pop())
           throw err
         }
       }
