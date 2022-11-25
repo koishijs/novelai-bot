@@ -25,19 +25,25 @@ commands:
       expect-image: Attendrez-vous une image.
       latin-only: Les descriptions textuelles ne sont pas valides, vous ne pouvez utiliser que des mots anglais.
       forbidden-word: Les descriptions textuelles contiennent des mots prohibés.
-      concurrent-jobs@random:
-        - Trop occupé pour répondre à votre demande...
-        - "Courte sieste :zzz:"
-        - (*~*) Pas le temps d'en dessiner un nouveau.
-      waiting@random:
-        - D'accord. Je dessine de belles images pour vous.
-        - Votre demande est en cours de génération, veuillez attendre un moment.
-        - L'illustrateur commence à peindre.
-        - Monet et Da Vinci, quel style convient le mieux à cette image ?
-      pending@plural:
-        - D'accord.
-        - D'accord, mais attendez que je complète la dernière demande.
-        - '>_< Il y a {0} travaux en cours.'
+      concurrent-jobs: |-
+        <random>
+          <>Trop occupé pour répondre à votre demande...</>
+          <>"Courte sieste :zzz:"</>
+          <>(*~*) Pas le temps d'en dessiner un nouveau.</>
+        </random>
+      waiting: |-
+        <random>
+          <>D'accord. Je dessine de belles images pour vous.</>
+          <>Votre demande est en cours de génération, veuillez attendre un moment.</>
+          <>L'illustrateur commence à peindre.</>
+          <>Monet et Da Vinci, quel style convient le mieux à cette image ?</>
+        </random>
+      pending: |-
+        <plural>
+          <>D'accord.</>
+          <>D'accord, mais attendez que je complète la dernière demande.</>
+          <>'>_< Il y a {0} travaux en cours.'</>
+        </plural>
       invalid-size: Le mode d'amélioration de l'image peut être utilisé seulement pour les images générées. Si vous utilisez le mode de img2img, utilisez « /novelai » sans l'option « --enhance ».
       invalid-resolution: La taille de l'image n'est pas valide. La largeur et la hauteur de l'image doivent être des multiples de 64.
       file-too-large: Le fichier est trop important.

@@ -1,7 +1,6 @@
-pull_request_title: i18n: update translations
+pull_request_title: 'i18n: update translations'
 pull_request_labels:
   - i18n
-  - crowdin
 files:
   - source: /src/locales/zh-CN.yml
     translation: /src/locales/%locale%.yml

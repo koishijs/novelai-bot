@@ -24,13 +24,17 @@ commands:
       expect-image: 請輸入圖像。
       latin-only: 僅接受英文輸入。
       forbidden-word: 輸入含有違禁詞。
-      concurrent-jobs@random:
-        - 等下再畫吧，我已經忙不過來了……
-        - 我…我纔不是不會畫畫，只是沒時間！
-        - 我先喝杯咖啡可以嗎，好睏～
-      waiting@random:
-        - 少女繪畫中
-        - 莫行開，我即時來畫！
+      concurrent-jobs: |-
+        <random>
+          <>等下再畫吧，我已經忙不過來了……</>
+          <>我…我纔不是不會畫畫，只是沒時間！</>
+          <>我先喝杯咖啡可以嗎，好睏～</>
+        </random>
+      waiting: |-
+        <random>
+          <>少女繪畫中</>
+          <>莫行開，我即時來畫！</>
+        </random>
       pending: 好酒沉甕底。您還需等我完成前面 {0} 個稿件。
       invalid-size: 增強功能僅適用於 Novel AI 生成圖。若要使用 img2img 功能請直接使用「約稿」而非「增強」。
       invalid-resolution: 圖像尺寸無效。寬度與高度都須爲 64 的倍數。
