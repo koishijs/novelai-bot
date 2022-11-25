@@ -359,6 +359,7 @@ export function apply(ctx: Context, config: Config) {
       .option('scale', '-s <scale:number>', { fallback: 2 })
       .option('resolution', '-r <resolution>', { type: resolution })
       .option('upscaler', '-u <upscaler>')
+      .option('upscaleFirst', '-f', { type: 'boolean', fallback: false })
       .action(async ({ session, options }, input) => {
         let imgUrl: string
         segment.transform(input, {
@@ -392,7 +393,7 @@ export function apply(ctx: Context, config: Config) {
           upscaling_resize_w: options.resolution?.width,
           upscaler_1: options.upscaler,
           upscaler_2: 'None',
-          upscale_first: false,
+          upscale_first: options.upscaleFirst,
         }
 
         try {

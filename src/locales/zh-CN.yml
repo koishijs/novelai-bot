@@ -55,6 +55,7 @@ commands:
     options:
       scale: 设置放大倍数
       resolution: 设定放大尺寸
+      upscaleFirst: 先放大再执行面部修复
 
     messages:
       expect-image: 请输入图片。
