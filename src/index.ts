@@ -245,11 +245,10 @@ export function apply(ctx: Context, config: Config) {
         }
       })()
 
-      const genData = (seedOffset = 0) => {
+      const genData = () => {
         if (config.type !== 'sd-webui') {
           parameters.sampler = sampler.sd2nai(options.sampler)
           parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
-          parameters.seed = parameters.seed + seedOffset
           if (config.type === 'naifu') return parameters
           return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
         }
@@ -257,10 +256,10 @@ export function apply(ctx: Context, config: Config) {
         return {
           sampler_index: sampler.sd[options.sampler],
           init_images: image && [image.dataUrl], // sd-webui accepts data URLs with base64 encoded image
-          seed: parameters.seed + seedOffset,
           ...project(parameters, {
             prompt: 'prompt',
             batch_size: 'n_samples',
+            seed: 'seed',
             negative_prompt: 'uc',
             cfg_scale: 'scale',
             steps: 'steps',
@@ -274,7 +273,7 @@ export function apply(ctx: Context, config: Config) {
       const iterations = options.iterations > 1 ? options.iterations : 1
       const messageIds: string[] = []
 
-      for (let offset = 0; offset < iterations; offset++) {
+      for (let offset = 0; offset < iterations; offset++, parameters.seed++) {
         const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
           method: 'POST',
           timeout: config.requestTimeout,
@@ -282,7 +281,7 @@ export function apply(ctx: Context, config: Config) {
             ...config.headers,
             authorization: 'Bearer ' + token,
           },
-          data: genData(offset),
+          data: genData(),
         }).then((res) => {
           if (config.type === 'sd-webui') {
             return stripDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
