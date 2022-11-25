@@ -347,14 +347,13 @@ export function apply(ctx: Context, config: Config) {
         }
 
         messageIds.push(...await session.send(getContent()))
-
-        parameters.seed++
       }
 
       while (iterations--) {
         try {
           await iterate()
           cleanUp(ids.pop())
+          parameters.seed++
         } catch (err) {
           cleanUp(ids.pop())
           throw err
