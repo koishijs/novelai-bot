@@ -352,73 +352,71 @@ export function apply(ctx: Context, config: Config) {
     cmd._options.sampler.type = Object.keys(config.type === 'sd-webui' ? sampler.sd : sampler.nai)
   }, { immediate: true })
 
-  if (config.type === 'sd-webui' && config.enableUpscale) {
-    const subcmd = cmd
-      .subcommand('.upscale')
-      .shortcut('放大', { fuzzy: true })
-      .option('scale', '-s <scale:number>', { fallback: 2 })
-      .option('resolution', '-r <resolution>', { type: resolution })
-      .option('crop', '-c', { type: 'boolean', fallback: true })
-      .option('upscaler', '-u <upscaler>')
-      .option('upscaler2', '-p <upscaler2>')
-      .option('upscaler2visibility', '-v <upscaler2visibility:number>')
-      .option('upscaleFirst', '-f', { type: 'boolean', fallback: false })
-      .action(async ({ session, options }, input) => {
-        let imgUrl: string
-        segment.transform(input, {
-          image(attrs) {
-            imgUrl = attrs.url
-            return ''
-          },
-        })
-
-        if (!imgUrl) return session.text('.expect-image')
-        let image: ImageData
-        try {
-          image = await download(ctx, imgUrl)
-        } catch (err) {
-          if (err instanceof NetworkError) {
-            return session.text(err.message, err.params)
-          }
-          logger.error(err)
-          return session.text('.download-error')
-        }
-
-        if (!sdUpscalers.includes(options.upscaler) || (options.upscaler2 && !sdUpscalers.includes(options.upscaler2))) {
-          return session.text('.invalid-upscaler')
-        }
-
-        const data: StableDiffusionWebUI.ExtraSingleImageRequest = {
-          image: image.dataUrl,
-          resize_mode: !!options.resolution ? 1 : 0,
-          show_extras_results: true,
-          upscaling_resize: options.scale,
-          upscaling_resize_h: options.resolution?.height,
-          upscaling_resize_w: options.resolution?.width,
-          upscaling_crop: options.crop,
-          upscaler_1: options.upscaler,
-          upscaler_2: options.upscaler2 ?? 'None',
-          extras_upscaler_2_visibility: options.upscaler2visibility ?? 1,
-          upscale_first: options.upscaleFirst,
-        }
-
-        try {
-          const resp = await ctx.http.axios(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
-            method: 'POST',
-            timeout: config.requestTimeout,
-            headers: {
-              ...config.headers,
-            },
-            data,
-          })
-          const base64 = stripDataPrefix((resp.data as StableDiffusionWebUI.ExtraSingleImageResponse).image)
-          return segment.image('base64://' + base64)
-        } catch (e) { console.log (e) }
+  const subcmd = ctx.intersect(() => config.type === 'sd-webui')
+    .command('novelai.upscale')
+    .shortcut('放大', { fuzzy: true })
+    .option('scale', '-s <scale:number>', { fallback: 2 })
+    .option('resolution', '-r <resolution>', { type: resolution })
+    .option('crop', '-c', { type: 'boolean', fallback: true })
+    .option('upscaler', '-u <upscaler>')
+    .option('upscaler2', '-p <upscaler2>')
+    .option('upscaler2visibility', '-v <upscaler2visibility:number>')
+    .option('upscaleFirst', '-f', { type: 'boolean', fallback: false })
+    .action(async ({ session, options }, input) => {
+      let imgUrl: string
+      segment.transform(input, {
+        image(attrs) {
+          imgUrl = attrs.url
+          return ''
+        },
       })
 
-    ctx.accept(['upscaler'], (config) => {
-      subcmd._options.upscaler.fallback = config.upscaler
-      subcmd._options.upscaler.type = sdUpscalers
-    }, { immediate: true })
-  }
+      if (!imgUrl) return session.text('.expect-image')
+      let image: ImageData
+      try {
+        image = await download(ctx, imgUrl)
+      } catch (err) {
+        if (err instanceof NetworkError) {
+          return session.text(err.message, err.params)
+        }
+        logger.error(err)
+        return session.text('.download-error')
+      }
+
+      if (!sdUpscalers.includes(options.upscaler) || (options.upscaler2 && !sdUpscalers.includes(options.upscaler2))) {
+        return session.text('.invalid-upscaler')
+      }
+
+      const data: StableDiffusionWebUI.ExtraSingleImageRequest = {
+        image: image.dataUrl,
+        resize_mode: !!options.resolution ? 1 : 0,
+        show_extras_results: true,
+        upscaling_resize: options.scale,
+        upscaling_resize_h: options.resolution?.height,
+        upscaling_resize_w: options.resolution?.width,
+        upscaling_crop: options.crop,
+        upscaler_1: options.upscaler,
+        upscaler_2: options.upscaler2 ?? 'None',
+        extras_upscaler_2_visibility: options.upscaler2visibility ?? 1,
+        upscale_first: options.upscaleFirst,
+      }
+
+      try {
+        const resp = await ctx.http.axios(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
+          method: 'POST',
+          timeout: config.requestTimeout,
+          headers: {
+            ...config.headers,
+          },
+          data,
+        })
+        const base64 = stripDataPrefix((resp.data as StableDiffusionWebUI.ExtraSingleImageResponse).image)
+        return segment.image('base64://' + base64)
+      } catch (e) { console.log (e) }
+    })
+
+  ctx.accept(['upscaler'], (config) => {
+    subcmd._options.upscaler.fallback = config.upscaler
+    subcmd._options.upscaler.type = sdUpscalers
+  }, { immediate: true })
 }
