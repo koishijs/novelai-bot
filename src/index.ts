@@ -275,7 +275,7 @@ export function apply(ctx: Context, config: Config) {
       let iterations = options.iterations > 1 ? options.iterations : 1
       const messageIds: string[] = []
 
-      while (iterations--) {
+      const iterate = async () => {
         const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
           method: 'POST',
           timeout: config.requestTimeout,
@@ -298,7 +298,6 @@ export function apply(ctx: Context, config: Config) {
         while (true) {
           try {
             base64 = await request()
-            cleanUp(ids.pop())
             break
           } catch (err) {
             if (Quester.isAxiosError(err)) {
@@ -306,17 +305,12 @@ export function apply(ctx: Context, config: Config) {
                 continue
               }
             }
-            cleanUp(ids.pop())
 
-            await session.send(handleError(session, err))
-            continue
+            return await session.send(handleError(session, err))
           }
         }
 
-        if (!base64.trim()) {
-          await session.send(session.text('.empty-response'))
-          continue
-        }
+        if (!base64.trim()) return await session.send(session.text('.empty-response'))
 
         function getContent() {
           if (config.output === 'minimal') return segment.image('base64://' + base64)
@@ -355,6 +349,16 @@ export function apply(ctx: Context, config: Config) {
         messageIds.push(...await session.send(getContent()))
 
         parameters.seed++
+      }
+
+      while (iterations--) {
+        try {
+          await iterate()
+          cleanUp(ids.pop())
+        } catch (err) {
+          cleanUp(ids.pop())
+          throw err
+        }
       }
 
       if (messageIds.length && config.recallTimeout) {
