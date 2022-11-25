@@ -380,13 +380,17 @@ export function apply(ctx: Context, config: Config) {
           return session.text('.download-error')
         }
 
+        if (!sdUpscalers.includes(options.upscaler)) {
+          return session.text('.invalid-upscaler')
+        }
+
         const data: StableDiffusionWebUI.ExtraSingleImageRequest = {
           image: image.dataUrl,
           resize_mode: !!options.resolution ? 1 : 0,
           upscaling_resize: options.scale,
           upscaling_resize_h: options.resolution?.height,
           upscaling_resize_w: options.resolution?.width,
-          upscaler_1: sdUpscalers[options.upscaler],
+          upscaler_1: options.upscaler,
           upscaler_2: 'None',
           upscale_first: false,
         }
@@ -405,9 +409,9 @@ export function apply(ctx: Context, config: Config) {
         } catch (e) { console.log (e) }
       })
 
-    // ctx.accept(['upscaler'], (config) => {
-    //   subcmd._options.upscaler.fallback = sdUpscalers[0]
-    //   subcmd._options.upscaler.type = Object.keys(sdUpscalers)
-    // }, { immediate: true })
+    ctx.accept(['upscaler'], (config) => {
+      subcmd._options.upscaler.fallback = config.upscaler
+      subcmd._options.upscaler.type = sdUpscalers
+    }, { immediate: true })
   }
 }
