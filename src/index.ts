@@ -359,6 +359,8 @@ export function apply(ctx: Context, config: Config) {
       .option('scale', '-s <scale:number>', { fallback: 2 })
       .option('resolution', '-r <resolution>', { type: resolution })
       .option('upscaler', '-u <upscaler>')
+      .option('upscaler2', '-p <upscaler2>')
+      .option('upscaler2visibility', '-v <upscaler2visibility:number>')
       .option('upscaleFirst', '-f', { type: 'boolean', fallback: false })
       .action(async ({ session, options }, input) => {
         let imgUrl: string
@@ -381,18 +383,20 @@ export function apply(ctx: Context, config: Config) {
           return session.text('.download-error')
         }
 
-        if (!sdUpscalers.includes(options.upscaler)) {
+        if (!sdUpscalers.includes(options.upscaler) || (options.upscaler2 && !sdUpscalers.includes(options.upscaler2))) {
           return session.text('.invalid-upscaler')
         }
 
         const data: StableDiffusionWebUI.ExtraSingleImageRequest = {
           image: image.dataUrl,
           resize_mode: !!options.resolution ? 1 : 0,
+          show_extras_results: true,
           upscaling_resize: options.scale,
           upscaling_resize_h: options.resolution?.height,
           upscaling_resize_w: options.resolution?.width,
           upscaler_1: options.upscaler,
-          upscaler_2: 'None',
+          upscaler_2: options.upscaler2 ?? 'None',
+          extras_upscaler_2_visibility: options.upscaler2visibility ?? 1,
           upscale_first: options.upscaleFirst,
         }
 

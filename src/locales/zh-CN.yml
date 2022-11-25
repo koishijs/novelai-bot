@@ -55,9 +55,12 @@ commands:
     options:
       scale: 设置放大倍数
       resolution: 设定放大尺寸
+      upscaler: 设置放大模型
+      upscaler2: 设置放大模型 2
+      upscaler2visibility: 设置放大模型 2 的可见度
       upscaleFirst: 先放大再执行面部修复
 
     messages:
       expect-image: 请输入图片。
-      invalid-upscaler: 不支持的放大算法。
+      invalid-upscaler: 不支持的放大模型。
       download-error: 图片解析失败。
