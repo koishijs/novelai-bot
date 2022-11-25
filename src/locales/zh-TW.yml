@@ -5,7 +5,6 @@ commands:
       輸入以逗號分割的英文標籤，例如 portrait, blonde hair, red eyes。
       查找標籤可以使用 Danbooru。
       快來給專案標星收藏吧：https://github.com/koishijs/novelai-bot
-
     options:
       enhance: 圖像增強模式
       model: 設定生成模型
@@ -17,23 +16,26 @@ commands:
       scale: 設置對輸入的服從度
       strength: 圖像修改幅度
       noise: 圖像雜訊強度
+      undesired: 排除标签
       noTranslator: 禁用自動翻譯
-
+      iterations: 设置绘制次数
     messages:
+      exceed-max-iteration: 超过最大绘制次数。
       expect-prompt: 請輸入標籤。
       expect-image: 請輸入圖像。
       latin-only: 僅接受英文輸入。
+      too-many-words: 输入的单词数量过多。
       forbidden-word: 輸入含有違禁詞。
       concurrent-jobs: |-
         <random>
-          <>等下再畫吧，我已經忙不過來了……</>
-          <>我…我纔不是不會畫畫，只是沒時間！</>
-          <>我先喝杯咖啡可以嗎，好睏～</>
+        <>等下再畫吧，我已經忙不過來了……</>
+        <>我…我纔不是不會畫畫，只是沒時間！</>
+        <>我先喝杯咖啡可以嗎，好睏～</>
         </random>
       waiting: |-
         <random>
-          <>少女繪畫中</>
-          <>莫行開，我即時來畫！</>
+        <>少女繪畫中</>
+        <>莫行開，我即時來畫！</>
         </random>
       pending: 好酒沉甕底。您還需等我完成前面 {0} 個稿件。
       invalid-size: 增強功能僅適用於 Novel AI 生成圖。若要使用 img2img 功能請直接使用「約稿」而非「增強」。
