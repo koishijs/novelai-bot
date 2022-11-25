@@ -219,11 +219,10 @@ export const Config = Schema.intersect([
   Schema.union([
     Schema.object({
       type: Schema.const('sd-webui'),
-      enableUpscale: Schema.boolean().description('是否启用图片放大功能。').default(false),
       upscaler: Schema
-        .union(Object.entries(sdUpscalers).map(([key, value]) => Schema.const(key).description(value)))
+        .union(sdUpscalers.map((up) => Schema.const(up)))
         .description('图片放大算法。')
-        .default('lanzos'),
+        .default('Lanczos'),
     }).description('图片放大'),
   ] as const),
 
