@@ -5,7 +5,6 @@ commands:
       Enter /novelai with English prompt or tags, e.g. a girl in the forest, blonde hair, red eyes, white dress, etc.
       You can also use comma separated tags like those on Danbooru.
       Star it: https://github.com/koishijs/novelai-bot
-
     options:
       enhance: Image Enhance Mode
       model: Set Model for Generation
@@ -17,30 +16,28 @@ commands:
       scale: Set CFG Scale
       strength: Set Denoising Strength
       noise: Set Noising Strength
+      undesired: 排除标签
       noTranslator: Disable Auto Translation
-
+      iterations: 设置绘制次数
     messages:
+      exceed-max-iteration: 超过最大绘制次数。
       expect-prompt: Expect a prompt.
       expect-image: Expect an image.
       latin-only: Invalid prompt, only English words can be used.
+      too-many-words: 输入的单词数量过多。
       forbidden-word: Forbidden words in prompt.
       concurrent-jobs: |-
         <random>
-          <>Too busy to handle your request...</>
-          <>"Brb power nap :zzz:"</>
-          <>(*~*) Have no time to draw a new one.</>
+        <>Too busy to handle your request...</>
+        <>"Brb power nap :zzz:"</>
+        <>(*~*) Have no time to draw a new one.</>
         </random>
       waiting: |-
         <random>
-          <>The illustrator starts painting.</>
-          <>Monet and Da Vinci, whose style is better for this?</>
+        <>The illustrator starts painting.</>
+        <>Monet and Da Vinci, whose style is better for this?</>
         </random>
-      pending: |-
-        <plural count={0}>
-          <>Sure.</>
-          <>Sure, but please wait for me to complete this one before.</>
-          <>Bruh, there are {0} jobs pending!</>
-        </plural>
+      pending: "<plural count={0}>\n<>Sure.</>\n<>Sure, but please wait for me to complete this one before.</>\n<>Bruh, there are {0} jobs pending!</>\n</plural>"
       invalid-size: The Enhance mode can only be used for images generated. Use /novelai without enhance option if you are using normal img2img.
       invalid-resolution: Invalid resolution for image generation. The width and height of image should be multiple of 64.
       file-too-large: File is too large.
