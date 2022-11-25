@@ -245,7 +245,7 @@ export function apply(ctx: Context, config: Config) {
         }
       })()
 
-      const genData = () => {
+      const getPayload = () => {
         if (config.type !== 'sd-webui') {
           parameters.sampler = sampler.sd2nai(options.sampler)
           parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
@@ -281,7 +281,7 @@ export function apply(ctx: Context, config: Config) {
             ...config.headers,
             authorization: 'Bearer ' + token,
           },
-          data: genData(),
+          data: getPayload(),
         }).then((res) => {
           if (config.type === 'sd-webui') {
             return stripDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
