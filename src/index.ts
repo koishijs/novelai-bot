@@ -323,7 +323,7 @@ export function apply(ctx: Context, config: Config) {
             nickname: session.author?.nickname || session.username,
           }
           const result = segment('figure')
-          const lines = [`seed = ${seed + offset}`]
+          const lines = [`seed = ${parameters.seed}`]
           if (offset === 0 && config.output === 'verbose') {
             if (!thirdParty()) {
               lines.push(`model = ${model}`)
