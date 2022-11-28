@@ -18,13 +18,13 @@ commands:
       noise: Définir l'intensité du bruit
       undesired: Définir les descriptions textuelles négatives
       noTranslator: Désactiver la traduction automatique
-      iterations: 设置绘制次数
+      iterations: Définir le nombre de générations
     messages:
-      exceed-max-iteration: 超过最大绘制次数。
+      exceed-max-iteration: Trop du nombre de générations.
       expect-prompt: Attendrez-vous les descriptions textuelles valides.
       expect-image: Attendrez-vous une image.
       latin-only: Les descriptions textuelles ne sont pas valides, vous ne pouvez utiliser que des mots anglais.
-      too-many-words: 输入的单词数量过多。
+      too-many-words: Trop de mots saisis.
       forbidden-word: Les descriptions textuelles contiennent des mots prohibés.
       concurrent-jobs: |-
         <random>
