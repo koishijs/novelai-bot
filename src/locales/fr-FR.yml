@@ -51,6 +51,6 @@ commands:
       empty-response: Le serveur répond avec l'image invalide.
       request-failed: 'La demande a échoué : ({0}).'
       request-timeout: Le délai d'attente de la demande dépassé.
-      invalid-password: Le adresse e-mail ou mot de passe introduit est incorrect.
+      invalid-password: L'adresse électronique ou mot de passe introduit est incorrect.
       invalid-token: Le token est invalide ou a expiré. Veuillez contacter l'administrateur.
       unauthorized: Le token n'est pas autorisé, peut-être que ce token n'a pas d'abonnement valide. Veuillez contacter l'administrateur.
