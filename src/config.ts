@@ -196,7 +196,7 @@ export const Config = Schema.intersect([
     Schema.object({
       type: Schema.const('sd-webui'),
       sampler: sampler.createSchema(sampler.sd),
-      upscaler: Schema.union(sdUpscalers.map((up) => Schema.const(up))).description('默认的放大算法。').default('Lanczos'),
+      upscaler: Schema.union(upscalers).description('默认的放大算法。').default('Lanczos'),
     }).description('参数设置'),
     Schema.object({
       type: Schema.const('naifu'),
