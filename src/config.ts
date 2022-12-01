@@ -67,7 +67,7 @@ export namespace sampler {
   }
 }
 
-export const sdUpscalers = [
+export const upscalers = [
   // built-in upscalers
   'None',
   'Lanczos',
@@ -134,7 +134,6 @@ export interface Config extends PromptConfig {
   anatomy?: boolean
   output?: 'minimal' | 'default' | 'verbose'
   allowAnlas?: boolean | number
-  enableUpscale?: boolean
   upscaler?: string
   endpoint?: string
   headers?: Dict<string>
@@ -197,6 +196,7 @@ export const Config = Schema.intersect([
     Schema.object({
       type: Schema.const('sd-webui'),
       sampler: sampler.createSchema(sampler.sd),
+      upscaler: Schema.union(sdUpscalers.map((up) => Schema.const(up))).description('默认的放大算法。').default('Lanczos'),
     }).description('参数设置'),
     Schema.object({
       type: Schema.const('naifu'),
@@ -215,16 +215,6 @@ export const Config = Schema.intersect([
   }),
 
   PromptConfig,
-
-  Schema.union([
-    Schema.object({
-      type: Schema.const('sd-webui'),
-      upscaler: Schema
-        .union(sdUpscalers.map((up) => Schema.const(up)))
-        .description('图片放大算法。')
-        .default('Lanczos'),
-    }).description('图片放大'),
-  ] as const),
 
   Schema.object({
     output: Schema.union([

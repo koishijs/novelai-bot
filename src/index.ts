@@ -1,5 +1,5 @@
 import { Context, Dict, Logger, omit, Quester, segment, Session, trimSlash } from 'koishi'
-import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler, sdUpscalers } from './config'
+import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler, upscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, getImageSize, login, NetworkError, project, resizeInput, Size, stripDataPrefix } from './utils'
 import {} from '@koishijs/translator'
@@ -358,8 +358,8 @@ export function apply(ctx: Context, config: Config) {
     .option('scale', '-s <scale:number>', { fallback: 2 })
     .option('resolution', '-r <resolution>', { type: resolution })
     .option('crop', '-c', { type: 'boolean', fallback: true })
-    .option('upscaler', '-u <upscaler>')
-    .option('upscaler2', '-p <upscaler2>')
+    .option('upscaler', '-u <upscaler>', { type: upscalers })
+    .option('upscaler2', '-p <upscaler2>', { type: upscalers })
     .option('upscaler2visibility', '-v <upscaler2visibility:number>')
     .option('upscaleFirst', '-f', { type: 'boolean', fallback: false })
     .action(async ({ session, options }, input) => {
@@ -381,10 +381,6 @@ export function apply(ctx: Context, config: Config) {
         }
         logger.error(err)
         return session.text('.download-error')
-      }
-
-      if (!sdUpscalers.includes(options.upscaler) || (options.upscaler2 && !sdUpscalers.includes(options.upscaler2))) {
-        return session.text('.invalid-upscaler')
       }
 
       const data: StableDiffusionWebUI.ExtraSingleImageRequest = {
@@ -412,11 +408,13 @@ export function apply(ctx: Context, config: Config) {
         })
         const base64 = stripDataPrefix((resp.data as StableDiffusionWebUI.ExtraSingleImageResponse).image)
         return segment.image('base64://' + base64)
-      } catch (e) { console.log (e) }
+      } catch (e) {
+        logger.warn(e)
+        return session.text('.unknown-error')
+      }
     })
 
   ctx.accept(['upscaler'], (config) => {
     subcmd._options.upscaler.fallback = config.upscaler
-    subcmd._options.upscaler.type = sdUpscalers
   }, { immediate: true })
 }

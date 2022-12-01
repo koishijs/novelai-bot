@@ -63,5 +63,5 @@ commands:
 
     messages:
       expect-image: 请输入图片。
-      invalid-upscaler: 不支持的放大模型。
       download-error: 图片解析失败。
+      unknown-error: 发生未知错误。
