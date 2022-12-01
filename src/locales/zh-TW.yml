@@ -51,3 +51,17 @@ commands:
       invalid-password: 電郵地址或密碼不正確。
       invalid-token: 令牌無效或已過期，請聯繫管理員。
       unauthorized: 令牌未經授權，可能關聯帳戶需要續費，請聯繫管理員。
+  novelai.upscale:
+    description: AI 放大图片
+    options:
+      scale: 设置放大倍数
+      resolution: 设定放大尺寸
+      crop: 是否裁剪以适应尺寸
+      upscaler: 设置放大模型
+      upscaler2: 设置放大模型 2
+      upscaler2visibility: 设置放大模型 2 的可见度
+      upscaleFirst: 先放大再执行面部修复
+    messages:
+      expect-image: 请输入图片。
+      download-error: 图片解析失败。
+      unknown-error: 发生未知错误。
