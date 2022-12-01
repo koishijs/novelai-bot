@@ -1,5 +1,5 @@
 import { Context, Dict, Logger, omit, Quester, segment, Session, trimSlash } from 'koishi'
-import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler } from './config'
+import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler, upscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, getImageSize, login, NetworkError, project, resizeInput, Size, stripDataPrefix } from './utils'
 import {} from '@koishijs/translator'
@@ -367,5 +367,71 @@ export function apply(ctx: Context, config: Config) {
     cmd._options.model.fallback = config.model
     cmd._options.sampler.fallback = config.sampler
     cmd._options.sampler.type = Object.keys(config.type === 'sd-webui' ? sampler.sd : sampler.nai)
+  }, { immediate: true })
+
+  const subcmd = ctx.intersect(() => config.type === 'sd-webui')
+    .command('novelai.upscale')
+    .shortcut('放大', { fuzzy: true })
+    .option('scale', '-s <scale:number>', { fallback: 2 })
+    .option('resolution', '-r <resolution>', { type: resolution })
+    .option('crop', '-C, --no-crop', { value: false, fallback: true })
+    .option('upscaler', '-1 <upscaler>', { type: upscalers })
+    .option('upscaler2', '-2 <upscaler2>', { type: upscalers })
+    .option('visibility', '-v <visibility:number>')
+    .option('upscaleFirst', '-f', { fallback: false })
+    .action(async ({ session, options }, input) => {
+      let imgUrl: string
+      segment.transform(input, {
+        image(attrs) {
+          imgUrl = attrs.url
+          return ''
+        },
+      })
+
+      if (!imgUrl) return session.text('.expect-image')
+      let image: ImageData
+      try {
+        image = await download(ctx, imgUrl)
+      } catch (err) {
+        if (err instanceof NetworkError) {
+          return session.text(err.message, err.params)
+        }
+        logger.error(err)
+        return session.text('.download-error')
+      }
+
+      const data: StableDiffusionWebUI.ExtraSingleImageRequest = {
+        image: image.dataUrl,
+        resize_mode: !!options.resolution ? 1 : 0,
+        show_extras_results: true,
+        upscaling_resize: options.scale,
+        upscaling_resize_h: options.resolution?.height,
+        upscaling_resize_w: options.resolution?.width,
+        upscaling_crop: options.crop,
+        upscaler_1: options.upscaler,
+        upscaler_2: options.upscaler2 ?? 'None',
+        extras_upscaler_2_visibility: options.visibility ?? 1,
+        upscale_first: options.upscaleFirst,
+      }
+
+      try {
+        const resp = await ctx.http.axios(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
+          method: 'POST',
+          timeout: config.requestTimeout,
+          headers: {
+            ...config.headers,
+          },
+          data,
+        })
+        const base64 = stripDataPrefix((resp.data as StableDiffusionWebUI.ExtraSingleImageResponse).image)
+        return segment.image('base64://' + base64)
+      } catch (e) {
+        logger.warn(e)
+        return session.text('.unknown-error')
+      }
+    })
+
+  ctx.accept(['upscaler'], (config) => {
+    subcmd._options.upscaler.fallback = config.upscaler
   }, { immediate: true })
 }

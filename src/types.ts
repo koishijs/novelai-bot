@@ -80,4 +80,28 @@ export namespace StableDiffusionWebUI {
     parameters: any
     info: any
   }
+
+  /**
+   * @see https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/828438b4a190759807f9054932cae3a8b880ddf1/modules/api/models.py#L122
+   */
+  export interface ExtraSingleImageRequest {
+    image: string
+    /** Sets the resize mode: 0 to upscale by upscaling_resize amount, 1 to upscale up to upscaling_resize_h x upscaling_resize_w. */
+    resize_mode?: 0 | 1
+    show_extras_results?: boolean
+    gfpgan_visibility?: number // float
+    codeformer_visibility?: number // float
+    codeformer_weight?: number // float
+    upscaling_resize?: number // float
+    upscaling_resize_w?: number // int
+    upscaling_resize_h?: number // int
+    upscaling_crop?: boolean
+    upscaler_1?: string
+    upscaler_2?: string
+    extras_upscaler_2_visibility?: number // float
+    upscale_first?: boolean
+  }
+  export interface ExtraSingleImageResponse {
+    image: string
+  }
 }

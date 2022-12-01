@@ -67,6 +67,25 @@ export namespace sampler {
   }
 }
 
+export const upscalers = [
+  // built-in upscalers
+  'None',
+  'Lanczos',
+  'Nearest',
+  // third-party upscalers (might not be available)
+  'LDSR',
+  'ESRGAN_4x',
+  'R-ESRGAN General 4xV3',
+  'R-ESRGAN General WDN 4xV3',
+  'R-ESRGAN AnimeVideo',
+  'R-ESRGAN 4x+',
+  'R-ESRGAN 4x+ Anime6B',
+  'R-ESRGAN 2x+',
+  'ScuNET GAN',
+  'ScuNET PSNR',
+  'SwinIR 4x',
+] as const
+
 export interface Options {
   enhance: boolean
   model: string
@@ -115,6 +134,7 @@ export interface Config extends PromptConfig {
   anatomy?: boolean
   output?: 'minimal' | 'default' | 'verbose'
   allowAnlas?: boolean | number
+  upscaler?: string
   endpoint?: string
   headers?: Dict<string>
   maxIteration?: number
@@ -177,6 +197,7 @@ export const Config = Schema.intersect([
     Schema.object({
       type: Schema.const('sd-webui'),
       sampler: sampler.createSchema(sampler.sd),
+      upscaler: Schema.union(upscalers).description('默认的放大算法。').default('Lanczos'),
     }).description('参数设置'),
     Schema.object({
       type: Schema.const('naifu'),
