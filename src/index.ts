@@ -357,11 +357,11 @@ export function apply(ctx: Context, config: Config) {
     .shortcut('放大', { fuzzy: true })
     .option('scale', '-s <scale:number>', { fallback: 2 })
     .option('resolution', '-r <resolution>', { type: resolution })
-    .option('crop', '-c', { type: 'boolean', fallback: true })
-    .option('upscaler', '-u <upscaler>', { type: upscalers })
-    .option('upscaler2', '-p <upscaler2>', { type: upscalers })
-    .option('upscaler2visibility', '-v <upscaler2visibility:number>')
-    .option('upscaleFirst', '-f', { type: 'boolean', fallback: false })
+    .option('crop', '-C, --no-crop', { value: false, fallback: true })
+    .option('upscaler', '-1 <upscaler>', { type: upscalers })
+    .option('upscaler2', '-2 <upscaler2>', { type: upscalers })
+    .option('visibility', '-v <visibility:number>')
+    .option('upscaleFirst', '-f', { fallback: false })
     .action(async ({ session, options }, input) => {
       let imgUrl: string
       segment.transform(input, {
@@ -393,7 +393,7 @@ export function apply(ctx: Context, config: Config) {
         upscaling_crop: options.crop,
         upscaler_1: options.upscaler,
         upscaler_2: options.upscaler2 ?? 'None',
-        extras_upscaler_2_visibility: options.upscaler2visibility ?? 1,
+        extras_upscaler_2_visibility: options.visibility ?? 1,
         upscale_first: options.upscaleFirst,
       }
 
