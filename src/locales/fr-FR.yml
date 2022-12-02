@@ -6,6 +6,10 @@ commands:
       De nombreux modèles exigent que les descriptions textuelles soient en anglais, par ex. a girl in the forest, blonde hair, red eyes, white dress.
       Vous pouvez utiliser des balises séparées par des virgules, comme sur Danbooru.
       Donnez-lui une étoile : https://github.com/koishijs/novelai-bot
+    shortcuts:
+      draw: 画画
+      draft: 约稿
+      enhance: 增强
     options:
       enhance: Mode d'amélioration de l'image
       model: Définir le modèle pour génération
@@ -56,6 +60,8 @@ commands:
       unauthorized: Le token n'est pas autorisé, peut-être que ce token n'a pas d'abonnement valide. Veuillez contacter l'administrateur.
   novelai.upscale:
     description: AI 放大图片
+    shortcuts:
+      upscale: 放大
     options:
       scale: 设置放大倍数
       resolution: 设定放大尺寸
