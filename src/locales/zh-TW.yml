@@ -5,6 +5,10 @@ commands:
       輸入以逗號分割的英文標籤，例如 portrait, blonde hair, red eyes。
       查找標籤可以使用 Danbooru。
       快來給專案標星收藏吧：https://github.com/koishijs/novelai-bot
+    shortcuts:
+      draw: 画画
+      draft: 约稿
+      enhance: 增强
     options:
       enhance: 圖像增強模式
       model: 設定生成模型
@@ -53,6 +57,8 @@ commands:
       unauthorized: 令牌未經授權，可能關聯帳戶需要續費，請聯繫管理員。
   novelai.upscale:
     description: AI 放大图片
+    shortcuts:
+      upscale: 放大
     options:
       scale: 设置放大倍数
       resolution: 设定放大尺寸
