@@ -31,7 +31,6 @@ plugins:
   group:basic:
     help:
     rate-limit:
-    suggest:
     locales:
     commands:
 

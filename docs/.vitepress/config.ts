@@ -26,7 +26,7 @@ export default defineConfig({
         items: [
           { text: '法术解析', link: 'https://spell.novelai.dev' },
           { text: '标签超市', link: 'https://tags.novelai.dev' },
-          { text: '绘世 Wiki', link: 'https://wiki.novelai.dev' },
+          { text: '绘世百科', link: 'https://wiki.novelai.dev' },
           { text: 'AiDraw', link: 'https://guide.novelai.dev' },
           { text: 'MutsukiBot', link: 'https://nb.novelai.dev' },
         ],
