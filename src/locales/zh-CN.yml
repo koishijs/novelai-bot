@@ -6,6 +6,11 @@ commands:
       查找标签可以使用 Danbooru。
       快来给仓库点个 star 吧：https://github.com/koishijs/novelai-bot
 
+    shortcuts:
+      draw: 画画
+      draft: 约稿
+      enhance: 增强
+
     options:
       enhance: 图片增强模式
       model: 设定生成模型
@@ -57,6 +62,9 @@ commands:
 
   novelai.upscale:
     description: AI 放大图片
+
+    shortcuts:
+      upscale: 放大
 
     options:
       scale: 设置放大倍数

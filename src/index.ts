@@ -83,14 +83,11 @@ export function apply(ctx: Context, config: Config) {
   }
 
   const cmd = ctx.command('novelai <prompts:text>')
-    .alias('nai')
+    .alias('nai', 'imagine')
     .userFields(['authority'])
-    .shortcut('画画', { fuzzy: true })
-    .shortcut('畫畫', { fuzzy: true })
-    .shortcut('约稿', { fuzzy: true })
-    .shortcut('約稿', { fuzzy: true })
-    .shortcut('增强', { fuzzy: true, options: { enhance: true } })
-    .shortcut('增強', { fuzzy: true, options: { enhance: true } })
+    .shortcut('draw', { i18n: true, fuzzy: true })
+    .shortcut('draft', { i18n: true, fuzzy: true })
+    .shortcut('enhance', { i18n: true, fuzzy: true, options: { enhance: true } })
     .option('enhance', '-e', { hidden: restricted })
     .option('model', '-m <model>', { type: models, hidden: thirdParty })
     .option('resolution', '-r <resolution>', { type: resolution })
@@ -371,7 +368,7 @@ export function apply(ctx: Context, config: Config) {
 
   const subcmd = ctx.intersect(() => config.type === 'sd-webui')
     .command('novelai.upscale')
-    .shortcut('放大', { fuzzy: true })
+    .shortcut('upscale', { i18n: true, fuzzy: true })
     .option('scale', '-s <scale:number>', { fallback: 2 })
     .option('resolution', '-r <resolution>', { type: resolution })
     .option('crop', '-C, --no-crop', { value: false, fallback: true })
@@ -402,7 +399,7 @@ export function apply(ctx: Context, config: Config) {
 
       const data: StableDiffusionWebUI.ExtraSingleImageRequest = {
         image: image.dataUrl,
-        resize_mode: !!options.resolution ? 1 : 0,
+        resize_mode: options.resolution ? 1 : 0,
         show_extras_results: true,
         upscaling_resize: options.scale,
         upscaling_resize_h: options.resolution?.height,
