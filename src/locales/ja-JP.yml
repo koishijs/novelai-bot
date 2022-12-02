@@ -5,6 +5,10 @@ commands:
       コンマで区切られた英語の生成呪文 (プロンプト) を入力してください。例：1girl, red eyes, black hair。
       モデルに用いられる単語は Danbooru のタグとほとんど同じです。
       興味があったら、レポジトリにスターを付けてください：https://github.com/koishijs/novelai-bot
+    shortcuts:
+      draw: 画画
+      draft: 约稿
+      enhance: 增强
     options:
       enhance: 向上 (enhance) モードを有効
       model: モデルを指定
@@ -53,6 +57,8 @@ commands:
       unauthorized: アカウント契約が期間切れるか、トークンが認可されていません。管理者に連絡してください。
   novelai.upscale:
     description: AI 放大图片
+    shortcuts:
+      upscale: 放大
     options:
       scale: 设置放大倍数
       resolution: 设定放大尺寸
