@@ -5,6 +5,10 @@ commands:
       Enter /novelai with English prompt or tags, e.g. a girl in the forest, blonde hair, red eyes, white dress, etc.
       You can also use comma separated tags like those on Danbooru.
       Star it: https://github.com/koishijs/novelai-bot
+    shortcuts:
+      draw: 画画
+      draft: 约稿
+      enhance: 增强
     options:
       enhance: Image Enhance Mode
       model: Set Model for Generation
@@ -53,6 +57,8 @@ commands:
       unauthorized: The token is unauthorized, this happens while your account has no a valid subscription. Please contact your administrator.
   novelai.upscale:
     description: AI 放大图片
+    shortcuts:
+      upscale: 放大
     options:
       scale: 设置放大倍数
       resolution: 设定放大尺寸
