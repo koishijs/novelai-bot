@@ -101,6 +101,7 @@ export namespace StableDiffusionWebUI {
     extras_upscaler_2_visibility?: number // float
     upscale_first?: boolean
   }
+
   export interface ExtraSingleImageResponse {
     image: string
   }

@@ -167,6 +167,8 @@ export function apply(ctx: Context, config: Config) {
         // 2: none
         ucPreset: 2,
         qualityToggle: false,
+        scale: options.scale ?? 11,
+        steps: options.steps ?? (imgUrl ? config.imageSteps : config.textSteps),
       }
 
       if (imgUrl) {
@@ -180,10 +182,6 @@ export function apply(ctx: Context, config: Config) {
           return session.text('.download-error')
         }
 
-        Object.assign(parameters, {
-          scale: options.scale ?? 11,
-          steps: options.steps ?? 50,
-        })
         if (options.enhance) {
           const size = getImageSize(image.buffer)
           if (size.width + size.height !== 1280) {
@@ -209,8 +207,6 @@ export function apply(ctx: Context, config: Config) {
         Object.assign(parameters, {
           height: options.resolution.height,
           width: options.resolution.width,
-          scale: options.scale ?? 11,
-          steps: options.steps ?? 28,
         })
       }
 
@@ -364,6 +360,7 @@ export function apply(ctx: Context, config: Config) {
     })
 
   ctx.accept(['model', 'orient', 'sampler'], (config) => {
+    cmd._options.scale.fallback = config.scale
     cmd._options.model.fallback = config.model
     cmd._options.sampler.fallback = config.sampler
     cmd._options.sampler.type = Object.keys(config.type === 'sd-webui' ? sampler.sd : sampler.nai)
@@ -402,7 +399,7 @@ export function apply(ctx: Context, config: Config) {
 
       const data: StableDiffusionWebUI.ExtraSingleImageRequest = {
         image: image.dataUrl,
-        resize_mode: !!options.resolution ? 1 : 0,
+        resize_mode: options.resolution ? 1 : 0,
         show_extras_results: true,
         upscaling_resize: options.scale,
         upscaling_resize_h: options.resolution?.height,
