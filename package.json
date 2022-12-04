@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-novelai",
   "description": "Generate images by diffusion models",
-  "version": "1.15.2",
+  "version": "1.15.3",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [

@@ -103,12 +103,12 @@ export function apply(ctx: Context, config: Config) {
     .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
-    .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIteration <= 1 })
+    .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
-      if (options.iterations && options.iterations > config.maxIteration) {
-        return session.text('.exceed-max-iteration', [config.maxIteration])
+      if (options.iterations && options.iterations > config.maxIterations) {
+        return session.text('.exceed-max-iteration', [config.maxIterations])
       }
 
       let imgUrl: string, image: ImageData
@@ -203,7 +203,9 @@ export function apply(ctx: Context, config: Config) {
           })
         }
       } else {
-        options.resolution ||= orientMap[config.orient]
+        options.resolution ||= typeof config.resolution === 'string'
+          ? orientMap[config.resolution]
+          : config.resolution
         Object.assign(parameters, {
           height: options.resolution.height,
           width: options.resolution.width,

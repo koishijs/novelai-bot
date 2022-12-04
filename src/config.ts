@@ -127,7 +127,7 @@ export interface Config extends PromptConfig {
   email?: string
   password?: string
   model?: Model
-  orient?: Orient
+  resolution?: Orient | Size
   sampler?: string
   scale?: number
   textSteps?: number
@@ -140,7 +140,7 @@ export interface Config extends PromptConfig {
   upscaler?: string
   endpoint?: string
   headers?: Dict<string>
-  maxIteration?: number
+  maxIterations?: number
   maxRetryCount?: number
   requestTimeout?: number
   recallTimeout?: number
@@ -213,12 +213,20 @@ export const Config = Schema.intersect([
   ] as const),
 
   Schema.object({
-    orient: Schema.union(orients).description('默认的图片方向。').default('portrait'),
     scale: Schema.natural().description('默认对输入的服从度。').default(11),
     textSteps: Schema.natural().description('文本生图时默认的迭代步数。').default(28),
     imageSteps: Schema.natural().description('以图生图时默认的迭代步数。').default(50),
     maxSteps: Schema.natural().description('允许的最大迭代步数。').default(0),
-    maxResolution: Schema.natural().description('生成图片的最大尺寸。').default(0),
+    resolution: Schema.union([
+      Schema.const('portrait' as const).description('肖像 (768x512)'),
+      Schema.const('landscape' as const).description('风景 (512x768)'),
+      Schema.const('square' as const).description('方形 (640x640)'),
+      Schema.object({
+        width: Schema.natural().description('宽度。').default(640),
+        height: Schema.natural().description('高度。').default(640),
+      }).description('自定义'),
+    ] as const).description('默认生成的图片尺寸。').default('portrait'),
+    maxResolution: Schema.natural().description('允许生成的宽度和高度最大值。').default(0),
   }),
 
   PromptConfig,
@@ -229,7 +237,7 @@ export const Config = Schema.intersect([
       Schema.const('default').description('发送图片和关键信息'),
       Schema.const('verbose').description('发送全部信息'),
     ]).description('输出方式。').default('default'),
-    maxIteration: Schema.natural().description('允许的最大绘制次数。').default(1),
+    maxIterations: Schema.natural().description('允许的最大绘制次数。').default(1),
     maxRetryCount: Schema.natural().description('连接失败时最大的重试次数。').default(3),
     requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute),
     recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
