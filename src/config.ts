@@ -121,23 +121,25 @@ export const PromptConfig: Schema<PromptConfig> = Schema.object({
   maxWords: Schema.natural().description('允许的最大单词数量。').default(0),
 }).description('输入设置')
 
-export interface Config extends PromptConfig {
-  type: 'token' | 'login' | 'naifu' | 'sd-webui'
-  token?: string
-  email?: string
-  password?: string
+interface ParamConfig {
   model?: Model
+  upscaler?: string
   resolution?: Orient | Size
+  maxResolution?: number
   sampler?: string
   scale?: number
   textSteps?: number
   imageSteps?: number
   maxSteps?: number
-  maxResolution?: number
-  anatomy?: boolean
+}
+
+export interface Config extends PromptConfig, ParamConfig {
+  type: 'token' | 'login' | 'naifu' | 'sd-webui'
+  token?: string
+  email?: string
+  password?: string
   output?: 'minimal' | 'default' | 'verbose'
   allowAnlas?: boolean | number
-  upscaler?: string
   endpoint?: string
   headers?: Dict<string>
   maxIterations?: number
@@ -180,7 +182,7 @@ export const Config = Schema.intersect([
           Schema.const(true).description('允许'),
           Schema.const(false).description('禁止'),
           Schema.natural().description('权限等级').default(1),
-        ]).default(true).description('是否允许使用点数。禁用后部分功能 (图片增强和手动设置某些参数) 将无法使用。'),
+        ]).default(true).description('是否启用高级功能 (例如图片增强和手动设置某些参数)。'),
       }),
     ]),
     Schema.object({
@@ -222,8 +224,8 @@ export const Config = Schema.intersect([
       Schema.const('landscape' as const).description('风景 (512x768)'),
       Schema.const('square' as const).description('方形 (640x640)'),
       Schema.object({
-        width: Schema.natural().description('宽度。').default(640),
-        height: Schema.natural().description('高度。').default(640),
+        width: Schema.natural().description('图片宽度。').default(640),
+        height: Schema.natural().description('图片高度。').default(640),
       }).description('自定义'),
     ] as const).description('默认生成的图片尺寸。').default('portrait'),
     maxResolution: Schema.natural().description('允许生成的宽度和高度最大值。').default(0),

@@ -55,7 +55,6 @@ export function apply(ctx: Context, config: Config) {
   const thirdParty = () => !['login', 'token'].includes(config.type)
 
   const restricted = (session: Session<'authority'>) => {
-    if (thirdParty()) return false
     if (typeof config.allowAnlas === 'boolean') {
       return !config.allowAnlas
     } else {
@@ -94,7 +93,7 @@ export function apply(ctx: Context, config: Config) {
     .option('enhance', '-e', { hidden: restricted })
     .option('model', '-m <model>', { type: models, hidden: thirdParty })
     .option('resolution', '-r <resolution>', { type: resolution })
-    .option('override', '-O')
+    .option('override', '-O', { hidden: restricted })
     .option('sampler', '-s <sampler>')
     .option('seed', '-x <seed:number>')
     .option('steps', '-t <step>', { type: step, hidden: restricted })
@@ -130,6 +129,9 @@ export function apply(ctx: Context, config: Config) {
       } else {
         delete options.enhance
         delete options.steps
+        delete options.noise
+        delete options.strength
+        delete options.override
       }
 
       if (config.translator && ctx.translator && !options.noTranslator) {
