@@ -247,7 +247,7 @@ export function apply(ctx: Context, config: Config) {
           case 'sd-webui':
             return image ? '/sdapi/v1/img2img' : '/sdapi/v1/txt2img'
           case 'stable-horde':
-            return '/v2/generate/async'
+            return '/api/v2/generate/async'
           case 'naifu':
             return '/generate-stream'
           default:
@@ -313,6 +313,17 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
+      const getHeaders = () => {
+        switch (config.type) {
+          case 'login':
+          case 'token':
+          case 'naifu':
+            return { Authorization: `Bearer ${token}` }
+          case 'stable-horde':
+            return { apikey: token }
+        }
+      }
+
       const iterate = async () => {
         const request = async () => {
           const res = await ctx.http.axios(trimSlash(config.endpoint) + path, {
@@ -320,7 +331,7 @@ export function apply(ctx: Context, config: Config) {
             timeout: config.requestTimeout,
             headers: {
               ...config.headers,
-              authorization: 'Bearer ' + token,
+              ...getHeaders(),
             },
             data: getPayload(),
           })
@@ -331,12 +342,12 @@ export function apply(ctx: Context, config: Config) {
           if (config.type === 'stable-horde') {
             const uuid = res.data.id
 
-            const check = () => ctx.http.get(trimSlash(config.endpoint) + '/v2/generate/check/' + uuid).then((res) => res.done)
+            const check = () => ctx.http.get(trimSlash(config.endpoint) + '/api/v2/generate/check/' + uuid).then((res) => res.done)
             const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
             while(await check() === false) {
               await sleep(1000)
             }
-            const result = await ctx.http.get(trimSlash(config.endpoint) + '/v2/generate/status/' + uuid)
+            const result = await ctx.http.get(trimSlash(config.endpoint) + '/api/v2/generate/status/' + uuid)
             return result.generations[0].img
           }
           // event: newImage
