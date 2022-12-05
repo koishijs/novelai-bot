@@ -256,6 +256,7 @@ export function parseForbidden(input: string) {
   return input.trim()
     .toLowerCase()
     .replace(/，/g, ',')
+    .replace(/！/g, '!')
     .split(/(?:,\s*|\s*\n\s*)/g)
     .filter(Boolean)
     .map<Forbidden>((pattern: string) => {
