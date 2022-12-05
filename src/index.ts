@@ -52,14 +52,20 @@ export function apply(ctx: Context, config: Config) {
   const getToken = () => tokenTask ||= login(ctx)
   ctx.accept(['token', 'type', 'email', 'password'], () => tokenTask = null)
 
+  type HiddenCallback = (session: Session<'authority'>) => boolean
+
   const thirdParty = () => !['login', 'token'].includes(config.type)
 
-  const restricted = (session: Session<'authority'>) => {
+  const restricted: HiddenCallback = (session) => {
     if (typeof config.allowAnlas === 'boolean') {
       return !config.allowAnlas
     } else {
       return session.user.authority < config.allowAnlas
     }
+  }
+
+  const some = (...args: HiddenCallback[]): HiddenCallback => (session) => {
+    return args.some(callback => callback(session))
   }
 
   const step = (source: string) => {
@@ -98,7 +104,7 @@ export function apply(ctx: Context, config: Config) {
     .option('seed', '-x <seed:number>')
     .option('steps', '-t <step>', { type: step, hidden: restricted })
     .option('scale', '-c <scale:number>')
-    .option('noise', '-n <noise:number>', { hidden: restricted })
+    .option('noise', '-n <noise:number>', { hidden: some(restricted, thirdParty) })
     .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })

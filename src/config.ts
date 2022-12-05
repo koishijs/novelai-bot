@@ -178,11 +178,6 @@ export const Config = Schema.intersect([
           'referer': 'https://novelai.net/',
           'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
         }),
-        allowAnlas: Schema.union([
-          Schema.const(true).description('允许'),
-          Schema.const(false).description('禁止'),
-          Schema.natural().description('权限等级').default(1),
-        ]).default(true).description('是否启用高级功能 (例如图片增强和手动设置某些参数)。'),
       }),
     ]),
     Schema.object({
@@ -239,6 +234,11 @@ export const Config = Schema.intersect([
       Schema.const('default').description('发送图片和关键信息'),
       Schema.const('verbose').description('发送全部信息'),
     ]).description('输出方式。').default('default'),
+    allowAnlas: Schema.union([
+      Schema.const(true).description('允许'),
+      Schema.const(false).description('禁止'),
+      Schema.natural().description('权限等级').default(1),
+    ]).default(true).description('是否启用高级功能 (例如图片增强和手动设置某些参数)。'),
     maxIterations: Schema.natural().description('允许的最大绘制次数。').default(1),
     maxRetryCount: Schema.natural().description('连接失败时最大的重试次数。').default(3),
     requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute),
