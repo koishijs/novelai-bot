@@ -12,10 +12,6 @@
 
 ### 从图片生成图片 (img2img)
 
-::: warning
-此功能在关闭 [allowAnlas](./config.md#allowAnlas) 后不可用。
-:::
-
 输入「约稿」+ 图片 + 关键词 进行图片绘制。例如：
 
 ```text
@@ -23,10 +19,6 @@
 ```
 
 ### 图片增强 (enhance)
-
-::: warning
-此功能在关闭 [allowAnlas](./config.md#allowAnlas) 后不可用。
-:::
 
 图片增强用于优化已经生成的图片。输入「增强」+ 图片 + 关键词 进行图片增强。例如：
 
@@ -43,10 +35,10 @@
 > [引用回复] 约稿/增强
 ```
 
-### 批量生成
+### 多次生成 (iterations)
 
 ::: tip
-此功能需要通过配置项 [`maxIteration`](./config.md#maxiteration) 手动开启。
+此功能需要通过配置项 [`maxIterations`](./config.md#maxiterations) 手动开启。
 :::
 
 如果想要以一组输入多次生成图片，可以使用 `-i, --iterations` 参数：
@@ -64,7 +56,7 @@
 ```
 
 ::: tip
-novelai-bot 同时兼容 novelai 和大部分 stable diffusion webui 的语法。
+novelai-bot 同时兼容 NovelAI 和大部分 stable diffusion webui 的语法。
 :::
 
 ### 负面关键词
@@ -138,7 +130,7 @@ NovelAI Bot 允许用户配置基础的正面和负面关键词。它们会在�
 此选项在图片增强时不可用。
 :::
 
-可以用 `-r` 或 `--resolution` 更改图片方向，可选值包括：
+可以用 `-r` 或 `--resolution` 更改图片方向，它包含三种预设：
 
 - `portrait`：768×512 (默认)
 - `square`：640×640
@@ -148,7 +140,7 @@ NovelAI Bot 允许用户配置基础的正面和负面关键词。它们会在�
 约稿 -r landscape koishi
 ```
 
-当启用了 [allowAnlas](./config.md#allowAnlas) 后，你还可以指定图片的具体长宽：
+除了上述三种预设外，你还可以指定图片的具体长宽：
 
 ```text
 约稿 -r 1024x1024 koishi
@@ -184,10 +176,6 @@ AI 会使用种子来生成噪音然后进一步生成你需要的图片，每�
 
 ### 迭代步数 (steps)
 
-::: warning
-此功能在关闭 [allowAnlas](./config.md#allowAnlas) 后不可用。
-:::
-
 更多的迭代步数**可能**会有更好的生成效果，但是一定会导致生成时间变长。太多的steps也可能适得其反，几乎不会有提高。
 
 一种做法是先使用较少的步数来进行快速生成来检查构图，直到找到喜欢的，然后再使用更多步数来生成最终图像。
@@ -220,7 +208,7 @@ AI 会使用种子来生成噪音然后进一步生成你需要的图片，每�
 ### 强度 (strength)
 
 ::: tip
-注意：该参数仅能在 img2img 或 enhance 中使用。
+注意：该参数仅能在 img2img 模式下使用。
 :::
 
 AI 会参考该参数调整图像构成。值越低越接近于原图，越高越接近训练集平均画风。使用 `-N` 或 `--strength` 手动控制强度。
@@ -239,7 +227,7 @@ AI 会参考该参数调整图像构成。值越低越接近于原图，越高�
 ### 噪音 (noise)
 
 ::: tip
-注意：该参数仅能在 img2img 或 enhance 中使用。
+注意：该参数仅能在 NovelAI / NAIFU 的 img2img 模式下使用。
 :::
 
 噪音是让 AI 生成细节内容的关键。更多的噪音可以让生成的图片拥有更多细节，但是太高的值会让产生异形，伪影和杂点。
