@@ -13,6 +13,59 @@ export const orientMap = {
   square: { height: 640, width: 640 },
 } as const
 
+export const hordeModels = [
+  'Papercut Diffusion',
+  'colorbook',
+  'Archer Diffusion',
+  'Guohua Diffusion',
+  'Xynthii-Diffusion',
+  'Redshift Diffusion',
+  'Mega Merge Diffusion',
+  'vectorartz',
+  'Classic Animation Diffusion',
+  'Borderlands',
+  'Voxel Art Diffusion',
+  'Ranma Diffusion',
+  'Elden Ring Diffusion',
+  'Cyberpunk Anime Diffusion',
+  'Microworlds',
+  'Poison',
+  'Midjourney Diffusion',
+  'mo-di-diffusion',
+  'Samdoesarts Ultmerge',
+  'Robo-Diffusion',
+  'stable_diffusion_inpainting',
+  'Arcane Diffusion',
+  'JWST Deep Space Diffusion',
+  'Zeipher Female Model',
+  'AIO Pixel Art',
+  'RPG',
+  'Dungeons and Diffusion',
+  'trinart',
+  'Yiffy',
+  'waifu_diffusion',
+  'Midjourney PaintArt',
+  'App Icon Diffusion',
+  'BubblyDubbly',
+  'Comic-Diffusion',
+  'Inkpunk Diffusion',
+  'Van Gogh Diffusion',
+  'Zack3D',
+  'Hentai Diffusion',
+  'Fantasy Card Diffusion',
+  'stable_diffusion',
+  'Synthwave',
+  'Ghibli Diffusion',
+  'Furry Epoch',
+  'Knollingcase',
+  'Anything Diffusion',
+  'Tron Legacy Diffusion',
+  'Spider-Verse Diffusion',
+  'stable_diffusion_2.0',
+  'Nitro Diffusion',
+  'Clazy',
+] as const
+
 const ucPreset = [
   'nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers',
   'extra digit, fewer digits, cropped, worst quality, low quality',
@@ -52,6 +105,19 @@ export namespace sampler {
     'k_dpmpp_2m_ka': 'DPM++ 2M Karras',
     'ddim': 'DDIM',
     'plms': 'PLMS',
+  }
+
+  export const horde = {
+    k_lms: 'LMS',
+    k_heun: 'Heun',
+    k_euler: 'Euler',
+    k_euler_a: 'Euler a',
+    k_dpm_2: 'DPM2',
+    k_dpm_2_a: 'DPM2 a',
+    k_dpm_fast: 'DPM fast',
+    k_dpm_adaptive: 'DPM adaptive',
+    k_dpmpp_2m: 'DPM++ 2M',
+    k_dpmpp_2s_a: 'DPM++ 2S a',
   }
 
   export function createSchema(map: Dict<string>) {
@@ -134,7 +200,7 @@ interface ParamConfig {
 }
 
 export interface Config extends PromptConfig, ParamConfig {
-  type: 'token' | 'login' | 'naifu' | 'sd-webui'
+  type: 'token' | 'login' | 'naifu' | 'sd-webui' | 'stable-horde'
   token?: string
   email?: string
   password?: string
@@ -142,6 +208,7 @@ export interface Config extends PromptConfig, ParamConfig {
   allowAnlas?: boolean | number
   endpoint?: string
   headers?: Dict<string>
+  nsfw?: boolean
   maxIterations?: number
   maxRetryCount?: number
   requestTimeout?: number
@@ -156,6 +223,7 @@ export const Config = Schema.intersect([
       ...process.env.KOISHI_ENV === 'browser' ? [] : [Schema.const('login' as const).description('账号密码')],
       Schema.const('naifu' as const).description('naifu'),
       Schema.const('sd-webui' as const).description('sd-webui'),
+      Schema.const('stable-horde' as const).description('Stable Horde'),
     ] as const).description('登录方式'),
   }).description('登录设置'),
 
@@ -191,6 +259,11 @@ export const Config = Schema.intersect([
       endpoint: Schema.string().description('API 服务器地址。').required(),
       headers: Schema.dict(String).description('要附加的额外请求头。'),
     }),
+    Schema.object({
+      type: Schema.const('stable-horde'),
+      endpoint: Schema.string().description('API 服务器地址。').default('https://stablehorde.net/').required(),
+      token: Schema.string().description('授权令牌。').role('secret').default('0000000000').required(),
+    }),
   ]),
 
   Schema.union([
@@ -199,6 +272,11 @@ export const Config = Schema.intersect([
       sampler: sampler.createSchema(sampler.sd),
       upscaler: Schema.union(upscalers).description('默认的放大算法。').default('Lanczos'),
     }).description('参数设置'),
+    Schema.object({
+      type: Schema.const('stable-horde'),
+      sampler: sampler.createSchema(sampler.horde),
+      model: Schema.union(hordeModels),
+    }),
     Schema.object({
       type: Schema.const('naifu'),
       sampler: sampler.createSchema(sampler.nai),

@@ -246,6 +246,8 @@ export function apply(ctx: Context, config: Config) {
         switch (config.type) {
           case 'sd-webui':
             return image ? '/sdapi/v1/img2img' : '/sdapi/v1/txt2img'
+          case 'stable-horde':
+            return '/v2/generate/async'
           case 'naifu':
             return '/generate-stream'
           default:
@@ -254,48 +256,94 @@ export function apply(ctx: Context, config: Config) {
       })()
 
       const getPayload = () => {
-        if (config.type !== 'sd-webui') {
-          parameters.sampler = sampler.sd2nai(options.sampler)
-          parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
-          if (config.type === 'naifu') return parameters
-          return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
-        }
-
-        return {
-          sampler_index: sampler.sd[options.sampler],
-          init_images: image && [image.dataUrl], // sd-webui accepts data URLs with base64 encoded image
-          ...project(parameters, {
-            prompt: 'prompt',
-            batch_size: 'n_samples',
-            seed: 'seed',
-            negative_prompt: 'uc',
-            cfg_scale: 'scale',
-            steps: 'steps',
-            width: 'width',
-            height: 'height',
-            denoising_strength: 'strength',
-          }),
+        switch (config.type) {
+          case 'login':
+          case 'token':
+          case 'naifu': {
+            parameters.sampler = sampler.sd2nai(options.sampler)
+            parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
+            if (config.type === 'naifu') return parameters
+            return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
+          }
+          case 'sd-webui': {
+            return {
+              sampler_index: sampler.sd[options.sampler],
+              init_images: image && [image.dataUrl], // sd-webui accepts data URLs with base64 encoded image
+              ...project(parameters, {
+                prompt: 'prompt',
+                batch_size: 'n_samples',
+                seed: 'seed',
+                negative_prompt: 'uc',
+                cfg_scale: 'scale',
+                steps: 'steps',
+                width: 'width',
+                height: 'height',
+                denoising_strength: 'strength',
+              }),
+            }
+          }
+          case 'stable-horde': {
+            return {
+              prompt: parameters.prompt,
+              params: {
+                sampler_name: options.sampler,
+                toggles: [1, 4],
+                cfg_scale: parameters.scale,
+                denoising_strength: parameters.strength,
+                seed: parameters.seed,
+                height: parameters.height,
+                width: parameters.width,
+                // 'seed_variation': 1,
+                // 'post_processing': [
+                //   'GFPGAN'
+                // ],
+                karras: true,
+                steps: parameters.steps,
+                n: 1,
+              },
+              nsfw: config.nsfw,
+              trusted_workers: false,
+              censor_nsfw: config.nsfw,
+              models: [options.model],
+              source_image: image?.base64,
+              source_processing: 'img2img',
+              // 'source_mask': 'string'
+            }
+          }
         }
       }
 
       const iterate = async () => {
-        const request = () => ctx.http.axios(trimSlash(config.endpoint) + path, {
-          method: 'POST',
-          timeout: config.requestTimeout,
-          headers: {
-            ...config.headers,
-            authorization: 'Bearer ' + token,
-          },
-          data: getPayload(),
-        }).then((res) => {
+        const request = async () => {
+          const res = await ctx.http.axios(trimSlash(config.endpoint) + path, {
+            method: 'POST',
+            timeout: config.requestTimeout,
+            headers: {
+              ...config.headers,
+              authorization: 'Bearer ' + token,
+            },
+            data: getPayload(),
+          })
+
           if (config.type === 'sd-webui') {
             return stripDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
+          }
+          if (config.type === 'stable-horde') {
+            const uuid = res.data.id
+
+            const check = () => ctx.http.get(trimSlash(config.endpoint) + '/v2/generate/check/' + uuid).then((res) => res.done)
+            const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+            while(await check() === false) {
+              await sleep(1000)
+            }
+            const result = await ctx.http.get(trimSlash(config.endpoint) + '/v2/generate/status/' + uuid)
+            return result.generations[0].img
           }
           // event: newImage
           // id: 1
           // data:
           return res.data?.slice(27)
-        })
+        }
 
         let base64: string, count = 0
         while (true) {
