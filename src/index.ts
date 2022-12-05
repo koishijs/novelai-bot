@@ -287,16 +287,13 @@ export function apply(ctx: Context, config: Config) {
               prompt: parameters.prompt,
               params: {
                 sampler_name: options.sampler,
-                toggles: [1, 4],
                 cfg_scale: parameters.scale,
                 denoising_strength: parameters.strength,
-                seed: parameters.seed,
+                seed: parameters.seed.toString(),
                 height: parameters.height,
                 width: parameters.width,
-                // 'seed_variation': 1,
-                // 'post_processing': [
-                //   'GFPGAN'
-                // ],
+                seed_variation: 1000,
+                post_processing: [],
                 karras: true,
                 steps: parameters.steps,
                 n: 1,
@@ -306,7 +303,7 @@ export function apply(ctx: Context, config: Config) {
               censor_nsfw: config.nsfw,
               models: [options.model],
               source_image: image?.base64,
-              source_processing: 'img2img',
+              source_processing: image ? 'img2img' : undefined,
               // 'source_mask': 'string'
             }
           }
