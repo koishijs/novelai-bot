@@ -208,7 +208,7 @@ export interface Config extends PromptConfig, ParamConfig {
   allowAnlas?: boolean | number
   endpoint?: string
   headers?: Dict<string>
-  nsfw?: boolean
+  nsfw?: 'disallow' | 'censor' | 'allow'
   maxIterations?: number
   maxRetryCount?: number
   requestTimeout?: number
@@ -261,8 +261,13 @@ export const Config = Schema.intersect([
     }),
     Schema.object({
       type: Schema.const('stable-horde'),
-      endpoint: Schema.string().description('API 服务器地址。').default('https://stablehorde.net/').required(),
-      token: Schema.string().description('授权令牌。').role('secret').default('0000000000').required(),
+      endpoint: Schema.string().description('API 服务器地址。').default('https://stablehorde.net/'),
+      token: Schema.string().description('授权令牌。').role('secret').default('0000000000'),
+      nsfw: Schema.union([
+        Schema.const('disallow').description('禁止'),
+        Schema.const('censor').description('遮罩'),
+        Schema.const('allow').description('允许'),
+      ]).description('是否允许 NSFW 内容。').default('allow'),
     }),
   ]),
 
