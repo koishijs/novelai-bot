@@ -64,13 +64,6 @@ API 服务器地址。如果你搭建了私服，可以将此项设置为你的�
 
 默认的生成模型。
 
-### orient
-
-- 类型：`'portrait' | 'square' | 'landscape'`
-- 默认值：`'portrait'`
-
-默认的图片方向。
-
 ### sampler
 
 - 类型：`'k_euler_ancestral' | 'k_euler' | 'k_lms' | 'plms' | 'ddim'`
@@ -78,17 +71,47 @@ API 服务器地址。如果你搭建了私服，可以将此项设置为你的�
 
 默认的采样器。
 
+### scale
+
+- 类型：`number`
+- 默认值：`11`
+
+默认对输入的服从度。
+
+### textSteps
+
+- 类型：`number`
+- 默认值：`28`
+
+文本生图时默认的迭代步数。
+
+### imageSteps
+
+- 类型：`number`
+- 默认值：`50`
+
+以图生图时默认的迭代步数。
+
 ### maxSteps
 
 - 类型：`number`
+- 默认值：`64`
 
-选项 `--steps` 的最大值。
+允许的最大迭代步数。
+
+### resolution
+
+- 类型：`'portrait' | 'square' | 'landscape' | { width: number, height: number }`
+- 默认值：`'portrait'`
+
+默认生成的图片尺寸。
 
 ### maxResolution
 
 - 类型：`number`
+- 默认值：`1024`
 
-选项 `--resolution` 中边长的最大值。
+允许生成的宽高最大值。
 
 ## 输入设置
 

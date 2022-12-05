@@ -210,10 +210,10 @@ export const Config = Schema.intersect([
   ] as const),
 
   Schema.object({
-    scale: Schema.natural().description('默认对输入的服从度。').default(11),
+    scale: Schema.number().description('默认对输入的服从度。').default(11),
     textSteps: Schema.natural().description('文本生图时默认的迭代步数。').default(28),
     imageSteps: Schema.natural().description('以图生图时默认的迭代步数。').default(50),
-    maxSteps: Schema.natural().description('允许的最大迭代步数。').default(0),
+    maxSteps: Schema.natural().description('允许的最大迭代步数。').default(64),
     resolution: Schema.union([
       Schema.const('portrait' as const).description('肖像 (768x512)'),
       Schema.const('landscape' as const).description('风景 (512x768)'),
@@ -223,7 +223,7 @@ export const Config = Schema.intersect([
         height: Schema.natural().description('图片高度。').default(640),
       }).description('自定义'),
     ] as const).description('默认生成的图片尺寸。').default('portrait'),
-    maxResolution: Schema.natural().description('允许生成的宽度和高度最大值。').default(0),
+    maxResolution: Schema.natural().description('允许生成的宽高最大值。').default(1024),
   }),
 
   PromptConfig,
