@@ -262,7 +262,7 @@ export const Config = Schema.intersect([
     Schema.object({
       type: Schema.const('stable-horde'),
       endpoint: Schema.string().description('API 服务器地址。').default('https://stablehorde.net/'),
-      token: Schema.string().description('授权令牌。').role('secret').default('0000000000'),
+      token: Schema.string().description('授权令牌 (API Key)。').role('secret').default('0000000000'),
       nsfw: Schema.union([
         Schema.const('disallow').description('禁止'),
         Schema.const('censor').description('遮罩'),
