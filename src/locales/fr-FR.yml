@@ -59,18 +59,18 @@ commands:
       invalid-token: Le token est invalide ou a expiré. Veuillez contacter l'administrateur.
       unauthorized: Le token n'est pas autorisé, peut-être que ce token n'a pas d'abonnement valide. Veuillez contacter l'administrateur.
   novelai.upscale:
-    description: Améliorer des images sur IA
+    description: Agrandir des images sur IA
     shortcuts:
       upscale: 放大
     options:
-      scale: 设置放大倍数
-      resolution: 设定放大尺寸
-      crop: 是否裁剪以适应尺寸
-      upscaler: 设置放大模型
-      upscaler2: 设置放大模型 2
-      upscaler2visibility: 设置放大模型 2 的可见度
-      upscaleFirst: 先放大再执行面部修复
+      scale: Mise à l'échelle de
+      resolution: Mise à l'échelle à
+      crop: Recadrer à la taille
+      upscaler: Définir l'agrandisseur
+      upscaler2: Définir l'agrandisseur 2
+      upscaler2visibility: Définir la visibilité de l'agrandisseur 2
+      upscaleFirst: Agrandir les images avant de restaurer les visages
     messages:
-      expect-image: 请输入图片。
-      download-error: 图片解析失败。
+      expect-image: Attendrez-vous une image.
+      download-error: Une erreur d'analyse syntaxique de l'image s'est produite.
       unknown-error: Une erreur inconnue s'est produite.
