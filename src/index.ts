@@ -431,7 +431,7 @@ export function apply(ctx: Context, config: Config) {
     cmd._options.scale.fallback = config.scale
     cmd._options.model.fallback = config.model
     cmd._options.sampler.fallback = config.sampler
-    cmd._options.sampler.type = Object.keys(config.type === 'sd-webui' ? sampler.sd : sampler.nai)
+    cmd._options.sampler.type = Object.keys(getSamplers())
   }, { immediate: true })
 
   const subcmd = ctx.intersect(() => config.type === 'sd-webui')
