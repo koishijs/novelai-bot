@@ -59,7 +59,7 @@ commands:
       invalid-token: Le token est invalide ou a expiré. Veuillez contacter l'administrateur.
       unauthorized: Le token n'est pas autorisé, peut-être que ce token n'a pas d'abonnement valide. Veuillez contacter l'administrateur.
   novelai.upscale:
-    description: AI 放大图片
+    description: Améliorer des images sur IA
     shortcuts:
       upscale: 放大
     options:
@@ -73,4 +73,4 @@ commands:
     messages:
       expect-image: 请输入图片。
       download-error: 图片解析失败。
-      unknown-error: 发生未知错误。
+      unknown-error: Une erreur inconnue s'est produite.
