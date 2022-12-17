@@ -342,7 +342,7 @@ export function apply(ctx: Context, config: Config) {
             const check = () => ctx.http.get(trimSlash(config.endpoint) + '/api/v2/generate/check/' + uuid).then((res) => res.done)
             const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
             while(await check() === false) {
-              await sleep(1000)
+              await sleep(config.pollInterval)
             }
             const result = await ctx.http.get(trimSlash(config.endpoint) + '/api/v2/generate/status/' + uuid)
             return result.generations[0].img
