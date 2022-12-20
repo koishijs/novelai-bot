@@ -99,6 +99,7 @@ export function apply(ctx: Context, config: Config) {
     .option('enhance', '-e', { hidden: restricted })
     .option('model', '-m <model>', { type: models, hidden: thirdParty })
     .option('resolution', '-r <resolution>', { type: resolution })
+    .option('output', '-o', { type: ['minimal', 'default', 'verbose'] })
     .option('override', '-O', { hidden: restricted })
     .option('sampler', '-s <sampler>')
     .option('seed', '-x <seed:number>')
@@ -315,14 +316,14 @@ export function apply(ctx: Context, config: Config) {
         if (!base64.trim()) return await session.send(session.text('.empty-response'))
 
         function getContent() {
-          if (config.output === 'minimal') return segment.image('base64://' + base64)
+          if (options.output === 'minimal') return segment.image('base64://' + base64)
           const attrs = {
             userId: session.userId,
             nickname: session.author?.nickname || session.username,
           }
           const result = segment('figure')
           const lines = [`seed = ${parameters.seed}`]
-          if (config.output === 'verbose') {
+          if (options.output === 'verbose') {
             if (!thirdParty()) {
               lines.push(`model = ${model}`)
             }
@@ -340,7 +341,7 @@ export function apply(ctx: Context, config: Config) {
           }
           result.children.push(segment('message', attrs, lines.join('\n')))
           result.children.push(segment('message', attrs, `prompt = ${prompt}`))
-          if (config.output === 'verbose') {
+          if (options.output === 'verbose') {
             result.children.push(segment('message', attrs, `undesired = ${uc}`))
           }
           result.children.push(segment('message', attrs, segment.image('base64://' + base64)))
@@ -369,7 +370,8 @@ export function apply(ctx: Context, config: Config) {
       }
     })
 
-  ctx.accept(['model', 'orient', 'sampler'], (config) => {
+  ctx.accept(['scale', 'model', 'sampler', 'output'], (config) => {
+    cmd._options.output.fallback = config.output
     cmd._options.scale.fallback = config.scale
     cmd._options.model.fallback = config.model
     cmd._options.sampler.fallback = config.sampler
