@@ -11,8 +11,8 @@
 配置文件所在的目录叫**根目录**。根据你的安装方式，根目录的位置可能不同：
 
 - zip: 解压目录下 `data/instances/default`
-- msi: `C:/Users/你的用户名/AppData/Roaming/Il Harper/Koishi/data/instances/default`
-- pkg: `~/Library/Application Support/Il Harper/Koishi/data/instances/default`
+- msi: `C:/Users/你的用户名/AppData/Roaming/Koishi/Desktop/data/instances/default`
+- pkg: `~/Library/Application Support/Koishi/Desktop/data/instances/default`
 
 配置文件是根目录下名为 `koishi.yml` 的文件。当你遇到问题时，开发者可能会要求你提供配置文件的内容。此时去上面的地方找就好了。
 

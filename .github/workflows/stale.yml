@@ -18,4 +18,4 @@ jobs:
             This issue was closed because it has been stalled for 5 days with no activity.
           days-before-issue-stale: 15
           days-before-issue-close: 5
-          any-of-labels: awaiting feedback
+          any-of-labels: awaiting feedback, invalid
