@@ -42,11 +42,6 @@ export default defineConfig({
         { text: '更多资源', link: '/more' },
       ],
     }, {
-      text: '部署',
-      items: [
-        { text: '部署 NAIFU', link: '/deploy/naifu' },
-      ],
-    }, {
       text: '进阶',
       items: [
         { text: '配置文件', link: '/advanced/config' },

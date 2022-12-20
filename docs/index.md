@@ -8,7 +8,7 @@
 - 自定义违禁词表
 - 中文关键词自动翻译
 - 发送一段时间后自动撤回
-- 连接到私服 · [NAIFU](./deploy/naifu.md) · [SD-WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
+- 连接到私服 · [SD-WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 - img2img · 图片增强
 
 得益于 Koishi 的插件化机制，只需配合其他插件即可实现更多功能：
