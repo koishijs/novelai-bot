@@ -292,7 +292,6 @@ export function apply(ctx: Context, config: Config) {
                 seed: parameters.seed.toString(),
                 height: parameters.height,
                 width: parameters.width,
-                seed_variation: 1000,
                 post_processing: [],
                 karras: options.sampler.includes('_ka'),
                 steps: parameters.steps,
@@ -304,7 +303,6 @@ export function apply(ctx: Context, config: Config) {
               models: [options.model],
               source_image: image?.base64,
               source_processing: image ? 'img2img' : undefined,
-              // 'source_mask': 'string'
             }
           }
         }
