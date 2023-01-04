@@ -286,7 +286,7 @@ export function apply(ctx: Context, config: Config) {
             return {
               prompt: parameters.prompt,
               params: {
-                sampler_name: options.sampler,
+                sampler_name: options.sampler.replace('_ka', ''),
                 cfg_scale: parameters.scale,
                 denoising_strength: parameters.strength,
                 seed: parameters.seed.toString(),
@@ -294,7 +294,7 @@ export function apply(ctx: Context, config: Config) {
                 width: parameters.width,
                 seed_variation: 1000,
                 post_processing: [],
-                karras: true,
+                karras: options.sampler.includes('_ka'),
                 steps: parameters.steps,
                 n: 1,
               },
