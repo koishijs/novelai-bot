@@ -266,7 +266,7 @@ export const Config = Schema.intersect([
       token: Schema.string().description('授权令牌 (API Key)。').role('secret').default('0000000000'),
       nsfw: Schema.union([
         Schema.const('disallow').description('禁止'),
-        Schema.const('censor').description('遮罩'),
+        Schema.const('censor').description('屏蔽'),
         Schema.const('allow').description('允许'),
       ]).description('是否允许 NSFW 内容。').default('allow'),
     }),
