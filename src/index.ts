@@ -299,7 +299,7 @@ export function apply(ctx: Context, config: Config) {
                 n: 1,
               },
               nsfw: config.nsfw !== 'disallow',
-              trusted_workers: false,
+              trusted_workers: config.trustedWorkerOnly,
               censor_nsfw: config.nsfw === 'censor',
               models: [options.model],
               source_image: image?.base64,

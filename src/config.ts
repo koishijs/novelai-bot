@@ -225,6 +225,7 @@ export interface Config extends PromptConfig, ParamConfig {
   recallTimeout?: number
   maxConcurrency?: number
   pollInterval?: number
+  trustedWorkerOnly?: boolean
 }
 
 export const Config = Schema.intersect([
@@ -338,6 +339,7 @@ export const Config = Schema.intersect([
     Schema.union([
       Schema.object({
         type: Schema.const('stable-horde'),
+        trustedWorkerOnly: Schema.boolean().description('是否只请求可信任工作节点。').default(false),
         pollInterval: Schema.number().role('time').description('轮询进度间隔时长。').default(Time.second),
       }),
     ] as const),
