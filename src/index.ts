@@ -427,6 +427,17 @@ export function apply(ctx: Context, config: Config) {
     })
 
   ctx.accept(['scale', 'model', 'sampler', 'output'], (config) => {
+    const getSamplers = () => {
+      switch (config.type) {
+        case 'sd-webui':
+          return sampler.sd
+        case 'stable-horde':
+          return sampler.horde
+        default:
+          return sampler.nai
+      }
+    }
+
     cmd._options.output.fallback = config.output
     cmd._options.scale.fallback = config.scale
     cmd._options.model.fallback = config.model
