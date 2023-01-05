@@ -16,6 +16,7 @@ commands:
       scale: Set CFG Scale
       strength: Set Denoising Strength
       noise: Set Noising Strength
+      hiresFix: 启用高分辨率修复
       undesired: Negative Prompt
       noTranslator: Disable Auto Translation
       iterations: 设置绘制次数
