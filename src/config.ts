@@ -13,6 +13,8 @@ export const orientMap = {
   square: { height: 640, width: 640 },
 } as const
 
+export const hordeModels = require('../data/horde-models.json') as string[]
+
 const ucPreset = [
   'nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers',
   'extra digit, fewer digits, cropped, worst quality, low quality',
@@ -52,6 +54,29 @@ export namespace sampler {
     'k_dpmpp_2m_ka': 'DPM++ 2M Karras',
     'ddim': 'DDIM',
     'plms': 'PLMS',
+  }
+
+  export const horde = {
+    k_lms: 'LMS',
+    k_heun: 'Heun',
+    k_euler: 'Euler',
+    k_euler_a: 'Euler a',
+    k_dpm_2: 'DPM2',
+    k_dpm_2_a: 'DPM2 a',
+    k_dpm_fast: 'DPM fast',
+    k_dpm_adaptive: 'DPM adaptive',
+    k_dpmpp_2m: 'DPM++ 2M',
+    k_dpmpp_2s_a: 'DPM++ 2S a',
+    k_lms_ka: 'LMS Karras',
+    k_heun_ka: 'Heun Karras',
+    k_euler_ka: 'Euler Karras',
+    k_euler_a_ka: 'Euler a Karras',
+    k_dpm_2_ka: 'DPM2 Karras',
+    k_dpm_2_a_ka: 'DPM2 a Karras',
+    k_dpm_fast_ka: 'DPM fast Karras',
+    k_dpm_adaptive_ka: 'DPM adaptive Karras',
+    k_dpmpp_2m_ka: 'DPM++ 2M Karras',
+    k_dpmpp_2s_a_ka: 'DPM++ 2S a Karras',
   }
 
   export function createSchema(map: Dict<string>) {
@@ -135,7 +160,7 @@ interface ParamConfig {
 }
 
 export interface Config extends PromptConfig, ParamConfig {
-  type: 'token' | 'login' | 'naifu' | 'sd-webui'
+  type: 'token' | 'login' | 'naifu' | 'sd-webui' | 'stable-horde'
   token?: string
   email?: string
   password?: string
@@ -143,11 +168,14 @@ export interface Config extends PromptConfig, ParamConfig {
   allowAnlas?: boolean | number
   endpoint?: string
   headers?: Dict<string>
+  nsfw?: 'disallow' | 'censor' | 'allow'
   maxIterations?: number
   maxRetryCount?: number
   requestTimeout?: number
   recallTimeout?: number
   maxConcurrency?: number
+  pollInterval?: number
+  trustedWorkerOnly?: boolean
 }
 
 export const Config = Schema.intersect([
@@ -157,6 +185,7 @@ export const Config = Schema.intersect([
       ...process.env.KOISHI_ENV === 'browser' ? [] : [Schema.const('login' as const).description('账号密码')],
       Schema.const('naifu' as const).description('naifu'),
       Schema.const('sd-webui' as const).description('sd-webui'),
+      Schema.const('stable-horde' as const).description('Stable Horde'),
     ] as const).description('登录方式'),
   }).description('登录设置'),
 
@@ -192,6 +221,18 @@ export const Config = Schema.intersect([
       endpoint: Schema.string().description('API 服务器地址。').required(),
       headers: Schema.dict(String).description('要附加的额外请求头。'),
     }),
+    Schema.object({
+      type: Schema.const('stable-horde'),
+      endpoint: Schema.string().description('API 服务器地址。').default('https://stablehorde.net/'),
+      token: Schema.string().description('授权令牌 (API Key)。').role('secret').default('0000000000'),
+      nsfw: Schema.union([
+        Schema.const('disallow').description('禁止'),
+        Schema.const('censor').description('屏蔽'),
+        Schema.const('allow').description('允许'),
+      ]).description('是否允许 NSFW 内容。').default('allow'),
+      trustedWorkerOnly: Schema.boolean().description('是否只请求可信任工作节点。').default(false),
+      pollInterval: Schema.number().role('time').description('轮询进度间隔时长。').default(Time.second),
+    }),
   ]),
 
   Schema.union([
@@ -201,6 +242,11 @@ export const Config = Schema.intersect([
       upscaler: Schema.union(upscalers).description('默认的放大算法。').default('Lanczos'),
       hiresFix: Schema.boolean().description('是否启用高分辨率修复。').default(false),
     }).description('参数设置'),
+    Schema.object({
+      type: Schema.const('stable-horde'),
+      sampler: sampler.createSchema(sampler.horde),
+      model: Schema.union(hordeModels),
+    }),
     Schema.object({
       type: Schema.const('naifu'),
       sampler: sampler.createSchema(sampler.nai),
@@ -236,11 +282,6 @@ export const Config = Schema.intersect([
       Schema.const('default').description('发送图片和关键信息'),
       Schema.const('verbose').description('发送全部信息'),
     ]).description('输出方式。').default('default'),
-    allowAnlas: Schema.union([
-      Schema.const(true).description('允许'),
-      Schema.const(false).description('禁止'),
-      Schema.natural().description('权限等级').default(1),
-    ]).default(true).description('是否启用高级功能 (例如图片增强和手动设置某些参数)。'),
     maxIterations: Schema.natural().description('允许的最大绘制次数。').default(1),
     maxRetryCount: Schema.natural().description('连接失败时最大的重试次数。').default(3),
     requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute),
