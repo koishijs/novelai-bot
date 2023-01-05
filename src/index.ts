@@ -1,7 +1,7 @@
 import { Context, Dict, Logger, omit, Quester, segment, Session, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler, upscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
-import { closestMultiple, download, getImageSize, login, NetworkError, project, resizeInput, Size, stripDataPrefix } from './utils'
+import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
 import {} from '@koishijs/translator'
 import {} from '@koishijs/plugin-help'
 
@@ -333,29 +333,29 @@ export function apply(ctx: Context, config: Config) {
           })
 
           if (config.type === 'sd-webui') {
-            return stripDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
+            return forceDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
           }
           if (config.type === 'stable-horde') {
             const uuid = res.data.id
 
             const check = () => ctx.http.get(trimSlash(config.endpoint) + '/api/v2/generate/check/' + uuid).then((res) => res.done)
             const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-            while(await check() === false) {
+            while (await check() === false) {
               await sleep(config.pollInterval)
             }
             const result = await ctx.http.get(trimSlash(config.endpoint) + '/api/v2/generate/status/' + uuid)
-            return result.generations[0].img
+            return forceDataPrefix(result.generations[0].img, 'image/webp')
           }
           // event: newImage
           // id: 1
           // data:
-          return res.data?.slice(27)
+          return forceDataPrefix(res.data?.slice(27))
         }
 
-        let base64: string, count = 0
+        let dataUrl: string, count = 0
         while (true) {
           try {
-            base64 = await request()
+            dataUrl = await request()
             break
           } catch (err) {
             if (Quester.isAxiosError(err)) {
@@ -368,10 +368,10 @@ export function apply(ctx: Context, config: Config) {
           }
         }
 
-        if (!base64.trim()) return await session.send(session.text('.empty-response'))
+        if (!dataUrl.trim()) return await session.send(session.text('.empty-response'))
 
         function getContent() {
-          if (options.output === 'minimal') return segment.image('base64://' + base64)
+          if (options.output === 'minimal') return segment.image(dataUrl)
           const attrs = {
             userId: session.userId,
             nickname: session.author?.nickname || session.username,
@@ -399,7 +399,7 @@ export function apply(ctx: Context, config: Config) {
           if (options.output === 'verbose') {
             result.children.push(segment('message', attrs, `undesired = ${uc}`))
           }
-          result.children.push(segment('message', attrs, segment.image('base64://' + base64)))
+          result.children.push(segment('message', attrs, segment.image(dataUrl)))
           return result
         }
 
@@ -475,7 +475,7 @@ export function apply(ctx: Context, config: Config) {
         return session.text('.download-error')
       }
 
-      const data: StableDiffusionWebUI.ExtraSingleImageRequest = {
+      const payload: StableDiffusionWebUI.ExtraSingleImageRequest = {
         image: image.dataUrl,
         resize_mode: options.resolution ? 1 : 0,
         show_extras_results: true,
@@ -490,16 +490,15 @@ export function apply(ctx: Context, config: Config) {
       }
 
       try {
-        const resp = await ctx.http.axios(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
+        const { data } = await ctx.http.axios<StableDiffusionWebUI.ExtraSingleImageResponse>(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
           method: 'POST',
           timeout: config.requestTimeout,
           headers: {
             ...config.headers,
           },
-          data,
+          data: payload,
         })
-        const base64 = stripDataPrefix((resp.data as StableDiffusionWebUI.ExtraSingleImageResponse).image)
-        return segment.image('base64://' + base64)
+        return segment.image(forceDataPrefix(data.image))
       } catch (e) {
         logger.warn(e)
         return session.text('.unknown-error')
