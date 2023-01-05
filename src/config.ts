@@ -156,6 +156,7 @@ interface ParamConfig {
   textSteps?: number
   imageSteps?: number
   maxSteps?: number
+  hiresFix?: boolean
 }
 
 export interface Config extends PromptConfig, ParamConfig {
@@ -239,6 +240,7 @@ export const Config = Schema.intersect([
       type: Schema.const('sd-webui'),
       sampler: sampler.createSchema(sampler.sd),
       upscaler: Schema.union(upscalers).description('默认的放大算法。').default('Lanczos'),
+      hiresFix: Schema.boolean().description('是否启用高分辨率修复。').default(false),
     }).description('参数设置'),
     Schema.object({
       type: Schema.const('stable-horde'),
