@@ -107,7 +107,7 @@ export function apply(ctx: Context, config: Config) {
     .option('scale', '-c <scale:number>')
     .option('noise', '-n <noise:number>', { hidden: some(restricted, thirdParty) })
     .option('strength', '-N <strength:number>', { hidden: restricted })
-    .option('hiresfix', '-H', { hidden: () => config.type !== 'sd-webui' })
+    .option('hiresFix', '-H', { hidden: () => config.type !== 'sd-webui' })
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
     .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
