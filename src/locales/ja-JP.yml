@@ -16,6 +16,7 @@ commands:
       scale: CFG スケール値を設定
       strength: ノイズ除去強度を設定
       noise: ノイズ強度を設定
+      hiresFix: 启用高分辨率修复
       undesired: 反対呪文 (ネガティブプロンプト) を設定
       noTranslator: 禁用自动翻译
       iterations: 设置绘制次数
