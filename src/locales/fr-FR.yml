@@ -17,6 +17,7 @@ commands:
       scale: Définir CFG Scale
       strength: Définir l'intensité de débruitage
       noise: Définir l'intensité du bruit
+      hiresFix: 启用高分辨率修复
       undesired: Définir les descriptions textuelles négatives
       noTranslator: Désactiver la traduction automatique
       iterations: Définir le nombre de générations
