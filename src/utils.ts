@@ -174,9 +174,9 @@ export function resizeInput(size: Size): Size {
   }
 }
 
-export function forceDataPrefix(url: string) {
+export function forceDataPrefix(url: string, mime = 'image/png') {
   // workaround for different gradio versions
   // https://github.com/koishijs/novelai-bot/issues/90
   if (url.startsWith('data:')) return url
-  return 'data:image/png;base64,' + url
+  return `data:${mime};base64,` + url
 }
