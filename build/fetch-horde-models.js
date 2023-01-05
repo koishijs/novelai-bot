@@ -3,7 +3,7 @@ const https = require('https')
 const path = require('path')
 
 const MODELS_URL = 'https://stablehorde.net/api/v2/status/models'
-const SRC_CONFIG_PATH = path.join(__dirname, '..', 'src', 'config.ts')
+const DATA_JSON_PATH = path.join(__dirname, '..', 'data', 'horde-models.json')
 
 ;(async () => {
   const db = await new Promise((resolve, reject) => {
@@ -16,11 +16,6 @@ const SRC_CONFIG_PATH = path.join(__dirname, '..', 'src', 'config.ts')
 
   const models = db.map((model) => model.name)
 
-  // replace auto-generated models
-  const config = await fsp.readFile(SRC_CONFIG_PATH, 'utf-8')
-  const newConfig = config.replace(
-    /\/\* AUTO-GENERATED STABLE HORDE MODELS \*\/\s*.*\s*\/\* END OF AUTO-GENERATED STABLE HORDE MODELS \*\//is,
-    `/* AUTO-GENERATED STABLE HORDE MODELS */\nexport const hordeModels = ${JSON.stringify(models, null, 2).replaceAll('"', '\'')} as const\n/* END OF AUTO-GENERATED STABLE HORDE MODELS */`
-  )
-  await fsp.writeFile(SRC_CONFIG_PATH, newConfig)
+  const json = JSON.stringify(models, null, 2)
+  await fsp.writeFile(DATA_JSON_PATH, json)
 })()
