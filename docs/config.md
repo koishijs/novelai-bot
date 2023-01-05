@@ -4,10 +4,10 @@
 
 ### type
 
-- 类型：`'login' | 'token' | 'naifu' | 'sd-webui'`
+- 类型：`'login' | 'token' | 'naifu' | 'sd-webui' | 'stable-horde'`
 - 默认值：`'token'`
 
-登录方式。`login` 表示使用账号密码登录，`token` 表示使用授权令牌登录。`naifu` 和 `sd-webui` 对应着其他类型的后端。
+登录方式。`login` 表示使用账号密码登录，`token` 表示使用授权令牌登录。`naifu`、 `sd-webui` 和 `stable-horde` 对应着其他类型的后端。
 
 ### email
 
@@ -125,7 +125,7 @@ API 服务器地址。如果你搭建了私服，可以将此项设置为你的�
 ### negativePrompt
 
 - 类型: `string`
-- 默认值: 
+- 默认值:
   ```text
   nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers,
   extra digit, fewer digits, cropped, worst quality, low quality,
