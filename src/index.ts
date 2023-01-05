@@ -270,6 +270,7 @@ export function apply(ctx: Context, config: Config) {
             return {
               sampler_index: sampler.sd[options.sampler],
               init_images: image && [image.dataUrl], // sd-webui accepts data URLs with base64 encoded image
+              restore_faces: config.restoreFaces ?? false,
               ...project(parameters, {
                 prompt: 'prompt',
                 batch_size: 'n_samples',
