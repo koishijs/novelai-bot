@@ -1,4 +1,4 @@
-import { Context, Dict, pick, Quester } from 'koishi'
+import { arrayBufferToBase64, Context, Dict, pick, Quester } from 'koishi'
 import {
   crypto_generichash, crypto_pwhash,
   crypto_pwhash_ALG_ARGON2ID13, crypto_pwhash_SALTBYTES, ready,
@@ -20,27 +20,13 @@ export interface Size {
 }
 
 export function getImageSize(buffer: ArrayBuffer): Size {
-  if (process.env.KOISHI_ENV === 'browser') {
-    const blob = new Blob([buffer])
-    const image = new Image()
-    image.src = URL.createObjectURL(blob)
-    return pick(image, ['width', 'height'])
-  } else {
+  if (typeof Buffer !== 'undefined') {
     return imageSize(Buffer.from(buffer))
   }
-}
-
-export function arrayBufferToBase64(buffer: ArrayBuffer) {
-  if (process.env.KOISHI_ENV === 'browser') {
-    let result = ''
-    const chunk = 8192
-    for (let index = 0; index < buffer.byteLength; index += chunk) {
-      result += String.fromCharCode.apply(null, buffer.slice(index, index + chunk))
-    }
-    return btoa(result)
-  } else {
-    return Buffer.from(buffer).toString('base64')
-  }
+  const blob = new Blob([buffer])
+  const image = new Image()
+  image.src = URL.createObjectURL(blob)
+  return pick(image, ['width', 'height'])
 }
 
 const MAX_OUTPUT_SIZE = 1048576
@@ -188,8 +174,9 @@ export function resizeInput(size: Size): Size {
   }
 }
 
-export function stripDataPrefix(base64: string) {
+export function forceDataPrefix(url: string, mime = 'image/png') {
   // workaround for different gradio versions
   // https://github.com/koishijs/novelai-bot/issues/90
-  return base64.replace(/^data:image\/[\w-]+;base64,/, '')
+  if (url.startsWith('data:')) return url
+  return `data:${mime};base64,` + url
 }
