@@ -55,7 +55,7 @@ API 服务器地址。如果你搭建了私服，可以将此项设置为你的�
 
 要附加的额外请求头。如果你的 `endpoint` 是第三方服务器，你可能需要设置正确的请求头，否则请求可能会被拒绝。
 
-### trustedWorkerOnly
+### trustedWorkers
 
 - 类型: `boolean`
 - 默认值: `false`
