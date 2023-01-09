@@ -270,7 +270,7 @@ export function apply(ctx: Context, config: Config) {
             return {
               sampler_index: sampler.sd[options.sampler],
               init_images: image && [image.dataUrl], // sd-webui accepts data URLs with base64 encoded image
-              restore_faces: config.restoreFaces ?? false,
+              restore_faces: config.restoreFaces === true,
               enable_hr: options.hiresFix ?? config.hiresFix ?? false,
               ...project(parameters, {
                 prompt: 'prompt',
@@ -286,6 +286,10 @@ export function apply(ctx: Context, config: Config) {
             }
           }
           case 'stable-horde': {
+            const postProcessing = []
+            if (typeof config.restoreFaces === 'string') {
+              postProcessing.push(config.restoreFaces)
+            }
             return {
               prompt: parameters.prompt,
               params: {
@@ -295,7 +299,7 @@ export function apply(ctx: Context, config: Config) {
                 seed: parameters.seed.toString(),
                 height: parameters.height,
                 width: parameters.width,
-                post_processing: [],
+                post_processing: postProcessing,
                 karras: options.sampler.includes('_ka'),
                 steps: parameters.steps,
                 n: 1,

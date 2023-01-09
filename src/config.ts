@@ -156,7 +156,7 @@ interface ParamConfig {
   textSteps?: number
   imageSteps?: number
   maxSteps?: number
-  restoreFaces?: boolean
+  restoreFaces?: 'CodeFormer' | 'GFPGAN' | boolean
   hiresFix?: boolean
 }
 
@@ -248,6 +248,11 @@ export const Config = Schema.intersect([
       type: Schema.const('stable-horde'),
       sampler: sampler.createSchema(sampler.horde),
       model: Schema.union(hordeModels),
+      restoreFaces: Schema.union([
+        Schema.const(false).description('禁用'),
+        Schema.const('CodeFormer').description('使用 CodeFormer'),
+        Schema.const('GFPGAN').description('使用 GFPGAN'),
+      ]).description('是否启用人脸修复。').default(false),
     }),
     Schema.object({
       type: Schema.const('naifu'),
