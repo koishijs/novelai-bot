@@ -175,7 +175,7 @@ export interface Config extends PromptConfig, ParamConfig {
   recallTimeout?: number
   maxConcurrency?: number
   pollInterval?: number
-  trustedWorkerOnly?: boolean
+  trustedWorkers?: boolean
 }
 
 export const Config = Schema.intersect([
@@ -230,7 +230,7 @@ export const Config = Schema.intersect([
         Schema.const('censor').description('屏蔽'),
         Schema.const('allow').description('允许'),
       ]).description('是否允许 NSFW 内容。').default('allow'),
-      trustedWorkerOnly: Schema.boolean().description('是否只请求可信任工作节点。').default(false),
+      trustedWorkers: Schema.boolean().description('是否只请求可信任工作节点。').default(false),
       pollInterval: Schema.number().role('time').description('轮询进度间隔时长。').default(Time.second),
     }),
   ]),

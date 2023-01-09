@@ -300,7 +300,7 @@ export function apply(ctx: Context, config: Config) {
                 n: 1,
               },
               nsfw: config.nsfw !== 'disallow',
-              trusted_workers: config.trustedWorkerOnly,
+              trusted_workers: config.trustedWorkers,
               censor_nsfw: config.nsfw === 'censor',
               models: [options.model],
               source_image: image?.base64,
