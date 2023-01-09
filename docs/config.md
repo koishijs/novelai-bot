@@ -55,6 +55,22 @@ API 服务器地址。如果你搭建了私服，可以将此项设置为你的�
 
 要附加的额外请求头。如果你的 `endpoint` 是第三方服务器，你可能需要设置正确的请求头，否则请求可能会被拒绝。
 
+### trustedWorkerOnly
+
+- 类型: `boolean`
+- 默认值: `false`
+- 当 `type` 为 `stable-horde` 时可选
+
+是否只请求可信任工作节点。
+
+### pollInterval
+
+- 类型: `number`
+- 默认值: `1000`
+- 当 `type` 为 `stable-horde` 时可选
+
+轮询进度间隔时长。单位为毫秒。
+
 ## 参数设置
 
 ### model
