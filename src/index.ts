@@ -267,6 +267,11 @@ export function apply(ctx: Context, config: Config) {
             return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
           }
           case 'sd-webui': {
+            // set default denoising strength to `0.75` for `hires fix` feature
+            // https://github.com/koishijs/novelai-bot/issues/158
+            if (options.hiresFix || config.hiresFix) {
+              parameters.strength ??= 0.75
+            }
             return {
               sampler_index: sampler.sd[options.sampler],
               init_images: image && [image.dataUrl], // sd-webui accepts data URLs with base64 encoded image
