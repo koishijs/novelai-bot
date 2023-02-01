@@ -55,6 +55,7 @@ body:
         - NovelAI (Token)
         - NAIFU
         - Stable Diffusion WebUI (AUTOMATIC1111)
+        - Stable Horde
     validations:
       required: true
   - type: textarea
