@@ -56,6 +56,7 @@ body:
         - NAIFU
         - Stable Diffusion WebUI (AUTOMATIC1111)
         - Stable Horde
+        - Others
     validations:
       required: true
   - type: textarea
