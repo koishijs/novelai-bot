@@ -83,7 +83,7 @@ export function apply(ctx: Context, config: Config) {
     if (Math.max(width, height) > (config.maxResolution || Infinity)) {
       throw new SessionError('commands.novelai.messages.invalid-resolution')
     }
-    return { width, height }
+    return { width, height, custom: true }
   }
 
   const cmd = ctx.command('novelai <prompts:text>')
@@ -117,7 +117,7 @@ export function apply(ctx: Context, config: Config) {
       // This code is originally written in the `resolution` function,
       // but currently `session.user` is not available in the type infering process.
       // See: https://github.com/koishijs/novelai-bot/issues/159
-      if (options.resolution && restricted(session)) {
+      if (options.resolution?.custom && restricted(session)) {
         return session.text('.custom-resolution-unsupported')
       }
 

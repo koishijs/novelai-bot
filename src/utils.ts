@@ -135,6 +135,8 @@ export function closestMultiple(num: number, mult = 64) {
 export interface Size {
   width: number
   height: number
+  /** Indicate whether this resolution is pre-defined or customized */
+  custom?: boolean
 }
 
 export function resizeInput(size: Size): Size {
