@@ -38,6 +38,7 @@ commands:
       pending: 仕事している前に {0} つの絵が完遂するべきです。
       invalid-size: 向上モードは AI 生成画像のみに用いられる。img2img (指定画像から生成) を使いたければ、「--enhance」を追加せずにコマンドを再実行してください。
       invalid-resolution: 無効な解像度。幅と高さが 64 の倍数である必要があります。
+      custom-resolution-unsupported: カスタム画像解像度は現在サポートされていません。
       file-too-large: ファイルのサイズが大きすぎる。
       unsupported-file-type: ファイルのタイプがサポートされていません。
       download-error: 画像のダウンロードに失敗しました。

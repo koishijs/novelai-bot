@@ -44,6 +44,7 @@ commands:
       pending: 在画了在画了，不过前面还有 {0} 个稿……
       invalid-size: 增强功能仅适用于被生成的图片。普通的 img2img 请直接使用「约稿」而不是「增强」。
       invalid-resolution: 非法的图片尺寸。宽高必须都为 64 的倍数。
+      custom-resolution-unsupported: 不支持自定义图片尺寸。
       file-too-large: 文件体积过大。
       unsupported-file-type: 不支持的文件格式。
       download-error: 图片解析失败。

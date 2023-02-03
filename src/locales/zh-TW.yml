@@ -38,8 +38,9 @@ commands:
       pending: 好酒沉甕底。您還需等我完成前面 {0} 個稿件。
       invalid-size: 增強功能僅適用於 Novel AI 生成圖。若要使用 img2img 功能請直接使用「約稿」而非「增強」。
       invalid-resolution: 圖像尺寸無效。寬度與高度都須爲 64 的倍數。
+      custom-resolution-unsupported: 不支援自定義圖像尺寸。
       file-too-large: 文件體積過大。
-      unsupported-file-type: 不支持的文件格式。
+      unsupported-file-type: 不支援的文件格式。
       download-error: 圖像解析失敗。
       unknown-error: 發生未知的錯誤。
       response-error: 發生未知的錯誤 ({0})。
