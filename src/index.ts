@@ -1,4 +1,4 @@
-import { Context, Dict, Logger, omit, Quester, segment, Session, trimSlash } from 'koishi'
+import { Context, Dict, Logger, omit, Quester, segment, Session, SessionError, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler, upscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
@@ -76,15 +76,14 @@ export function apply(ctx: Context, config: Config) {
 
   const resolution = (source: string, session: Session<'authority'>): Size => {
     if (source in orientMap) return orientMap[source]
-    if (restricted(session)) throw new Error()
     const cap = source.match(/^(\d+)[x×](\d+)$/)
     if (!cap) throw new Error()
     const width = closestMultiple(+cap[1])
     const height = closestMultiple(+cap[2])
     if (Math.max(width, height) > (config.maxResolution || Infinity)) {
-      throw new Error()
+      throw new SessionError('commands.novelai.messages.invalid-resolution')
     }
-    return { width, height }
+    return { width, height, custom: true }
   }
 
   const cmd = ctx.command('novelai <prompts:text>')
@@ -113,6 +112,14 @@ export function apply(ctx: Context, config: Config) {
     .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
+
+      // Check if the user is allowed to use this command.
+      // This code is originally written in the `resolution` function,
+      // but currently `session.user` is not available in the type infering process.
+      // See: https://github.com/koishijs/novelai-bot/issues/159
+      if (options.resolution?.custom && restricted(session)) {
+        return session.text('.custom-resolution-unsupported')
+      }
 
       if (options.iterations && options.iterations > config.maxIterations) {
         return session.text('.exceed-max-iteration', [config.maxIterations])
