@@ -1,4 +1,4 @@
-import { Context, Dict, Logger, omit, Quester, segment, Session, SessionError, trimSlash } from 'koishi'
+import { Context, Dict, h, Logger, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler, upscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
@@ -127,12 +127,13 @@ export function apply(ctx: Context, config: Config) {
 
       let imgUrl: string, image: ImageData
       if (!restricted(session)) {
-        input = segment.transform(input, {
+        input = h('', h.transform(h.parse(input), {
           image(attrs) {
+            if (imgUrl) throw new SessionError('commands.novelai.messages.too-many-images')
             imgUrl = attrs.url
             return ''
           },
-        })
+        })).toString(true)
 
         if (options.enhance && !imgUrl) {
           return session.text('.expect-image')
@@ -142,6 +143,7 @@ export function apply(ctx: Context, config: Config) {
           return session.text('.expect-prompt')
         }
       } else {
+        input = h('', h.parse(input)).toString(true)
         delete options.enhance
         delete options.steps
         delete options.noise
@@ -397,12 +399,12 @@ export function apply(ctx: Context, config: Config) {
         if (!dataUrl.trim()) return await session.send(session.text('.empty-response'))
 
         function getContent() {
-          if (options.output === 'minimal') return segment.image(dataUrl)
+          if (options.output === 'minimal') return h.image(dataUrl)
           const attrs = {
             userId: session.userId,
             nickname: session.author?.nickname || session.username,
           }
-          const result = segment('figure')
+          const result = h('figure')
           const lines = [`seed = ${parameters.seed}`]
           if (options.output === 'verbose') {
             if (!thirdParty()) {
@@ -420,12 +422,12 @@ export function apply(ctx: Context, config: Config) {
               )
             }
           }
-          result.children.push(segment('message', attrs, lines.join('\n')))
-          result.children.push(segment('message', attrs, `prompt = ${prompt}`))
+          result.children.push(h('message', attrs, lines.join('\n')))
+          result.children.push(h('message', attrs, `prompt = ${prompt}`))
           if (options.output === 'verbose') {
-            result.children.push(segment('message', attrs, `undesired = ${uc}`))
+            result.children.push(h('message', attrs, `undesired = ${uc}`))
           }
-          result.children.push(segment('message', attrs, segment.image(dataUrl)))
+          result.children.push(h('message', attrs, h.image(dataUrl)))
           return result
         }
 
@@ -482,7 +484,7 @@ export function apply(ctx: Context, config: Config) {
     .option('upscaleFirst', '-f', { fallback: false })
     .action(async ({ session, options }, input) => {
       let imgUrl: string
-      segment.transform(input, {
+      h.transform(input, {
         image(attrs) {
           imgUrl = attrs.url
           return ''
@@ -524,7 +526,7 @@ export function apply(ctx: Context, config: Config) {
           },
           data: payload,
         })
-        return segment.image(forceDataPrefix(data.image))
+        return h.image(forceDataPrefix(data.image))
       } catch (e) {
         logger.warn(e)
         return session.text('.unknown-error')

@@ -335,7 +335,7 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
     .replace(backslash, '\\')
     .replace(/_/g, ' ')
 
-  if (config.latinOnly && /[^\s\w"'“”‘’.,:|\\()\[\]{}-]/.test(input)) {
+  if (config.latinOnly && /[^\s\w"'“”‘’.,:|\\()\[\]{}<>-]/.test(input)) {
     return ['.latin-only']
   }
 
