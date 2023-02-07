@@ -319,6 +319,9 @@ export function apply(ctx: Context, config: Config) {
               models: [options.model],
               source_image: image?.base64,
               source_processing: image ? 'img2img' : undefined,
+              // support r2 upload
+              // https://github.com/koishijs/novelai-bot/issues/163
+              r2: true,
             }
           }
         }
@@ -359,7 +362,15 @@ export function apply(ctx: Context, config: Config) {
               await sleep(config.pollInterval)
             }
             const result = await ctx.http.get(trimSlash(config.endpoint) + '/api/v2/generate/status/' + uuid)
-            return forceDataPrefix(result.generations[0].img, 'image/webp')
+            const imgUrl = result.generations[0].img
+            if (!imgUrl.startsWith('http')) {
+              // r2 upload
+              // in case some client doesn't support r2 upload and follow the ye olde way.
+              return forceDataPrefix(result.generations[0].img, 'image/webp')
+            }
+            const imgRes = await ctx.http.axios(imgUrl, { responseType: 'arraybuffer' })
+            const b64 = Buffer.from(imgRes.data).toString('base64')
+            return forceDataPrefix(b64, imgRes.headers['content-type'])
           }
           // event: newImage
           // id: 1
