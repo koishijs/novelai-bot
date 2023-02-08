@@ -17,7 +17,7 @@ commands:
       scale: Définir CFG Scale
       strength: Définir l'intensité de débruitage
       noise: Définir l'intensité du bruit
-      hiresFix: 启用高分辨率修复
+      hiresFix: Activer la correction pour résolution haute.
       undesired: Définir les descriptions textuelles négatives
       noTranslator: Désactiver la traduction automatique
       iterations: Définir le nombre de générations
@@ -44,7 +44,7 @@ commands:
       pending: "<plural count={0}>\n  <>D'accord.</>\n  <>D'accord, mais attendez que je complète la dernière demande.</>\n  <>'>_< Il y a {0} travaux en cours.'</>\n</plural>"
       invalid-size: Le mode d'amélioration de l'image peut être utilisé seulement pour les images générées. Si vous utilisez le mode de img2img, utilisez « /novelai » sans l'option « --enhance ».
       invalid-resolution: La taille de l'image n'est pas valide. La largeur et la hauteur de l'image doivent être des multiples de 64.
-      custom-resolution-unsupported: 不支持自定义图片尺寸。
+      custom-resolution-unsupported: La personnalisation de la résolution n'est pas prise en charge actuellement.
       file-too-large: Le fichier est trop important.
       unsupported-file-type: Le format de fichier non reconnu.
       download-error: Une erreur d'analyse syntaxique de l'image s'est produite.
