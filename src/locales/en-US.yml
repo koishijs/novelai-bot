@@ -16,16 +16,16 @@ commands:
       scale: Set CFG Scale
       strength: Set Denoising Strength
       noise: Set Noising Strength
-      hiresFix: 启用高分辨率修复
+      hiresFix: Enable Hires Fix.
       undesired: Negative Prompt
       noTranslator: Disable Auto Translation
-      iterations: 设置绘制次数
+      iterations: Set Batch Count.
     messages:
-      exceed-max-iteration: 超过最大绘制次数。
+      exceed-max-iteration: Exceeded max batch count.
       expect-prompt: Expect a prompt.
       expect-image: Expect an image.
       latin-only: Invalid prompt, only English words can be used.
-      too-many-words: 输入的单词数量过多。
+      too-many-words: Too many words in prompt.
       forbidden-word: Forbidden words in prompt.
       concurrent-jobs: |-
         <random>
@@ -41,7 +41,7 @@ commands:
       pending: "<plural count={0}>\n  <>Sure.</>\n  <>Sure, but please wait for me to complete this one before.</>\n  <>Bruh, there are {0} jobs pending!</>\n</plural>"
       invalid-size: The Enhance mode can only be used for images generated. Use /novelai without enhance option if you are using normal img2img.
       invalid-resolution: Invalid resolution for image generation. The width and height of image should be multiple of 64.
-      custom-resolution-unsupported: 不支持自定义图片尺寸。
+      custom-resolution-unsupported: Not allowed customizing resolution.
       file-too-large: File is too large.
       unsupported-file-type: Unsupported file type.
       download-error: Parsing image failed.
@@ -54,16 +54,16 @@ commands:
       invalid-token: The token is invalid or expired. Please contact your administrator.
       unauthorized: The token is unauthorized, this happens while your account has no a valid subscription. Please contact your administrator.
   novelai.upscale:
-    description: AI 放大图片
+    description: Upscale Images by AI
     options:
-      scale: 设置放大倍数
-      resolution: 设定放大尺寸
-      crop: 是否裁剪以适应尺寸
-      upscaler: 设置放大模型
-      upscaler2: 设置放大模型 2
-      upscaler2visibility: 设置放大模型 2 的可见度
-      upscaleFirst: 先放大再执行面部修复
+      scale: Set Upscale By.
+      resolution: Set Upscale To.
+      crop: Crop Image Before Upscaling.
+      upscaler: Set Upscaler Model.
+      upscaler2: Set Upscale Model 2.
+      upscaler2visibility: Set Visibility of Upscale 2.
+      upscaleFirst: Upscale Image Before Restoring Face.
     messages:
-      expect-image: 请输入图片。
-      download-error: 图片解析失败。
-      unknown-error: 发生未知错误。
+      expect-image: Expect an image.
+      download-error: Parsing image failed.
+      unknown-error: An unknown error occurred.
