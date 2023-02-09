@@ -52,17 +52,17 @@ commands:
       request-timeout: Request timeout.
       invalid-password: Incorrect email address or password.
       invalid-token: The token is invalid or expired. Please contact your administrator.
-      unauthorized: The token is unauthorized, this happens while your account has no a valid subscription. Please contact your administrator.
+      unauthorized: The token is unauthorized, this happens while your account didn't have a valid subscription. Please contact your administrator.
   novelai.upscale:
     description: Upscale Images by AI
     options:
-      scale: Set Upscale By.
-      resolution: Set Upscale To.
-      crop: Crop Image Before Upscaling.
-      upscaler: Set Upscaler Model.
-      upscaler2: Set Upscale Model 2.
-      upscaler2visibility: Set Visibility of Upscale 2.
-      upscaleFirst: Upscale Image Before Restoring Face.
+      scale: Set Upscale By
+      resolution: Set Upscale To
+      crop: Crop Image Before Upscaling
+      upscaler: Set Upscaler
+      upscaler2: Set Upscaler
+      upscaler2visibility: Set Visibility of Upscaler 2
+      upscaleFirst: Upscale Image Before Restoring Face
     messages:
       expect-image: Expect an image.
       download-error: Parsing image failed.
