@@ -31,7 +31,8 @@
 ## 快速搭建
 
 ::: warning
-在此之前，你需要一个**拥有有效付费计划的 NovelAI 账号**，本插件只使用 NovelAI 提供的接口。
+本插件支持 [NovelAI](https://novelai.net/)、NAIFU、[SD-WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)、[Stable Horde](https://stablehorde.net/) 等多种后端。
+如果你选择使用 NovelAI 作为后端，你需要一个**拥有有效付费计划的 NovelAI 账号**。
 付费计划请自行前往 [NovelAI](https://novelai.net/) 了解。
 :::
 
@@ -40,11 +41,13 @@
 1. 前往[这里](https://koishi.chat/manual/starter/windows.html)下载 Koishi 桌面版
 2. 启动桌面版，你将会看到一个控制台界面
 3. 点击左侧的「插件市场」，搜索「novelai」并点击「安装」
-4. 点击左侧的「插件配置」，选择「novelai」插件，并在以下两种方案中**任选一种**：
+4. 点击左侧的「插件配置」，点击右上角的「添加插件」按钮，在弹出的对话框中选择「novelai」插件，你会看到 NovelAI 插件的配置页面
+5. 在以下两种方案中**任选一种**：
     - 选择登录方式为「账号密码」，并在「email」和「password」中填入邮箱和密码 (推荐)
     - 选择登录方式为「授权令牌」，并在「token」中填入授权令牌 ([获取方式](./config.md#token))
-5. 点击右上角的「启用」按钮
-6. 现在你已经可以在「沙盒」中使用画图功能了！
+    - 选择其他登录方式，请参考[SD-WebUI](./deploy/sd-webui.md)或[Stable Horde](./deploy/stable-horde.md)的指南
+6. 点击右上角的「启用」按钮
+7. 现在你已经可以在「沙盒」中使用画图功能了！
 
 如果想进一步在 QQ 中使用，可继续进行下列操作：
 
