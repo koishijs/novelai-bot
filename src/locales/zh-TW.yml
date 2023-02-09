@@ -2,28 +2,31 @@ commands:
   novelai:
     description: AI 繪圖
     usage: |-
-      輸入以逗號分割的英文標籤，例如 portrait, blonde hair, red eyes。
-      查找標籤可以使用 Danbooru。
+      輸入以逗號分割的英文提示詞，例如 portrait, blonde hair, red eyes。
+      查找可用的提示詞標籤可以使用 Danbooru。
       快來給專案標星收藏吧：https://github.com/koishijs/novelai-bot
-
     options:
       enhance: 圖像增強模式
       model: 設定生成模型
       resolution: 設定圖像尺寸
       override: 禁用預設標籤
-      sampler: 設定取樣器
-      seed: 設置隨機種子
-      steps: 設置迭代步數
-      scale: 設置對輸入的服從度
+      sampler: 設定採樣器
+      seed: 設定隨機種子
+      steps: 設定迭代步數
+      scale: 設定提示詞的相關性
       strength: 圖像修改幅度
       noise: 圖像雜訊強度
+      hiresFix: 啟用高分辨率修復
+      undesired: 反向提示詞
       noTranslator: 禁用自動翻譯
-
+      iterations: 設定繪畫次數
     messages:
-      expect-prompt: 請輸入標籤。
+      exceed-max-iteration: 超過最大繪畫次數
+      expect-prompt: 請輸入提示詞。
       expect-image: 請輸入圖像。
-      latin-only: 僅接受英文輸入。
-      forbidden-word: 輸入含有違禁詞。
+      latin-only: 僅接受英文提示詞。
+      too-many-words: 輸入的提示詞數量過多
+      forbidden-word: 提示詞中含有違禁詞彙。
       concurrent-jobs: |-
         <random>
           <>等下再畫吧，我已經忙不過來了……</>
@@ -38,15 +41,29 @@ commands:
       pending: 好酒沉甕底。您還需等我完成前面 {0} 個稿件。
       invalid-size: 增強功能僅適用於 Novel AI 生成圖。若要使用 img2img 功能請直接使用「約稿」而非「增強」。
       invalid-resolution: 圖像尺寸無效。寬度與高度都須爲 64 的倍數。
-      custom-resolution-unsupported: 不支援自定義圖像尺寸。
+      custom-resolution-unsupported: 不支援自訂圖像尺寸。
       file-too-large: 文件體積過大。
-      unsupported-file-type: 不支援的文件格式。
+      unsupported-file-type: 不支援的檔案格式。
       download-error: 圖像解析失敗。
       unknown-error: 發生未知的錯誤。
       response-error: 發生未知的錯誤 ({0})。
       empty-response: 伺服器返回了空圖像，請稍後重試。
-      request-failed: 請求失敗 ({0})，請稍後重試。
-      request-timeout: 請求超時。
+      request-failed: 擷取資料失敗 ({0})，請稍後重試。
+      request-timeout: 擷取資料超時。
       invalid-password: 電郵地址或密碼不正確。
       invalid-token: 令牌無效或已過期，請聯繫管理員。
       unauthorized: 令牌未經授權，可能關聯帳戶需要續費，請聯繫管理員。
+  novelai.upscale:
+    description: AI 放大圖像
+    options:
+      scale: 設定放大倍率
+      resolution: 設定放大尺寸
+      crop: 是否裁剪以適應尺寸
+      upscaler: 設定放大模型
+      upscaler2: 設定放大模型 2
+      upscaler2visibility: 設定放大模型 2 的可視度
+      upscaleFirst: 先放大再執行面部修復
+    messages:
+      expect-image: 請輸入圖像。
+      download-error: 圖像解析失敗。
+      unknown-error: 發生未知的錯誤。

@@ -5,20 +5,23 @@ commands:
       コンマで区切られた英語の生成呪文 (プロンプト) を入力してください。例：1girl, red eyes, black hair。
       モデルに用いられる単語は Danbooru のタグとほとんど同じです。
       興味があったら、レポジトリにスターを付けてください：https://github.com/koishijs/novelai-bot
-
     options:
       enhance: 向上 (enhance) モードを有効
       model: モデルを指定
       resolution: 画像解像度を設定
+      override: デフォルトプロンプトを無効にする
       sampler: サンプラーを指定
       seed: シード値を設定
       steps: ステップ数を設定
       scale: CFG スケール値を設定
       strength: ノイズ除去強度を設定
       noise: ノイズ強度を設定
+      hiresFix: 高解像度修正を有効
       undesired: 反対呪文 (ネガティブプロンプト) を設定
-
+      noTranslator: 自動翻訳を無効
+      iterations: 画像生成数を設定
     messages:
+      exceed-max-iteration: 画像生成数が最大に超えました。
       expect-prompt: 生成呪文を入力してください。
       expect-image: 画像を入力してください。
       latin-only: 英数字だけが入力可能です。
@@ -38,7 +41,7 @@ commands:
       pending: 仕事している前に {0} つの絵が完遂するべきです。
       invalid-size: 向上モードは AI 生成画像のみに用いられる。img2img (指定画像から生成) を使いたければ、「--enhance」を追加せずにコマンドを再実行してください。
       invalid-resolution: 無効な解像度。幅と高さが 64 の倍数である必要があります。
-      custom-resolution-unsupported: カスタム画像解像度は現在サポートされていません。
+      custom-resolution-unsupported: カスタム画像解像度は使用できません。
       file-too-large: ファイルのサイズが大きすぎる。
       unsupported-file-type: ファイルのタイプがサポートされていません。
       download-error: 画像のダウンロードに失敗しました。
@@ -50,3 +53,17 @@ commands:
       invalid-password: メールアドレスやパスワードが間違っています。
       invalid-token: 期間切れたまたは無効なトークンです。管理者に連絡してください。
       unauthorized: アカウント契約が期間切れるか、トークンが認可されていません。管理者に連絡してください。
+  novelai.upscale:
+    description: AI で画像拡大
+    options:
+      scale: 拡大倍率を設定
+      resolution: 拡大目標解像度を設定
+      crop: 拡大する前に画像をクロップする
+      upscaler: 拡大モデルを設定
+      upscaler2: 拡大モデル２を設定
+      upscaler2visibility: 拡大モデル２の可視度を設定
+      upscaleFirst: 拡大する前にフェイス修正を行う
+    messages:
+      expect-image: 画像を入力してください。
+      download-error: 画像のダウンロードに失敗しました。
+      unknown-error: 不明なエラーが発生しました。

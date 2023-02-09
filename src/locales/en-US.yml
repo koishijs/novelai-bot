@@ -2,10 +2,9 @@ commands:
   novelai:
     description: Generate Images from Novel AI
     usage: |-
-      Enter /novelai with English prompt or tags, e.g. a girl in the forest, blonde hair, red eyes, white dress, etc.
+      Enter "novelai" with English prompt or tags, e.g. a girl in the forest, blonde hair, red eyes, white dress, etc.
       You can also use comma separated tags like those on Danbooru.
       Star it: https://github.com/koishijs/novelai-bot
-
     options:
       enhance: Image Enhance Mode
       model: Set Model for Generation
@@ -17,17 +16,21 @@ commands:
       scale: Set CFG Scale
       strength: Set Denoising Strength
       noise: Set Noising Strength
+      hiresFix: Enable Hires Fix.
+      undesired: Negative Prompt
       noTranslator: Disable Auto Translation
-
+      iterations: Set Batch Count.
     messages:
+      exceed-max-iteration: Exceeded max batch count.
       expect-prompt: Expect a prompt.
       expect-image: Expect an image.
       latin-only: Invalid prompt, only English words can be used.
+      too-many-words: Too many words in prompt.
       forbidden-word: Forbidden words in prompt.
       concurrent-jobs: |-
         <random>
           <>Too busy to handle your request...</>
-          <>"Brb power nap :zzz:"</>
+          <>Brb power nap :zzz:</>
           <>(*~*) Have no time to draw a new one.</>
         </random>
       waiting: |-
@@ -35,15 +38,10 @@ commands:
           <>The illustrator starts painting.</>
           <>Monet and Da Vinci, whose style is better for this?</>
         </random>
-      pending: |-
-        <plural count={0}>
-          <>Sure.</>
-          <>Sure, but please wait for me to complete this one before.</>
-          <>Bruh, there are {0} jobs pending!</>
-        </plural>
-      invalid-size: The Enhance mode can only be used for images generated. Use /novelai without enhance option if you are using normal img2img.
+      pending: "<plural count={0}>\n  <>Sure.</>\n  <>Sure, but please wait for me to complete this one before.</>\n  <>Bruh, there are {0} jobs pending!</>\n</plural>"
+      invalid-size: The Enhance mode can only be used for images generated. Use "novelai" without enhance option if you are using normal img2img.
       invalid-resolution: Invalid resolution for image generation. The width and height of image should be multiple of 64.
-      custom-resolution-unsupported: Custom resolution is not supported currently.
+      custom-resolution-unsupported: Custom resolution is not supported.
       file-too-large: File is too large.
       unsupported-file-type: Unsupported file type.
       download-error: Parsing image failed.
@@ -54,4 +52,18 @@ commands:
       request-timeout: Request timeout.
       invalid-password: Incorrect email address or password.
       invalid-token: The token is invalid or expired. Please contact your administrator.
-      unauthorized: The token is unauthorized, this happens while your account has no a valid subscription. Please contact your administrator.
+      unauthorized: The token is unauthorized, this happens while your account didn't have a valid subscription. Please contact your administrator.
+  novelai.upscale:
+    description: Upscale Images by AI
+    options:
+      scale: Set Upscale By
+      resolution: Set Upscale To
+      crop: Crop Image Before Upscaling
+      upscaler: Set Upscaler
+      upscaler2: Set Upscaler
+      upscaler2visibility: Set Visibility of Upscaler 2
+      upscaleFirst: Upscale Image Before Restoring Face
+    messages:
+      expect-image: Expect an image.
+      download-error: Parsing image failed.
+      unknown-error: An unknown error occurred.
