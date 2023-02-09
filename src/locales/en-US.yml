@@ -2,7 +2,7 @@ commands:
   novelai:
     description: Generate Images from Novel AI
     usage: |-
-      Enter /novelai with English prompt or tags, e.g. a girl in the forest, blonde hair, red eyes, white dress, etc.
+      Enter "novelai" with English prompt or tags, e.g. a girl in the forest, blonde hair, red eyes, white dress, etc.
       You can also use comma separated tags like those on Danbooru.
       Star it: https://github.com/koishijs/novelai-bot
     options:
@@ -39,7 +39,7 @@ commands:
           <>Monet and Da Vinci, whose style is better for this?</>
         </random>
       pending: "<plural count={0}>\n  <>Sure.</>\n  <>Sure, but please wait for me to complete this one before.</>\n  <>Bruh, there are {0} jobs pending!</>\n</plural>"
-      invalid-size: The Enhance mode can only be used for images generated. Use /novelai without enhance option if you are using normal img2img.
+      invalid-size: The Enhance mode can only be used for images generated. Use "novelai" without enhance option if you are using normal img2img.
       invalid-resolution: Invalid resolution for image generation. The width and height of image should be multiple of 64.
       custom-resolution-unsupported: Custom resolution is not supported.
       file-too-large: File is too large.
