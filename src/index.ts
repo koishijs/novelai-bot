@@ -95,7 +95,7 @@ export function apply(ctx: Context, config: Config) {
     .shortcut('約稿', { fuzzy: true })
     .shortcut('增强', { fuzzy: true, options: { enhance: true } })
     .shortcut('增強', { fuzzy: true, options: { enhance: true } })
-    .option('enhance', '-e', { hidden: restricted })
+    .option('enhance', '-e', { hidden: some(restricted, thirdParty) })
     .option('model', '-m <model>', { type: models, hidden: thirdParty })
     .option('resolution', '-r <resolution>', { type: resolution })
     .option('output', '-o', { type: ['minimal', 'default', 'verbose'] })
