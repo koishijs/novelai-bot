@@ -61,7 +61,7 @@ commands:
     options:
       scale: Mise à l'échelle de
       resolution: Mise à l'échelle à
-      crop: Recadrer à la taille
+      crop: Recadrer à la taille avant de l'agrandissement.
       upscaler: Définir l'agrandisseur
       upscaler2: Définir l'agrandisseur 2
       upscaler2visibility: Définir la visibilité de l'agrandisseur 2
