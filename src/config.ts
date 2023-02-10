@@ -36,6 +36,9 @@ export namespace sampler {
     'plms': 'PLMS',
   }
 
+  // samplers in stable-diffusion-webui
+  // https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/master/modules/sd_samplers_compvis.py#L12
+  // https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/master/modules/sd_samplers_kdiffusion.py#L12
   export const sd = {
     'k_euler_a': 'Euler a',
     'k_euler': 'Euler',
@@ -47,11 +50,13 @@ export namespace sampler {
     'k_dpmpp_2m': 'DPM++ 2M',
     'k_dpm_fast': 'DPM fast',
     'k_dpm_ad': 'DPM adaptive',
+    'k_dpmpp_sde': 'DPM++ SDE',
     'k_lms_ka': 'LMS Karras',
     'k_dpm_2_ka': 'DPM2 Karras',
     'k_dpm_2_a_ka': 'DPM2 a Karras',
     'k_dpmpp_2s_a_ka': 'DPM++ 2S a Karras',
     'k_dpmpp_2m_ka': 'DPM++ 2M Karras',
+    'k_dpmpp_sde_ka': 'DPM++ SDE Karras',
     'ddim': 'DDIM',
     'plms': 'PLMS',
   }
