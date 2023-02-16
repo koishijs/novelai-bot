@@ -1,4 +1,4 @@
-import { Dict, Schema, Time } from 'koishi'
+import { Computed, Dict, Schema, Session, Time } from 'koishi'
 import { Size } from './utils'
 
 export const modelMap = {
@@ -129,40 +129,40 @@ export interface Options {
 }
 
 export interface PromptConfig {
-  basePrompt?: string
-  negativePrompt?: string
-  forbidden?: string
-  placement?: 'before' | 'after'
-  latinOnly?: boolean
+  basePrompt?: Computed<string>
+  negativePrompt?: Computed<string>
+  forbidden?: Computed<string>
+  placement?: Computed<'before' | 'after'>
+  latinOnly?: Computed<boolean>
   translator?: boolean
-  maxWords?: number
+  maxWords?: Computed<number>
 }
 
 export const PromptConfig: Schema<PromptConfig> = Schema.object({
-  basePrompt: Schema.string().role('textarea').description('默认附加的标签。').default('masterpiece, best quality'),
-  negativePrompt: Schema.string().role('textarea').description('默认附加的反向标签。').default(ucPreset),
-  forbidden: Schema.string().role('textarea').description('违禁词列表。请求中的违禁词将会被自动删除。').default(''),
-  placement: Schema.union([
+  basePrompt: Schema.computed(Schema.string().role('textarea')).description('默认附加的标签。').default('masterpiece, best quality'),
+  negativePrompt: Schema.computed(Schema.string().role('textarea')).description('默认附加的反向标签。').default(ucPreset),
+  forbidden: Schema.computed(Schema.string().role('textarea')).description('违禁词列表。请求中的违禁词将会被自动删除。').default(''),
+  placement: Schema.computed(Schema.union([
     Schema.const('before' as const).description('置于最前'),
     Schema.const('after' as const).description('置于最后'),
-  ]).description('默认附加标签的位置。').default('after'),
+  ])).description('默认附加标签的位置。').default('after'),
   translator: Schema.boolean().description('是否启用自动翻译。').default(true),
-  latinOnly: Schema.boolean().description('是否只接受英文输入。').default(false),
-  maxWords: Schema.natural().description('允许的最大单词数量。').default(0),
+  latinOnly: Schema.computed(Schema.boolean()).description('是否只接受英文输入。').default(false),
+  maxWords: Schema.computed(Schema.natural()).description('允许的最大单词数量。').default(0),
 }).description('输入设置')
 
 interface ParamConfig {
   model?: Model
-  upscaler?: string
-  resolution?: Orient | Size
-  maxResolution?: number
   sampler?: string
-  scale?: number
-  textSteps?: number
-  imageSteps?: number
-  maxSteps?: number
+  upscaler?: string
   restoreFaces?: boolean
   hiresFix?: boolean
+  scale?: Computed<number>
+  textSteps?: Computed<number>
+  imageSteps?: Computed<number>
+  maxSteps?: Computed<number>
+  resolution?: Computed<Orient | Size>
+  maxResolution?: Computed<number>
 }
 
 export interface Config extends PromptConfig, ParamConfig {
@@ -192,7 +192,7 @@ export const Config = Schema.intersect([
       Schema.const('naifu' as const).description('naifu'),
       Schema.const('sd-webui' as const).description('sd-webui'),
       Schema.const('stable-horde' as const).description('Stable Horde'),
-    ] as const).description('登录方式'),
+    ] as const).description('登录方式。'),
   }).description('登录设置'),
 
   Schema.union([
@@ -210,7 +210,7 @@ export const Config = Schema.intersect([
       ]),
       Schema.object({
         endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
-        headers: Schema.dict(String).description('要附加的额外请求头。').default({
+        headers: Schema.dict(String).role('table').description('要附加的额外请求头。').default({
           'referer': 'https://novelai.net/',
           'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
         }),
@@ -220,12 +220,12 @@ export const Config = Schema.intersect([
       type: Schema.const('naifu'),
       token: Schema.string().description('授权令牌。').role('secret'),
       endpoint: Schema.string().description('API 服务器地址。').required(),
-      headers: Schema.dict(String).description('要附加的额外请求头。'),
+      headers: Schema.dict(String).role('table').description('要附加的额外请求头。'),
     }),
     Schema.object({
       type: Schema.const('sd-webui'),
       endpoint: Schema.string().description('API 服务器地址。').required(),
-      headers: Schema.dict(String).description('要附加的额外请求头。'),
+      headers: Schema.dict(String).role('table').description('要附加的额外请求头。'),
     }),
     Schema.object({
       type: Schema.const('stable-horde'),
@@ -253,7 +253,7 @@ export const Config = Schema.intersect([
       type: Schema.const('stable-horde'),
       sampler: sampler.createSchema(sampler.horde),
       model: Schema.union(hordeModels),
-    }),
+    }).description('参数设置'),
     Schema.object({
       type: Schema.const('naifu'),
       sampler: sampler.createSchema(sampler.nai),
@@ -265,10 +265,10 @@ export const Config = Schema.intersect([
   ] as const),
 
   Schema.object({
-    scale: Schema.number().description('默认对输入的服从度。').default(11),
-    textSteps: Schema.natural().description('文本生图时默认的迭代步数。').default(28),
-    imageSteps: Schema.natural().description('以图生图时默认的迭代步数。').default(50),
-    maxSteps: Schema.natural().description('允许的最大迭代步数。').default(64),
+    scale: Schema.computed(Schema.number()).description('默认对输入的服从度。').default(11),
+    textSteps: Schema.computed(Schema.natural()).description('文本生图时默认的迭代步数。').default(28),
+    imageSteps: Schema.computed(Schema.natural()).description('以图生图时默认的迭代步数。').default(50),
+    maxSteps: Schema.computed(Schema.natural()).description('允许的最大迭代步数。').default(64),
     resolution: Schema.union([
       Schema.const('portrait' as const).description('肖像 (768x512)'),
       Schema.const('landscape' as const).description('风景 (512x768)'),
@@ -278,7 +278,7 @@ export const Config = Schema.intersect([
         height: Schema.natural().description('图片高度。').default(640),
       }).description('自定义'),
     ] as const).description('默认生成的图片尺寸。').default('portrait'),
-    maxResolution: Schema.natural().description('允许生成的宽高最大值。').default(1024),
+    maxResolution: Schema.computed(Schema.natural()).description('允许生成的宽高最大值。').default(1024),
   }),
 
   PromptConfig,
@@ -319,7 +319,7 @@ export function parseForbidden(input: string) {
 
 const backslash = /@@__BACKSLASH__@@/g
 
-export function parseInput(input: string, config: Config, forbidden: Forbidden[], override: boolean): string[] {
+export function parseInput(session: Session, input: string, config: Config, override: boolean): string[] {
   input = input.toLowerCase()
     .replace(/\\\\/g, backslash.source)
     .replace(/，/g, ',')
@@ -340,18 +340,19 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
     .replace(backslash, '\\')
     .replace(/_/g, ' ')
 
-  if (config.latinOnly && /[^\s\w"'“”‘’.,:|\\()\[\]{}-]/.test(input)) {
+  if (session.resolve(config.latinOnly) && /[^\s\w"'“”‘’.,:|\\()\[\]{}-]/.test(input)) {
     return ['.latin-only']
   }
 
   const negative = []
+  const placement = session.resolve(config.placement)
   const appendToList = (words: string[], input: string) => {
     const tags = input.split(/,\s*/g)
-    if (config.placement === 'before') tags.reverse()
+    if (placement === 'before') tags.reverse()
     for (let tag of tags) {
       tag = tag.trim().toLowerCase()
       if (!tag || words.includes(tag)) continue
-      if (config.placement === 'before') {
+      if (placement === 'before') {
         words.unshift(tag)
       } else {
         words.push(tag)
@@ -367,6 +368,7 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
   }
 
   // remove forbidden words
+  const forbidden = parseForbidden(session.resolve(config.forbidden))
   const positive = input.split(/,\s*/g).filter((word) => {
     // eslint-disable-next-line no-control-regex
     word = word.replace(/[\x00-\x7f]/g, s => s.replace(/[^0-9a-zA-Z]/, ' ')).replace(/\s+/, ' ').trim()
@@ -381,13 +383,13 @@ export function parseInput(input: string, config: Config, forbidden: Forbidden[]
     return true
   })
 
-  if (Math.max(getWordCount(positive), getWordCount(negative)) > (config.maxWords || Infinity)) {
+  if (Math.max(getWordCount(positive), getWordCount(negative)) > (session.resolve(config.maxWords) || Infinity)) {
     return ['.too-many-words']
   }
 
   if (!override) {
-    appendToList(positive, config.basePrompt)
-    appendToList(negative, config.negativePrompt)
+    appendToList(positive, session.resolve(config.basePrompt))
+    appendToList(negative, session.resolve(config.negativePrompt))
   }
 
   return [null, positive.join(', '), negative.join(', ')]

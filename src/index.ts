@@ -1,5 +1,5 @@
 import { Context, Dict, Logger, omit, Quester, segment, Session, SessionError, trimSlash } from 'koishi'
-import { Config, modelMap, models, orientMap, parseForbidden, parseInput, sampler, upscalers } from './config'
+import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
 import {} from '@koishijs/translator'
@@ -28,11 +28,6 @@ function handleError(session: Session, err: Error) {
   return session.text('.unknown-error')
 }
 
-interface Forbidden {
-  pattern: string
-  strict: boolean
-}
-
 export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh', require('./locales/zh-CN'))
   ctx.i18n.define('zh-TW', require('./locales/zh-TW'))
@@ -40,13 +35,8 @@ export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('fr', require('./locales/fr-FR'))
   ctx.i18n.define('ja', require('./locales/ja-JP'))
 
-  let forbidden: Forbidden[]
   const tasks: Dict<Set<string>> = Object.create(null)
   const globalTasks = new Set<string>()
-
-  ctx.accept(['forbidden'], (config) => {
-    forbidden = parseForbidden(config.forbidden)
-  }, { immediate: true })
 
   let tokenTask: Promise<string> = null
   const getToken = () => tokenTask ||= login(ctx)
@@ -68,9 +58,9 @@ export function apply(ctx: Context, config: Config) {
     return args.some(callback => callback(session))
   }
 
-  const step = (source: string) => {
+  const step = (source: string, session: Session) => {
     const value = +source
-    if (value * 0 === 0 && Math.floor(value) === value && value > 0 && value <= (config.maxSteps || Infinity)) return value
+    if (value * 0 === 0 && Math.floor(value) === value && value > 0 && value <= session.resolve(config.maxSteps || Infinity)) return value
     throw new Error()
   }
 
@@ -80,7 +70,7 @@ export function apply(ctx: Context, config: Config) {
     if (!cap) throw new Error()
     const width = closestMultiple(+cap[1])
     const height = closestMultiple(+cap[2])
-    if (Math.max(width, height) > (config.maxResolution || Infinity)) {
+    if (Math.max(width, height) > session.resolve(config.maxResolution || Infinity)) {
       throw new SessionError('commands.novelai.messages.invalid-resolution')
     }
     return { width, height, custom: true }
@@ -157,7 +147,7 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
-      const [errPath, prompt, uc] = parseInput(input, config, forbidden, options.override)
+      const [errPath, prompt, uc] = parseInput(session, input, config, options.override)
       if (errPath) return session.text(errPath)
 
       let token: string
@@ -184,8 +174,8 @@ export function apply(ctx: Context, config: Config) {
         // 2: none
         ucPreset: 2,
         qualityToggle: false,
-        scale: options.scale ?? 11,
-        steps: options.steps ?? (imgUrl ? config.imageSteps : config.textSteps),
+        scale: options.scale ?? session.resolve(config.scale),
+        steps: options.steps ?? session.resolve(imgUrl ? config.imageSteps : config.textSteps),
       }
 
       if (imgUrl) {
@@ -464,7 +454,6 @@ export function apply(ctx: Context, config: Config) {
     }
 
     cmd._options.output.fallback = config.output
-    cmd._options.scale.fallback = config.scale
     cmd._options.model.fallback = config.model
     cmd._options.sampler.fallback = config.sampler
     cmd._options.sampler.type = Object.keys(getSamplers())
