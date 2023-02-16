@@ -1,4 +1,4 @@
-import { Computed, Context, Dict, isNullable, Logger, omit, Quester, segment, Session, SessionError, trimSlash } from 'koishi'
+import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
@@ -45,7 +45,7 @@ export function apply(ctx: Context, config: Config) {
   type HiddenCallback = (session: Session<'authority'>) => boolean
 
   const useFilter = (filter: Computed<boolean>): HiddenCallback => (session) => {
-    return isNullable(filter) || session.resolve(filter)
+    return session.resolve(filter) ?? true
   }
 
   const useBackend = (...types: Config['type'][]): HiddenCallback => () => {
@@ -56,6 +56,10 @@ export function apply(ctx: Context, config: Config) {
 
   const restricted: HiddenCallback = (session) => {
     return !thirdParty() && useFilter(config.features.anlas)(session)
+  }
+
+  const noImage: HiddenCallback = (session) => {
+    return !useFilter(config.features.image)(session)
   }
 
   const some = (...args: HiddenCallback[]): HiddenCallback => (session) => {
@@ -89,7 +93,7 @@ export function apply(ctx: Context, config: Config) {
     .shortcut('約稿', { fuzzy: true })
     .shortcut('增强', { fuzzy: true, options: { enhance: true } })
     .shortcut('增強', { fuzzy: true, options: { enhance: true } })
-    .option('enhance', '-e', { hidden: some(restricted, thirdParty) })
+    .option('enhance', '-e', { hidden: some(restricted, thirdParty, noImage) })
     .option('model', '-m <model>', { type: models, hidden: thirdParty })
     .option('resolution', '-r <resolution>', { type: resolution })
     .option('output', '-o', { type: ['minimal', 'default', 'verbose'] })
@@ -119,14 +123,19 @@ export function apply(ctx: Context, config: Config) {
         return session.text('.exceed-max-iteration', [config.maxIterations])
       }
 
+      const allowText = useFilter(config.features.text)(session)
+      const allowImage = useFilter(config.features.image)(session)
+
       let imgUrl: string, image: ImageData
       if (!restricted(session)) {
-        input = segment.transform(input, {
+        input = h('', h.transform(h.parse(input), {
           image(attrs) {
+            if (!allowImage) throw new SessionError('commands.novelai.messages.invalid-content')
+            if (imgUrl) throw new SessionError('commands.novelai.messages.too-many-images')
             imgUrl = attrs.url
             return ''
           },
-        })
+        })).toString(true)
 
         if (options.enhance && !imgUrl) {
           return session.text('.expect-image')
@@ -136,11 +145,20 @@ export function apply(ctx: Context, config: Config) {
           return session.text('.expect-prompt')
         }
       } else {
+        input = h('', h.transform(h.parse(input), {
+          image(attrs) {
+            throw new SessionError('commands.novelai.messages.invalid-content')
+          },
+        })).toString(true)
         delete options.enhance
         delete options.steps
         delete options.noise
         delete options.strength
         delete options.override
+      }
+
+      if (!allowText && !imgUrl) {
+        return session.text('.expect-image')
       }
 
       if (config.translator && ctx.translator && !options.noTranslator) {
@@ -394,12 +412,12 @@ export function apply(ctx: Context, config: Config) {
 
         function getContent() {
           const output = session.resolve(options.output ?? config.output)
-          if (output === 'minimal') return segment.image(dataUrl)
+          if (output === 'minimal') return h.image(dataUrl)
           const attrs = {
             userId: session.userId,
             nickname: session.author?.nickname || session.username,
           }
-          const result = segment('figure')
+          const result = h('figure')
           const lines = [`seed = ${parameters.seed}`]
           if (output === 'verbose') {
             if (!thirdParty()) {
@@ -417,12 +435,12 @@ export function apply(ctx: Context, config: Config) {
               )
             }
           }
-          result.children.push(segment('message', attrs, lines.join('\n')))
-          result.children.push(segment('message', attrs, `prompt = ${prompt}`))
+          result.children.push(h('message', attrs, lines.join('\n')))
+          result.children.push(h('message', attrs, `prompt = ${h.escape(prompt)}`))
           if (output === 'verbose') {
-            result.children.push(segment('message', attrs, `undesired = ${uc}`))
+            result.children.push(h('message', attrs, `undesired = ${h.escape(uc)}`))
           }
-          result.children.push(segment('message', attrs, segment.image(dataUrl)))
+          result.children.push(h('message', attrs, h.image(dataUrl)))
           return result
         }
 
@@ -479,7 +497,7 @@ export function apply(ctx: Context, config: Config) {
     .option('upscaleFirst', '-f', { fallback: false })
     .action(async ({ session, options }, input) => {
       let imgUrl: string
-      segment.transform(input, {
+      h.transform(input, {
         image(attrs) {
           imgUrl = attrs.url
           return ''
@@ -521,7 +539,7 @@ export function apply(ctx: Context, config: Config) {
           },
           data: payload,
         })
-        return segment.image(forceDataPrefix(data.image))
+        return h.image(forceDataPrefix(data.image))
       } catch (e) {
         logger.warn(e)
         return session.text('.unknown-error')

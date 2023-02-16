@@ -159,16 +159,16 @@ interface FeatureConfig {
 }
 
 const naiFeatures = Schema.object({
-  anlas: Schema.filter().description('是否允许使用点数。'),
+  anlas: Schema.computed(Schema.boolean()).default(true).description('是否允许使用点数。'),
 })
 
 const sdFeatures = Schema.object({
-  upscale: Schema.filter().description('是否启用图片放大。'),
+  upscale: Schema.computed(Schema.boolean()).default(true).description('是否启用图片放大。'),
 })
 
 const features = Schema.object({
-  text: Schema.filter().description('是否启用文本转图片。'),
-  image: Schema.filter().description('是否启用图片转图片。'),
+  text: Schema.computed(Schema.boolean()).default(true).description('是否启用文本转图片。'),
+  image: Schema.computed(Schema.boolean()).default(true).description('是否启用图片转图片。'),
 })
 
 interface ParamConfig {
@@ -378,7 +378,7 @@ export function parseInput(session: Session, input: string, config: Config, over
     .replace(backslash, '\\')
     .replace(/_/g, ' ')
 
-  if (session.resolve(config.latinOnly) && /[^\s\w"'“”‘’.,:|\\()\[\]{}-]/.test(input)) {
+  if (session.resolve(config.latinOnly) && /[^\s\w"'“”‘’.,:|\\()\[\]{}<>-]/.test(input)) {
     return ['.latin-only']
   }
 

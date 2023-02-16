@@ -26,6 +26,8 @@ commands:
       exceed-max-iteration: 超过最大绘制次数。
       expect-prompt: 请输入标签。
       expect-image: 请输入图片。
+      too-many-images: 过多的图片。
+      invalid-content: 输入中含有无效内容。
       latin-only: 只接受英文输入。
       too-many-words: 输入的单词数量过多。
       forbidden-word: 输入含有违禁词。
