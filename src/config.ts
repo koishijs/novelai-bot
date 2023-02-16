@@ -151,6 +151,26 @@ export const PromptConfig: Schema<PromptConfig> = Schema.object({
   maxWords: Schema.computed(Schema.natural()).description('允许的最大单词数量。').default(0),
 }).description('输入设置')
 
+interface FeatureConfig {
+  anlas?: Computed<boolean>
+  text?: Computed<boolean>
+  image?: Computed<boolean>
+  upscale?: Computed<boolean>
+}
+
+const naiFeatures = Schema.object({
+  anlas: Schema.filter().description('是否允许使用点数。'),
+})
+
+const sdFeatures = Schema.object({
+  upscale: Schema.filter().description('是否启用图片放大。'),
+})
+
+const features = Schema.object({
+  text: Schema.filter().description('是否启用文本转图片。'),
+  image: Schema.filter().description('是否启用图片转图片。'),
+})
+
 interface ParamConfig {
   model?: Model
   sampler?: string
@@ -170,11 +190,11 @@ export interface Config extends PromptConfig, ParamConfig {
   token?: string
   email?: string
   password?: string
-  output?: 'minimal' | 'default' | 'verbose'
-  allowAnlas?: boolean | number
+  output?: Computed<'minimal' | 'default' | 'verbose'>
+  features?: FeatureConfig
   endpoint?: string
   headers?: Dict<string>
-  nsfw?: 'disallow' | 'censor' | 'allow'
+  nsfw?: Computed<'disallow' | 'censor' | 'allow'>
   maxIterations?: number
   maxRetryCount?: number
   requestTimeout?: number
@@ -192,7 +212,7 @@ export const Config = Schema.intersect([
       Schema.const('naifu' as const).description('naifu'),
       Schema.const('sd-webui' as const).description('sd-webui'),
       Schema.const('stable-horde' as const).description('Stable Horde'),
-    ] as const).description('登录方式。'),
+    ] as const).default('token').description('登录方式。'),
   }).description('登录设置'),
 
   Schema.union([
@@ -241,6 +261,24 @@ export const Config = Schema.intersect([
     }),
   ]),
 
+  Schema.object({}).description('功能设置'),
+
+  Schema.union([
+    Schema.object({
+      type: Schema.union(['token', 'login']).hidden(),
+      features: Schema.intersect([naiFeatures, features]),
+    }),
+    Schema.object({
+      type: Schema.const('sd-webui'),
+      features: Schema.intersect([features, sdFeatures]),
+    }),
+    Schema.object({
+      features: Schema.intersect([features]),
+    }),
+  ]),
+
+  Schema.object({}).description('参数设置'),
+
   Schema.union([
     Schema.object({
       type: Schema.const('sd-webui'),
@@ -248,20 +286,20 @@ export const Config = Schema.intersect([
       upscaler: Schema.union(upscalers).description('默认的放大算法。').default('Lanczos'),
       restoreFaces: Schema.boolean().description('是否启用人脸修复。').default(false),
       hiresFix: Schema.boolean().description('是否启用高分辨率修复。').default(false),
-    }).description('参数设置'),
+    }),
     Schema.object({
       type: Schema.const('stable-horde'),
       sampler: sampler.createSchema(sampler.horde),
       model: Schema.union(hordeModels),
-    }).description('参数设置'),
+    }),
     Schema.object({
       type: Schema.const('naifu'),
       sampler: sampler.createSchema(sampler.nai),
-    }).description('参数设置'),
+    }),
     Schema.object({
       model: Schema.union(models).description('默认的生成模型。').default('nai'),
       sampler: sampler.createSchema(sampler.nai),
-    }).description('参数设置'),
+    }),
   ] as const),
 
   Schema.object({
@@ -269,7 +307,7 @@ export const Config = Schema.intersect([
     textSteps: Schema.computed(Schema.natural()).description('文本生图时默认的迭代步数。').default(28),
     imageSteps: Schema.computed(Schema.natural()).description('以图生图时默认的迭代步数。').default(50),
     maxSteps: Schema.computed(Schema.natural()).description('允许的最大迭代步数。').default(64),
-    resolution: Schema.union([
+    resolution: Schema.computed(Schema.union([
       Schema.const('portrait' as const).description('肖像 (768x512)'),
       Schema.const('landscape' as const).description('风景 (512x768)'),
       Schema.const('square' as const).description('方形 (640x640)'),
@@ -277,7 +315,7 @@ export const Config = Schema.intersect([
         width: Schema.natural().description('图片宽度。').default(640),
         height: Schema.natural().description('图片高度。').default(640),
       }).description('自定义'),
-    ] as const).description('默认生成的图片尺寸。').default('portrait'),
+    ] as const)).description('默认生成的图片尺寸。').default('portrait'),
     maxResolution: Schema.computed(Schema.natural()).description('允许生成的宽高最大值。').default(1024),
   }),
 

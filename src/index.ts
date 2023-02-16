@@ -1,4 +1,4 @@
-import { Context, Dict, Logger, omit, Quester, segment, Session, SessionError, trimSlash } from 'koishi'
+import { Computed, Context, Dict, isNullable, Logger, omit, Quester, segment, Session, SessionError, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
@@ -44,14 +44,18 @@ export function apply(ctx: Context, config: Config) {
 
   type HiddenCallback = (session: Session<'authority'>) => boolean
 
+  const useFilter = (filter: Computed<boolean>): HiddenCallback => (session) => {
+    return isNullable(filter) || session.resolve(filter)
+  }
+
+  const useBackend = (...types: Config['type'][]): HiddenCallback => () => {
+    return types.includes(config.type)
+  }
+
   const thirdParty = () => !['login', 'token'].includes(config.type)
 
   const restricted: HiddenCallback = (session) => {
-    if (typeof config.allowAnlas === 'boolean') {
-      return !config.allowAnlas
-    } else {
-      return session.user.authority < config.allowAnlas
-    }
+    return !thirdParty() && useFilter(config.features.anlas)(session)
   }
 
   const some = (...args: HiddenCallback[]): HiddenCallback => (session) => {
@@ -210,9 +214,10 @@ export function apply(ctx: Context, config: Config) {
           })
         }
       } else {
-        options.resolution ||= typeof config.resolution === 'string'
-          ? orientMap[config.resolution]
-          : config.resolution
+        if (!options.resolution) {
+          const resolution = session.resolve(config.resolution)
+          options.resolution = typeof resolution === 'string' ? orientMap[resolution] : resolution
+        }
         Object.assign(parameters, {
           height: options.resolution.height,
           width: options.resolution.width,
@@ -289,6 +294,7 @@ export function apply(ctx: Context, config: Config) {
             }
           }
           case 'stable-horde': {
+            const nsfw = session.resolve(config.nsfw)
             return {
               prompt: parameters.prompt,
               params: {
@@ -303,9 +309,9 @@ export function apply(ctx: Context, config: Config) {
                 steps: parameters.steps,
                 n: 1,
               },
-              nsfw: config.nsfw !== 'disallow',
+              nsfw: nsfw !== 'disallow',
               trusted_workers: config.trustedWorkers,
-              censor_nsfw: config.nsfw === 'censor',
+              censor_nsfw: nsfw === 'censor',
               models: [options.model],
               source_image: image?.base64,
               source_processing: image ? 'img2img' : undefined,
@@ -387,14 +393,15 @@ export function apply(ctx: Context, config: Config) {
         if (!dataUrl.trim()) return await session.send(session.text('.empty-response'))
 
         function getContent() {
-          if (options.output === 'minimal') return segment.image(dataUrl)
+          const output = session.resolve(options.output ?? config.output)
+          if (output === 'minimal') return segment.image(dataUrl)
           const attrs = {
             userId: session.userId,
             nickname: session.author?.nickname || session.username,
           }
           const result = segment('figure')
           const lines = [`seed = ${parameters.seed}`]
-          if (options.output === 'verbose') {
+          if (output === 'verbose') {
             if (!thirdParty()) {
               lines.push(`model = ${model}`)
             }
@@ -412,7 +419,7 @@ export function apply(ctx: Context, config: Config) {
           }
           result.children.push(segment('message', attrs, lines.join('\n')))
           result.children.push(segment('message', attrs, `prompt = ${prompt}`))
-          if (options.output === 'verbose') {
+          if (output === 'verbose') {
             result.children.push(segment('message', attrs, `undesired = ${uc}`))
           }
           result.children.push(segment('message', attrs, segment.image(dataUrl)))
@@ -441,7 +448,7 @@ export function apply(ctx: Context, config: Config) {
       }
     })
 
-  ctx.accept(['scale', 'model', 'sampler', 'output'], (config) => {
+  ctx.accept(['model', 'sampler'], (config) => {
     const getSamplers = () => {
       switch (config.type) {
         case 'sd-webui':
@@ -453,13 +460,14 @@ export function apply(ctx: Context, config: Config) {
       }
     }
 
-    cmd._options.output.fallback = config.output
     cmd._options.model.fallback = config.model
     cmd._options.sampler.fallback = config.sampler
     cmd._options.sampler.type = Object.keys(getSamplers())
   }, { immediate: true })
 
-  const subcmd = ctx.intersect(() => config.type === 'sd-webui')
+  const subcmd = ctx
+    .intersect(useBackend('sd-webui'))
+    .intersect(useFilter(config.features.upscale))
     .command('novelai.upscale')
     .shortcut('放大', { fuzzy: true })
     .option('scale', '-s <scale:number>', { fallback: 2 })
