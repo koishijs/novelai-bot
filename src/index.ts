@@ -432,9 +432,9 @@ export function apply(ctx: Context, config: Config) {
             }
           }
           result.children.push(h('message', attrs, lines.join('\n')))
-          result.children.push(h('message', attrs, `prompt = ${h.escape(prompt)}`))
+          result.children.push(h('message', attrs, `prompt = ${prompt}`))
           if (output === 'verbose') {
-            result.children.push(h('message', attrs, `undesired = ${h.escape(uc)}`))
+            result.children.push(h('message', attrs, `undesired = ${uc}`))
           }
           result.children.push(h('message', attrs, h.image(dataUrl)))
           return result
