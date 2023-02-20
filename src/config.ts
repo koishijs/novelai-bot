@@ -261,7 +261,9 @@ export const Config = Schema.intersect([
     }),
   ]),
 
-  Schema.object({}).description('功能设置'),
+  Schema.object({
+    features: Schema.object({}),
+  }).description('功能设置'),
 
   Schema.union([
     Schema.object({
