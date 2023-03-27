@@ -1,6 +1,10 @@
 import { Computed, Dict, Schema, Session, Time } from 'koishi'
 import { Size } from './utils'
 
+const options: Computed.Options = {
+  userFields: ['authority'],
+}
+
 export const modelMap = {
   safe: 'safe-diffusion',
   nai: 'nai-diffusion',
@@ -139,16 +143,16 @@ export interface PromptConfig {
 }
 
 export const PromptConfig: Schema<PromptConfig> = Schema.object({
-  basePrompt: Schema.computed(Schema.string().role('textarea')).description('默认附加的标签。').default('masterpiece, best quality'),
-  negativePrompt: Schema.computed(Schema.string().role('textarea')).description('默认附加的反向标签。').default(ucPreset),
-  forbidden: Schema.computed(Schema.string().role('textarea')).description('违禁词列表。请求中的违禁词将会被自动删除。').default(''),
+  basePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的标签。').default('masterpiece, best quality'),
+  negativePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的反向标签。').default(ucPreset),
+  forbidden: Schema.computed(Schema.string().role('textarea'), options).description('违禁词列表。请求中的违禁词将会被自动删除。').default(''),
   placement: Schema.computed(Schema.union([
     Schema.const('before' as const).description('置于最前'),
     Schema.const('after' as const).description('置于最后'),
-  ])).description('默认附加标签的位置。').default('after'),
+  ]), options).description('默认附加标签的位置。').default('after'),
   translator: Schema.boolean().description('是否启用自动翻译。').default(true),
-  latinOnly: Schema.computed(Schema.boolean()).description('是否只接受英文输入。').default(false),
-  maxWords: Schema.computed(Schema.natural()).description('允许的最大单词数量。').default(0),
+  latinOnly: Schema.computed(Schema.boolean(), options).description('是否只接受英文输入。').default(false),
+  maxWords: Schema.computed(Schema.natural(), options).description('允许的最大单词数量。').default(0),
 }).description('输入设置')
 
 interface FeatureConfig {
@@ -159,16 +163,16 @@ interface FeatureConfig {
 }
 
 const naiFeatures = Schema.object({
-  anlas: Schema.computed(Schema.boolean()).default(true).description('是否允许使用点数。'),
+  anlas: Schema.computed(Schema.boolean(), options).default(true).description('是否允许使用点数。'),
 })
 
 const sdFeatures = Schema.object({
-  upscale: Schema.computed(Schema.boolean()).default(true).description('是否启用图片放大。'),
+  upscale: Schema.computed(Schema.boolean(), options).default(true).description('是否启用图片放大。'),
 })
 
 const features = Schema.object({
-  text: Schema.computed(Schema.boolean()).default(true).description('是否启用文本转图片。'),
-  image: Schema.computed(Schema.boolean()).default(true).description('是否启用图片转图片。'),
+  text: Schema.computed(Schema.boolean(), options).default(true).description('是否启用文本转图片。'),
+  image: Schema.computed(Schema.boolean(), options).default(true).description('是否启用图片转图片。'),
 })
 
 interface ParamConfig {
@@ -305,10 +309,10 @@ export const Config = Schema.intersect([
   ] as const),
 
   Schema.object({
-    scale: Schema.computed(Schema.number()).description('默认对输入的服从度。').default(11),
-    textSteps: Schema.computed(Schema.natural()).description('文本生图时默认的迭代步数。').default(28),
-    imageSteps: Schema.computed(Schema.natural()).description('以图生图时默认的迭代步数。').default(50),
-    maxSteps: Schema.computed(Schema.natural()).description('允许的最大迭代步数。').default(64),
+    scale: Schema.computed(Schema.number(), options).description('默认对输入的服从度。').default(11),
+    textSteps: Schema.computed(Schema.natural(), options).description('文本生图时默认的迭代步数。').default(28),
+    imageSteps: Schema.computed(Schema.natural(), options).description('以图生图时默认的迭代步数。').default(50),
+    maxSteps: Schema.computed(Schema.natural(), options).description('允许的最大迭代步数。').default(64),
     resolution: Schema.computed(Schema.union([
       Schema.const('portrait' as const).description('肖像 (768x512)'),
       Schema.const('landscape' as const).description('风景 (512x768)'),
@@ -317,8 +321,8 @@ export const Config = Schema.intersect([
         width: Schema.natural().description('图片宽度。').default(640),
         height: Schema.natural().description('图片高度。').default(640),
       }).description('自定义'),
-    ] as const)).description('默认生成的图片尺寸。').default('portrait'),
-    maxResolution: Schema.computed(Schema.natural()).description('允许生成的宽高最大值。').default(1024),
+    ] as const), options).description('默认生成的图片尺寸。').default('portrait'),
+    maxResolution: Schema.computed(Schema.natural(), options).description('允许生成的宽高最大值。').default(1024),
   }),
 
   PromptConfig,
