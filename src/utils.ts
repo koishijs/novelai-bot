@@ -2,7 +2,7 @@ import { arrayBufferToBase64, Context, Dict, pick, Quester } from 'koishi'
 import {
   crypto_generichash, crypto_pwhash,
   crypto_pwhash_ALG_ARGON2ID13, crypto_pwhash_SALTBYTES, ready,
-} from 'libsodium-wrappers'
+} from 'libsodium-wrappers-sumo'
 import imageSize from 'image-size'
 import { ImageData, Subscription } from './types'
 
