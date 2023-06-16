@@ -390,7 +390,7 @@ export function parseInput(session: Session, input: string, config: Config, over
 
   const negative = []
   const placement = session.resolve(config.placement)
-  const appendToList = (words: string[], input: string) => {
+  const appendToList = (words: string[], input = '') => {
     const tags = input.split(/,\s*/g)
     if (placement === 'before') tags.reverse()
     for (let tag of tags) {
