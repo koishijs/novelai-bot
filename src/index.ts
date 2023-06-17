@@ -104,6 +104,7 @@ export function apply(ctx: Context, config: Config) {
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
     .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
+    .option('batch', '-I <batch:option>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
@@ -115,8 +116,12 @@ export function apply(ctx: Context, config: Config) {
         return session.text('.custom-resolution-unsupported')
       }
 
-      if (options.iterations && options.iterations > config.maxIterations) {
-        return session.text('.exceed-max-iteration', [config.maxIterations])
+      {
+        const { batch = 1, iterations = 1 } = options
+        const total = batch * iterations
+        if (total > config.maxIterations) {
+          return session.text('.exceed-max-iteration', [config.maxIterations])
+        }
       }
 
       const allowText = useFilter(config.features.text)(session)
@@ -185,7 +190,7 @@ export function apply(ctx: Context, config: Config) {
       const parameters: Dict = {
         seed,
         prompt,
-        n_samples: 1,
+        n_samples: options.batch,
         uc,
         // 0: low quality + bad anatomy
         // 1: low quality
@@ -321,7 +326,7 @@ export function apply(ctx: Context, config: Config) {
                 post_processing: [],
                 karras: options.sampler.includes('_ka'),
                 steps: parameters.steps,
-                n: 1,
+                n: parameters.n_samples,
               },
               nsfw: nsfw !== 'disallow',
               trusted_workers: config.trustedWorkers,
