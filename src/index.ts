@@ -116,12 +116,10 @@ export function apply(ctx: Context, config: Config) {
         return session.text('.custom-resolution-unsupported')
       }
 
-      {
-        const { batch = 1, iterations = 1 } = options
-        const total = batch * iterations
-        if (total > config.maxIterations) {
-          return session.text('.exceed-max-iteration', [config.maxIterations])
-        }
+      const { batch = 1, iterations = 1 } = options
+      const total = batch * iterations
+      if (total > config.maxIterations) {
+        return session.text('.exceed-max-iteration', [config.maxIterations])
       }
 
       const allowText = useFilter(config.features.text)(session)
