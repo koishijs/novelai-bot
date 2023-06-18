@@ -361,7 +361,7 @@ export function parseForbidden(input: string) {
     .map<Forbidden>((pattern: string) => {
       const strict = pattern.endsWith('!')
       if (strict) pattern = pattern.slice(0, -1)
-      pattern = pattern.replace(/[^a-z0-9]+/g, ' ').trim()
+      pattern = pattern.replace(/[^a-z0-9\u00ff-\uffff]+/g, ' ').trim()
       return { pattern, strict }
     })
 }
@@ -431,7 +431,7 @@ export function parseInput(session: Session, input: string, config: Config, over
     }
     return true
   }).map((word) => {
-    if (/^<.+>$/.test(word)) return word
+    if (/^<.+>$/.test(word)) return word.replace(/ /g, '_')
     return word.toLowerCase()
   })
 
