@@ -188,6 +188,7 @@ interface ParamConfig {
   textSteps?: Computed<number>
   imageSteps?: Computed<number>
   maxSteps?: Computed<number>
+  strength?: Computed<number>
   resolution?: Computed<Orient | Size>
   maxResolution?: Computed<number>
 }
@@ -316,6 +317,7 @@ export const Config = Schema.intersect([
     textSteps: Schema.computed(Schema.natural(), options).description('文本生图时默认的迭代步数。').default(28),
     imageSteps: Schema.computed(Schema.natural(), options).description('以图生图时默认的迭代步数。').default(50),
     maxSteps: Schema.computed(Schema.natural(), options).description('允许的最大迭代步数。').default(64),
+    strength: Schema.computed(Schema.number(), options).min(0).max(1).description('默认的重绘强度。').default(0.7),
     resolution: Schema.computed(Schema.union([
       Schema.const('portrait' as const).description('肖像 (768x512)'),
       Schema.const('landscape' as const).description('风景 (512x768)'),
