@@ -320,6 +320,7 @@ export function apply(ctx: Context, config: Config) {
                 width: parameters.width,
                 post_processing: [],
                 karras: options.sampler.includes('_ka'),
+                hires_fix: options.hiresFix ?? config.hiresFix ?? false,
                 steps: parameters.steps,
                 n: 1,
               },
