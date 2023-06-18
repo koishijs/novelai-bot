@@ -1,0 +1,16 @@
+{
+  "name": "NovelAI Bot",
+  "short_name": "NovelAI Bot",
+  "description": "基于 NovelAI 的画图机器人",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#5546a3",
+  "icons": [
+    {
+      "src": "https://koishi.chat/logo.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    }
+  ]
+}
