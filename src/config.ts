@@ -369,7 +369,7 @@ export function parseForbidden(input: string) {
 const backslash = /@@__BACKSLASH__@@/g
 
 export function parseInput(session: Session, input: string, config: Config, override: boolean): string[] {
-  input = input.toLowerCase()
+  input = input
     .replace(/\\\\/g, backslash.source)
     .replace(/，/g, ',')
     .replace(/（/g, '(')
@@ -420,7 +420,7 @@ export function parseInput(session: Session, input: string, config: Config, over
   const forbidden = parseForbidden(session.resolve(config.forbidden))
   const positive = input.split(/,\s*/g).filter((word) => {
     // eslint-disable-next-line no-control-regex
-    word = word.replace(/[\x00-\x7f]/g, s => s.replace(/[^0-9a-zA-Z]/, ' ')).replace(/\s+/, ' ').trim()
+    word = word.toLowerCase().replace(/[\x00-\x7f]/g, s => s.replace(/[^0-9a-zA-Z]/, ' ')).replace(/\s+/, ' ').trim()
     if (!word) return false
     for (const { pattern, strict } of forbidden) {
       if (strict && word.split(/\W+/g).includes(pattern)) {
@@ -430,6 +430,9 @@ export function parseInput(session: Session, input: string, config: Config, over
       }
     }
     return true
+  }).map((word) => {
+    if (/^<.+>$/.test(word)) return word
+    return word.toLowerCase()
   })
 
   if (Math.max(getWordCount(positive), getWordCount(negative)) > (session.resolve(config.maxWords) || Infinity)) {
