@@ -248,13 +248,13 @@ export function apply(ctx: Context, config: Config) {
       }
 
       const getRandomId = () => Math.random().toString(36).slice(2)
-      const iterations = Array(options.iterations).fill(0).map(getRandomId)
+      const container = Array(iterations).fill(0).map(getRandomId)
       if (config.maxConcurrency) {
         const store = tasks[session.cid] ||= new Set()
         if (store.size >= config.maxConcurrency) {
           return session.text('.concurrent-jobs')
         } else {
-          iterations.forEach((id) => store.add(id))
+          container.forEach((id) => store.add(id))
         }
       }
 
@@ -262,7 +262,7 @@ export function apply(ctx: Context, config: Config) {
         ? session.text('.pending', [globalTasks.size])
         : session.text('.waiting'))
 
-      iterations.forEach((id) => globalTasks.add(id))
+      container.forEach((id) => globalTasks.add(id))
       const cleanUp = (id: string) => {
         tasks[session.cid]?.delete(id)
         globalTasks.delete(id)
@@ -453,13 +453,13 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
-      while (iterations.length) {
+      while (container.length) {
         try {
           await iterate()
-          cleanUp(iterations.pop())
+          cleanUp(container.pop())
           parameters.seed++
         } catch (err) {
-          iterations.forEach(cleanUp)
+          container.forEach(cleanUp)
           throw err
         }
       }
