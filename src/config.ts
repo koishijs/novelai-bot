@@ -94,7 +94,7 @@ export namespace sampler {
   export function createSchema(map: Dict<string>) {
     return Schema.union(Object.entries(map).map(([key, value]) => {
       return Schema.const(key).description(value)
-    })).description('默认的采样器。').default('k_euler_a')
+    })).loose().description('默认的采样器。').default('k_euler_a')
   }
 
   export function sd2nai(sampler: string): string {
@@ -150,8 +150,8 @@ export const PromptConfig: Schema<PromptConfig> = Schema.object({
   negativePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的反向标签。').default(ucPreset),
   forbidden: Schema.computed(Schema.string().role('textarea'), options).description('违禁词列表。请求中的违禁词将会被自动删除。').default(''),
   placement: Schema.computed(Schema.union([
-    Schema.const('before' as const).description('置于最前'),
-    Schema.const('after' as const).description('置于最后'),
+    Schema.const('before').description('置于最前'),
+    Schema.const('after').description('置于最后'),
   ]), options).description('默认附加标签的位置。').default('after'),
   translator: Schema.boolean().description('是否启用自动翻译。').default(true),
   latinOnly: Schema.computed(Schema.boolean(), options).description('是否只接受英文输入。').default(false),
@@ -215,12 +215,12 @@ export interface Config extends PromptConfig, ParamConfig {
 export const Config = Schema.intersect([
   Schema.object({
     type: Schema.union([
-      Schema.const('token' as const).description('授权令牌'),
-      ...process.env.KOISHI_ENV === 'browser' ? [] : [Schema.const('login' as const).description('账号密码')],
-      Schema.const('naifu' as const).description('naifu'),
-      Schema.const('sd-webui' as const).description('sd-webui'),
-      Schema.const('stable-horde' as const).description('Stable Horde'),
-    ] as const).default('token').description('登录方式。'),
+      Schema.const('token').description('授权令牌'),
+      ...process.env.KOISHI_ENV === 'browser' ? [] : [Schema.const('login').description('账号密码')],
+      Schema.const('naifu').description('naifu'),
+      Schema.const('sd-webui').description('sd-webui'),
+      Schema.const('stable-horde').description('Stable Horde'),
+    ]).default('token').description('登录方式。'),
   }).description('登录设置'),
 
   Schema.union([
@@ -291,24 +291,24 @@ export const Config = Schema.intersect([
 
   Schema.union([
     Schema.object({
-      type: Schema.const('sd-webui'),
+      type: Schema.const('sd-webui').required(),
       sampler: sampler.createSchema(sampler.sd),
       upscaler: Schema.union(upscalers).description('默认的放大算法。').default('Lanczos'),
       restoreFaces: Schema.boolean().description('是否启用人脸修复。').default(false),
       hiresFix: Schema.boolean().description('是否启用高分辨率修复。').default(false),
     }),
     Schema.object({
-      type: Schema.const('stable-horde'),
+      type: Schema.const('stable-horde').required(),
       sampler: sampler.createSchema(sampler.horde),
-      model: Schema.union(hordeModels),
+      model: Schema.union(hordeModels).loose().description('默认的生成模型。'),
     }),
     Schema.object({
-      type: Schema.const('naifu'),
+      type: Schema.const('naifu').required(),
       sampler: sampler.createSchema(sampler.nai),
     }),
     Schema.object({
-      model: Schema.union(models).description('默认的生成模型。').default('nai'),
       sampler: sampler.createSchema(sampler.nai),
+      model: Schema.union(models).loose().description('默认的生成模型。').default('nai'),
     }),
   ] as const),
 
@@ -319,14 +319,14 @@ export const Config = Schema.intersect([
     maxSteps: Schema.computed(Schema.natural(), options).description('允许的最大迭代步数。').default(64),
     strength: Schema.computed(Schema.number(), options).min(0).max(1).description('默认的重绘强度。').default(0.7),
     resolution: Schema.computed(Schema.union([
-      Schema.const('portrait' as const).description('肖像 (768x512)'),
-      Schema.const('landscape' as const).description('风景 (512x768)'),
-      Schema.const('square' as const).description('方形 (640x640)'),
+      Schema.const('portrait').description('肖像 (768x512)'),
+      Schema.const('landscape').description('风景 (512x768)'),
+      Schema.const('square').description('方形 (640x640)'),
       Schema.object({
         width: Schema.natural().description('图片宽度。').default(640),
         height: Schema.natural().description('图片高度。').default(640),
       }).description('自定义'),
-    ] as const), options).description('默认生成的图片尺寸。').default('portrait'),
+    ]), options).description('默认生成的图片尺寸。').default('portrait'),
     maxResolution: Schema.computed(Schema.natural(), options).description('允许生成的宽高最大值。').default(1024),
   }),
 
