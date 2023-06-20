@@ -227,7 +227,7 @@ export function apply(ctx: Context, config: Config) {
             height: options.resolution.height,
             width: options.resolution.width,
             noise: options.noise ?? 0.2,
-            strength: options.strength ?? 0.7,
+            strength: options.strength ?? session.resolve(config.strength),
           })
         }
       } else {
@@ -244,7 +244,7 @@ export function apply(ctx: Context, config: Config) {
       if (options.hiresFix || config.hiresFix) {
         // set default denoising strength to `0.75` for `hires fix` feature
         // https://github.com/koishijs/novelai-bot/issues/158
-        parameters.strength ??= 0.75
+        parameters.strength ??= session.resolve(config.strength)
       }
 
       const getRandomId = () => Math.random().toString(36).slice(2)
@@ -323,6 +323,7 @@ export function apply(ctx: Context, config: Config) {
                 width: parameters.width,
                 post_processing: [],
                 karras: options.sampler.includes('_ka'),
+                hires_fix: options.hiresFix ?? config.hiresFix ?? false,
                 steps: parameters.steps,
                 n: parameters.n_samples,
               },
