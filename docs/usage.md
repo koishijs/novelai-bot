@@ -53,10 +53,10 @@
 此功能需要通过配置项 [`maxIterations`](./config.md#maxiterations) 手动开启。
 :::
 
-如果想要以一组输入批量生成图片，可以使用 `-I, --batch` 参数：
+如果想要以一组输入批量生成图片，可以使用 `-b, --batch` 参数：
 
 ```text
-约稿 -I 10 koishi
+约稿 -b 10 koishi
 ```
 
 ### 输出方式 (output)

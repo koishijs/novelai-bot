@@ -104,7 +104,7 @@ export function apply(ctx: Context, config: Config) {
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
     .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
-    .option('batch', '-I <batch:option>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
+    .option('batch', '-b <batch:option>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
