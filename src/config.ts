@@ -138,6 +138,7 @@ export interface Options {
 export interface PromptConfig {
   basePrompt?: Computed<string>
   negativePrompt?: Computed<string>
+  defaultPrompt?: Computed<string>
   forbidden?: Computed<string>
   placement?: Computed<'before' | 'after'>
   latinOnly?: Computed<boolean>
@@ -148,6 +149,7 @@ export interface PromptConfig {
 export const PromptConfig: Schema<PromptConfig> = Schema.object({
   basePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的标签。').default('masterpiece, best quality'),
   negativePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的反向标签。').default(ucPreset),
+  defaultPrompt: Schema.string().role('textarea', options).description('默认提示词，在用户无输入prompt时仍然可以调用。建议在sd-webui中安装dynamic prompt插件，配合使用以达到随机提示词效果。').default(''),
   forbidden: Schema.computed(Schema.string().role('textarea'), options).description('违禁词列表。请求中的违禁词将会被自动删除。').default(''),
   placement: Schema.computed(Schema.union([
     Schema.const('before').description('置于最前'),
@@ -368,7 +370,15 @@ export function parseForbidden(input: string) {
 
 const backslash = /@@__BACKSLASH__@@/g
 
-export function parseInput(session: Session, input: string, config: Config, override: boolean): string[] {
+export function parseInput(session: Session, input: string, config: Config, override: boolean, addDefault: boolean): string[] {
+  if (!input) {
+    return [
+      null,
+      [session.resolve(config.basePrompt), session.resolve(config.defaultPrompt)].join(','),
+      session.resolve(config.negativePrompt)
+    ]
+  }
+
   input = input
     .replace(/\\\\/g, backslash.source)
     .replace(/，/g, ',')
@@ -442,6 +452,7 @@ export function parseInput(session: Session, input: string, config: Config, over
   if (!override) {
     appendToList(positive, session.resolve(config.basePrompt))
     appendToList(negative, session.resolve(config.negativePrompt))
+    if (addDefault) appendToList(positive, session.resolve(config.defaultPrompt))
   }
 
   return [null, positive.join(', '), negative.join(', ')]

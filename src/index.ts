@@ -89,6 +89,7 @@ export function apply(ctx: Context, config: Config) {
     .userFields(['authority'])
     .shortcut('imagine', { i18n: true, fuzzy: true })
     .shortcut('enhance', { i18n: true, fuzzy: true, options: { enhance: true } })
+    .shortcut('default', { i18n: true, fuzzy: true, options: { default: true } })
     .option('enhance', '-e', { hidden: some(restricted, thirdParty, noImage) })
     .option('model', '-m <model>', { type: models, hidden: thirdParty })
     .option('resolution', '-r <resolution>', { type: resolution })
@@ -101,11 +102,13 @@ export function apply(ctx: Context, config: Config) {
     .option('noise', '-n <noise:number>', { hidden: some(restricted, thirdParty) })
     .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('hiresFix', '-H', { hidden: () => config.type !== 'sd-webui' })
+    .option('default', '-d', {})
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
     .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
     .action(async ({ session, options }, input) => {
-      if (!input?.trim()) return session.execute('help novelai')
+      const haveInput = input?.trim() ? true : false
+      if (!haveInput && !options.default) return session.execute('help novelai')
 
       // Check if the user is allowed to use this command.
       // This code is originally written in the `resolution` function,
@@ -123,7 +126,7 @@ export function apply(ctx: Context, config: Config) {
       const allowImage = useFilter(config.features.image)(session)
 
       let imgUrl: string, image: ImageData
-      if (!restricted(session)) {
+      if (!restricted(session) && haveInput) {
         input = h('', h.transform(h.parse(input), {
           image(attrs) {
             if (!allowImage) throw new SessionError('commands.novelai.messages.invalid-content')
@@ -141,23 +144,24 @@ export function apply(ctx: Context, config: Config) {
           return session.text('.expect-prompt')
         }
       } else {
-        input = h('', h.transform(h.parse(input), {
+        input = haveInput ? h('', h.transform(h.parse(input), {
           image(attrs) {
             throw new SessionError('commands.novelai.messages.invalid-content')
           },
-        })).toString(true)
+        })).toString(true) : input
         delete options.enhance
         delete options.steps
         delete options.noise
         delete options.strength
         delete options.override
+        delete options.default
       }
 
       if (!allowText && !imgUrl) {
         return session.text('.expect-image')
       }
 
-      if (config.translator && ctx.translator && !options.noTranslator) {
+      if (haveInput && config.translator && ctx.translator && !options.noTranslator) {
         try {
           input = await ctx.translator.translate({ input, target: 'en' })
         } catch (err) {
@@ -165,7 +169,7 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
-      const [errPath, prompt, uc] = parseInput(session, input, config, options.override)
+      const [errPath, prompt, uc] = parseInput(session, input, config, options.override, options.default)
       if (errPath) return session.text(errPath)
 
       let token: string
