@@ -353,6 +353,7 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
+      let finalPrompt = prompt
       const iterate = async () => {
         const request = async () => {
           const res = await ctx.http.axios(trimSlash(config.endpoint) + path, {
@@ -366,6 +367,7 @@ export function apply(ctx: Context, config: Config) {
           })
 
           if (config.type === 'sd-webui') {
+            finalPrompt = (JSON.parse((res.data as StableDiffusionWebUI.Response).info)).prompt
             return forceDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
           }
           if (config.type === 'stable-horde') {
@@ -437,7 +439,7 @@ export function apply(ctx: Context, config: Config) {
             }
           }
           result.children.push(h('message', attrs, lines.join('\n')))
-          result.children.push(h('message', attrs, `prompt = ${prompt}`))
+          result.children.push(h('message', attrs, `prompt = ${finalPrompt}`))
           if (output === 'verbose') {
             result.children.push(h('message', attrs, `undesired = ${uc}`))
           }
