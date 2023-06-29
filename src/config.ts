@@ -138,8 +138,9 @@ export interface Options {
 export interface PromptConfig {
   basePrompt?: Computed<string>
   negativePrompt?: Computed<string>
-  defaultPrompt?: Computed<string>
   forbidden?: Computed<string>
+  defaultPromptSw?: boolean
+  defaultPrompt?: Computed<string>
   placement?: Computed<'before' | 'after'>
   latinOnly?: Computed<boolean>
   translator?: boolean
@@ -149,8 +150,9 @@ export interface PromptConfig {
 export const PromptConfig: Schema<PromptConfig> = Schema.object({
   basePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的标签。').default('masterpiece, best quality'),
   negativePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的反向标签。').default(ucPreset),
-  defaultPrompt: Schema.string().role('textarea', options).description('默认提示词，在用户无输入prompt时仍然可以调用。建议在sd-webui中安装dynamic prompt插件，配合使用以达到随机提示词效果。').default(''),
   forbidden: Schema.computed(Schema.string().role('textarea'), options).description('违禁词列表。请求中的违禁词将会被自动删除。').default(''),
+  defaultPromptSw: Schema.boolean().description('是否启用默认提示词。').default(false),
+  defaultPrompt: Schema.string().role('textarea', options).description('默认提示词，可以在用户无输入prompt时调用。建议在sd-webui中安装dynamic prompt插件，配合使用以达到随机提示词效果。').default(''),
   placement: Schema.computed(Schema.union([
     Schema.const('before').description('置于最前'),
     Schema.const('after').description('置于最后'),

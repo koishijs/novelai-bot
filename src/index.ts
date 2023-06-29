@@ -102,13 +102,12 @@ export function apply(ctx: Context, config: Config) {
     .option('noise', '-n <noise:number>', { hidden: some(restricted, thirdParty) })
     .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('hiresFix', '-H', { hidden: () => config.type !== 'sd-webui' })
-    .option('default', '-d', {})
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
     .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
     .action(async ({ session, options }, input) => {
       const haveInput = input?.trim() ? true : false
-      if (!haveInput && !options.default) return session.execute('help novelai')
+      if (!haveInput && !config.defaultPromptSw) return session.execute('help novelai')
 
       // Check if the user is allowed to use this command.
       // This code is originally written in the `resolution` function,
@@ -154,7 +153,6 @@ export function apply(ctx: Context, config: Config) {
         delete options.noise
         delete options.strength
         delete options.override
-        delete options.default
       }
 
       if (!allowText && !imgUrl) {
@@ -169,7 +167,9 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
-      const [errPath, prompt, uc] = parseInput(session, input, config, options.override, options.default)
+      const [errPath, prompt, uc] = parseInput(
+        session, input, config, options.override, config.defaultPromptSw
+      )
       if (errPath) return session.text(errPath)
 
       let token: string
