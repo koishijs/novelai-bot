@@ -106,6 +106,20 @@ export function apply(ctx: Context, config: Config) {
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
     .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
     .action(async ({ session, options }, input) => {
+      if (config.defaultPromptSw) {
+        if (session.user.authority < session.resolve(config.authLvDefault)) {
+          return session.text('internal.low-authority')
+        }
+        if (session.user.authority < session.resolve(config.authLv)) {
+          input = ''
+          options = options.resolution ? { resolution: options.resolution } : {}
+        }
+      }
+      else if (
+        !config.defaultPromptSw &&
+        session.user.authority < session.resolve(config.authLv)
+      ) return session.text('internal.low-auth')
+
       const haveInput = input?.trim() ? true : false
       if (!haveInput && !config.defaultPromptSw) return session.execute('help novelai')
 

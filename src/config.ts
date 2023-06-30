@@ -202,6 +202,8 @@ export interface Config extends PromptConfig, ParamConfig {
   token?: string
   email?: string
   password?: string
+  authLv?: Computed<number>
+  authLvDefault?: Computed<number>
   output?: Computed<'minimal' | 'default' | 'verbose'>
   features?: FeatureConfig
   endpoint?: string
@@ -272,6 +274,11 @@ export const Config = Schema.intersect([
       pollInterval: Schema.number().role('time').description('轮询进度间隔时长。').default(Time.second),
     }),
   ]),
+
+  Schema.object({
+    authLv: Schema.computed(Schema.natural(), options).description('使用画图全部功能所需要的权限等级。').default(0),
+    authLvDefault: Schema.computed(Schema.natural(), options).description('使用默认参数生成所需要的权限等级。').default(0),
+  }).description('权限设置'),
 
   Schema.object({
     features: Schema.object({}),
