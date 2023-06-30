@@ -17,7 +17,6 @@ commands:
       strength: Set Denoising Strength
       noise: Set Noising Strength
       hiresFix: Enable Hires Fix.
-      default: Add default prompt
       undesired: Negative Prompt
       noTranslator: Disable Auto Translation
       iterations: Set Batch Count.

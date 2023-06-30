@@ -89,7 +89,6 @@ export function apply(ctx: Context, config: Config) {
     .userFields(['authority'])
     .shortcut('imagine', { i18n: true, fuzzy: true })
     .shortcut('enhance', { i18n: true, fuzzy: true, options: { enhance: true } })
-    .shortcut('default', { i18n: true, fuzzy: true, options: { default: true } })
     .option('enhance', '-e', { hidden: some(restricted, thirdParty, noImage) })
     .option('model', '-m <model>', { type: models, hidden: thirdParty })
     .option('resolution', '-r <resolution>', { type: resolution })

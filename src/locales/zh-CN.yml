@@ -9,7 +9,6 @@ commands:
     shortcuts:
       imagine: 画画|约稿
       enhance: 增强
-      default: 随便画
 
     options:
       enhance: 图片增强模式

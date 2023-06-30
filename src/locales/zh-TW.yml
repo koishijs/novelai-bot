@@ -8,7 +8,6 @@ commands:
     shortcuts:
       imagine: 畫畫|約稿
       enhance: 增強
-      default: 隨便畫
     options:
       enhance: 圖像增強模式
       model: 設定生成模型
