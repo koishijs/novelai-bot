@@ -25,6 +25,7 @@ commands:
       undesired: 排除标签
       noTranslator: 禁用自动翻译
       iterations: 设置绘制次数
+      batch: 设置绘制批次大小
 
     messages:
       exceed-max-iteration: 超过最大绘制次数。

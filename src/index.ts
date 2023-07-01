@@ -104,6 +104,7 @@ export function apply(ctx: Context, config: Config) {
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
     .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
+    .option('batch', '-b <batch:option>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
     .action(async ({ session, options }, input) => {
       if (!input?.trim()) return session.execute('help novelai')
 
@@ -115,7 +116,9 @@ export function apply(ctx: Context, config: Config) {
         return session.text('.custom-resolution-unsupported')
       }
 
-      if (options.iterations && options.iterations > config.maxIterations) {
+      const { batch = 1, iterations = 1 } = options
+      const total = batch * iterations
+      if (total > config.maxIterations) {
         return session.text('.exceed-max-iteration', [config.maxIterations])
       }
 
@@ -185,7 +188,7 @@ export function apply(ctx: Context, config: Config) {
       const parameters: Dict = {
         seed,
         prompt,
-        n_samples: 1,
+        n_samples: options.batch,
         uc,
         // 0: low quality + bad anatomy
         // 1: low quality
@@ -245,13 +248,13 @@ export function apply(ctx: Context, config: Config) {
       }
 
       const getRandomId = () => Math.random().toString(36).slice(2)
-      const iterations = Array(options.iterations).fill(0).map(getRandomId)
+      const container = Array(iterations).fill(0).map(getRandomId)
       if (config.maxConcurrency) {
         const store = tasks[session.cid] ||= new Set()
         if (store.size >= config.maxConcurrency) {
           return session.text('.concurrent-jobs')
         } else {
-          iterations.forEach((id) => store.add(id))
+          container.forEach((id) => store.add(id))
         }
       }
 
@@ -259,7 +262,7 @@ export function apply(ctx: Context, config: Config) {
         ? session.text('.pending', [globalTasks.size])
         : session.text('.waiting'))
 
-      iterations.forEach((id) => globalTasks.add(id))
+      container.forEach((id) => globalTasks.add(id))
       const cleanUp = (id: string) => {
         tasks[session.cid]?.delete(id)
         globalTasks.delete(id)
@@ -322,7 +325,7 @@ export function apply(ctx: Context, config: Config) {
                 karras: options.sampler.includes('_ka'),
                 hires_fix: options.hiresFix ?? config.hiresFix ?? false,
                 steps: parameters.steps,
-                n: 1,
+                n: parameters.n_samples,
               },
               nsfw: nsfw !== 'disallow',
               trusted_workers: config.trustedWorkers,
@@ -451,13 +454,13 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
-      while (iterations.length) {
+      while (container.length) {
         try {
           await iterate()
-          cleanUp(iterations.pop())
+          cleanUp(container.pop())
           parameters.seed++
         } catch (err) {
-          iterations.forEach(cleanUp)
+          container.forEach(cleanUp)
           throw err
         }
       }

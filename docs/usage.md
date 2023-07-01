@@ -47,6 +47,18 @@
 约稿 -i 10 koishi
 ```
 
+### 批量生成 (batch)
+
+::: tip
+此功能需要通过配置项 [`maxIterations`](./config.md#maxiterations) 手动开启。
+:::
+
+如果想要以一组输入批量生成图片，可以使用 `-b, --batch` 参数：
+
+```text
+约稿 -b 10 koishi
+```
+
 ### 输出方式 (output)
 
 此插件提供了三种不同的输出方式：`minimal` 表示只发送图片，`default` 表示发送图片和关键信息，`verbose` 表示发送全部信息。你可以使用 `-o, --output` 手动指定输出方式，或通过配置项修改默认的行为。
