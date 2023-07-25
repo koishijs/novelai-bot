@@ -22,7 +22,6 @@ commands:
       strength: 图片修改幅度
       noise: 图片噪声强度
       hiresFix: 启用高分辨率修复
-      default: 添加默认提示词
       undesired: 排除标签
       noTranslator: 禁用自动翻译
       iterations: 设置绘制次数

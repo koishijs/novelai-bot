@@ -20,7 +20,6 @@ commands:
       strength: 圖像修改幅度
       noise: 圖像雜訊強度
       hiresFix: 啟用高分辨率修復
-      default: 默認提示詞
       undesired: 反向提示詞
       noTranslator: 禁用自動翻譯
       iterations: 設定繪畫次數
