@@ -143,6 +143,8 @@ export interface PromptConfig {
   basePrompt?: Computed<string>
   negativePrompt?: Computed<string>
   forbidden?: Computed<string>
+  defaultPromptSw?: boolean
+  defaultPrompt?: Computed<string>
   placement?: Computed<'before' | 'after'>
   latinOnly?: Computed<boolean>
   translator?: boolean
@@ -153,6 +155,8 @@ export const PromptConfig: Schema<PromptConfig> = Schema.object({
   basePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的标签。').default('masterpiece, best quality'),
   negativePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的反向标签。').default(ucPreset),
   forbidden: Schema.computed(Schema.string().role('textarea'), options).description('违禁词列表。请求中的违禁词将会被自动删除。').default(''),
+  defaultPromptSw: Schema.boolean().description('是否启用默认标签。').default(false),
+  defaultPrompt: Schema.string().role('textarea', options).description('默认标签，可以在用户无输入prompt时调用。可选在sd-webui中安装dynamic prompt插件，配合使用以达到随机标签效果。').default(''),
   placement: Schema.computed(Schema.union([
     Schema.const('before').description('置于最前'),
     Schema.const('after').description('置于最后'),
@@ -202,6 +206,8 @@ export interface Config extends PromptConfig, ParamConfig {
   token?: string
   email?: string
   password?: string
+  authLv?: Computed<number>
+  authLvDefault?: Computed<number>
   output?: Computed<'minimal' | 'default' | 'verbose'>
   features?: FeatureConfig
   endpoint?: string
@@ -272,6 +278,11 @@ export const Config = Schema.intersect([
       pollInterval: Schema.number().role('time').description('轮询进度间隔时长。').default(Time.second),
     }),
   ]),
+
+  Schema.object({
+    authLv: Schema.computed(Schema.natural(), options).description('使用画图全部功能所需要的权限等级。').default(0),
+    authLvDefault: Schema.computed(Schema.natural(), options).description('使用默认参数生成所需要的权限等级。').default(0),
+  }).description('权限设置'),
 
   Schema.object({
     features: Schema.object({}),
@@ -372,7 +383,15 @@ export function parseForbidden(input: string) {
 
 const backslash = /@@__BACKSLASH__@@/g
 
-export function parseInput(session: Session, input: string, config: Config, override: boolean): string[] {
+export function parseInput(session: Session, input: string, config: Config, override: boolean, addDefault: boolean): string[] {
+  if (!input) {
+    return [
+      null,
+      [session.resolve(config.basePrompt), session.resolve(config.defaultPrompt)].join(','),
+      session.resolve(config.negativePrompt)
+    ]
+  }
+
   input = input
     .replace(/\\\\/g, backslash.source)
     .replace(/，/g, ',')
@@ -446,6 +465,7 @@ export function parseInput(session: Session, input: string, config: Config, over
   if (!override) {
     appendToList(positive, session.resolve(config.basePrompt))
     appendToList(negative, session.resolve(config.negativePrompt))
+    if (addDefault) appendToList(positive, session.resolve(config.defaultPrompt))
   }
 
   return [null, positive.join(', '), negative.join(', ')]

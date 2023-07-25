@@ -106,7 +106,22 @@ export function apply(ctx: Context, config: Config) {
     .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
     .option('batch', '-b <batch:option>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
     .action(async ({ session, options }, input) => {
-      if (!input?.trim()) return session.execute('help novelai')
+      if (config.defaultPromptSw) {
+        if (session.user.authority < session.resolve(config.authLvDefault)) {
+          return session.text('internal.low-authority')
+        }
+        if (session.user.authority < session.resolve(config.authLv)) {
+          input = ''
+          options = options.resolution ? { resolution: options.resolution } : {}
+        }
+      }
+      else if (
+        !config.defaultPromptSw &&
+        session.user.authority < session.resolve(config.authLv)
+      ) return session.text('internal.low-auth')
+
+      const haveInput = input?.trim() ? true : false
+      if (!haveInput && !config.defaultPromptSw) return session.execute('help novelai')
 
       // Check if the user is allowed to use this command.
       // This code is originally written in the `resolution` function,
@@ -126,7 +141,7 @@ export function apply(ctx: Context, config: Config) {
       const allowImage = useFilter(config.features.image)(session)
 
       let imgUrl: string, image: ImageData
-      if (!restricted(session)) {
+      if (!restricted(session) && haveInput) {
         input = h('', h.transform(h.parse(input), {
           image(attrs) {
             if (!allowImage) throw new SessionError('commands.novelai.messages.invalid-content')
@@ -144,11 +159,11 @@ export function apply(ctx: Context, config: Config) {
           return session.text('.expect-prompt')
         }
       } else {
-        input = h('', h.transform(h.parse(input), {
+        input = haveInput ? h('', h.transform(h.parse(input), {
           image(attrs) {
             throw new SessionError('commands.novelai.messages.invalid-content')
           },
-        })).toString(true)
+        })).toString(true) : input
         delete options.enhance
         delete options.steps
         delete options.noise
@@ -160,7 +175,7 @@ export function apply(ctx: Context, config: Config) {
         return session.text('.expect-image')
       }
 
-      if (config.translator && ctx.translator && !options.noTranslator) {
+      if (haveInput && config.translator && ctx.translator && !options.noTranslator) {
         try {
           input = await ctx.translator.translate({ input, target: 'en' })
         } catch (err) {
@@ -168,7 +183,9 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
-      const [errPath, prompt, uc] = parseInput(session, input, config, options.override)
+      const [errPath, prompt, uc] = parseInput(
+        session, input, config, options.override, config.defaultPromptSw
+      )
       if (errPath) return session.text(errPath)
 
       let token: string
@@ -352,6 +369,7 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
+      let finalPrompt = prompt
       const iterate = async () => {
         const request = async () => {
           const res = await ctx.http.axios(trimSlash(config.endpoint) + path, {
@@ -365,6 +383,7 @@ export function apply(ctx: Context, config: Config) {
           })
 
           if (config.type === 'sd-webui') {
+            finalPrompt = (JSON.parse((res.data as StableDiffusionWebUI.Response).info)).prompt
             return forceDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
           }
           if (config.type === 'stable-horde') {
@@ -436,7 +455,7 @@ export function apply(ctx: Context, config: Config) {
             }
           }
           result.children.push(h('message', attrs, lines.join('\n')))
-          result.children.push(h('message', attrs, `prompt = ${prompt}`))
+          result.children.push(h('message', attrs, `prompt = ${finalPrompt}`))
           if (output === 'verbose') {
             result.children.push(h('message', attrs, `undesired = ${uc}`))
           }
