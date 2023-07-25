@@ -1,7 +1,7 @@
 import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
-import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
+import { closestMultiple, download, forceDataPrefix, getEmbeddingsList, getHypernetworksList, getImageSize, getLoraList, getCkptList, login, NetworkError, project, resizeInput, Size, getLycoList } from './utils'
 import {} from '@koishijs/translator'
 import {} from '@koishijs/plugin-help'
 
@@ -478,6 +478,76 @@ export function apply(ctx: Context, config: Config) {
         } catch (err) {
           iterations.forEach(cleanUp)
           throw err
+        }
+      }
+    })
+
+  const cmdLsEx = ctx.command('lsmd <name:text>')
+    .shortcut('lsckpt', { i18n: true, fuzzy: true, options: { ckpt: true } })
+    .shortcut('lslora', { i18n: true, fuzzy: true, options: { lora: true } })
+    .shortcut('lsemb', { i18n: true, fuzzy: true, options: { embedding: true } })
+    .shortcut('lshn', { i18n: true, fuzzy: true, options: { hypernetwork: true } })
+    .option('ckpt', '-c', {})
+    .option('lora', '-l', {})
+    .option('embedding', '-e', { hidden: some(restricted, thirdParty, noImage) })
+    .option('hypernetwork', '-hn', {})
+    .action(async ({ session, options }, input) => {
+      if (Object.keys(options).length === 0 && !input) {
+        options.ckpt = true
+        options.lora = true
+        options.embedding = true
+        options.hypernetwork = true
+      }
+
+      if (!input) {
+        try {
+          const res = []
+
+          if (options.ckpt) {
+            const ckptRes = []
+            const ckptList = await getCkptList(ctx, config);
+            for (const ckpt of ckptList) {
+              ckptRes.push(ckpt.model_name)
+            }
+            res.push(['ckpt', '=====', ckptRes.join('\n')].join('\n'))
+          }
+
+          if (options.lora) {
+            const loraRes = []
+            const lorasList = await getLoraList(ctx, config);
+            for (const lora of lorasList) {
+              loraRes.push(lora.name)
+            }
+            const lycoList = await getLycoList(ctx, config);
+            for (const lyco of lycoList) {
+              loraRes.push(lyco.name)
+            }
+            res.push(['lora', '=====', loraRes.join('\n')].join('\n'))
+          }
+
+          if (options.embedding) {
+            const embeddingRes = []
+            const embeddingsList = await getEmbeddingsList(ctx, config);
+            for (const embedding in embeddingsList.loaded) {
+              embeddingRes.push(embedding)
+            }
+            res.push(['embedding', '=====', embeddingRes.join('\n')].join('\n'))
+          }
+
+          if (options.hypernetwork) {
+            const hypernetworkRes = []
+            const hypernetworksList = await getHypernetworksList(ctx, config);
+            for (const hypernetwork of hypernetworksList) {
+              hypernetworkRes.push(hypernetwork.name)
+            }
+            res.push(['hypernetwork', '=====', hypernetworkRes.join('\n')].join('\n'))
+          }
+
+          return res.join('\n=====\n\n')
+        }
+        catch (err) {
+          logger.error(err)
+          return session.text('.unknown-error')
         }
       }
     })

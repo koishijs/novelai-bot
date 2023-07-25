@@ -45,6 +45,8 @@ export interface ImageData {
 }
 
 export namespace StableDiffusionWebUI {
+  export type ModelType = 'sd-model' | 'lora' | 'embedding' | 'hypernetwork'
+
   export interface Request {
     prompt: string
     negative_prompt?: string
@@ -104,5 +106,57 @@ export namespace StableDiffusionWebUI {
 
   export interface ExtraSingleImageResponse {
     image: string
+  }
+
+  export interface ModelListResponse extends Array<Model> { }
+
+  export interface Model {
+    title: string;
+    model_name: string;
+    hash: null | string;
+    sha256: null | string;
+    filename: string;
+    config: string;
+  }
+
+  export interface LoraListResponse extends Array<Lora> { }
+
+  export interface Lora {
+    name: string;
+    alias: string;
+    path: string;
+    metadata: any | null;
+  }
+
+  export interface LycoListResponse extends Array<Lyco> { }
+
+  export interface Lyco {
+    name: string;
+    path: string;
+    metadata: any | null;
+  }
+
+  export interface EmbeddingsListResponse {
+    loaded: Embeddings;
+    skipped: Embeddings;
+  }
+
+  interface Embeddings {
+    [name: string]: Embedding;
+  }
+
+  export interface Embedding {
+    step: number | null;
+    sd_checkpoint: null | string;
+    sd_checkpoint_name: null | string;
+    shape: number;
+    vectors: number;
+  }
+
+  export interface HypernetworkListResponse extends Array<Hypernetwork> { }
+
+  export interface Hypernetwork {
+    name: string
+    path: string
   }
 }

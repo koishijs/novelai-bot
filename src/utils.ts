@@ -1,10 +1,11 @@
-import { arrayBufferToBase64, Context, Dict, pick, Quester } from 'koishi'
+import { arrayBufferToBase64, Context, Dict, pick, Quester, trimSlash } from 'koishi'
 import {
   crypto_generichash, crypto_pwhash,
   crypto_pwhash_ALG_ARGON2ID13, crypto_pwhash_SALTBYTES, ready,
 } from 'libsodium-wrappers-sumo'
 import imageSize from 'image-size'
-import { ImageData, Subscription } from './types'
+import { ImageData, Subscription, StableDiffusionWebUI } from './types'
+import { Config } from './config'
 
 export function project(object: {}, mapping: {}) {
   const result = {}
@@ -181,4 +182,40 @@ export function forceDataPrefix(url: string, mime = 'image/png') {
   // https://github.com/koishijs/novelai-bot/issues/90
   if (url.startsWith('data:')) return url
   return `data:${mime};base64,` + url
+}
+
+async function getSdInfo(ctx: Context, config: Config, path: string)
+  : Promise<any> {
+  return ctx.http.axios(trimSlash(config.endpoint) + path, {
+    method: 'GET',
+    timeout: config.requestTimeout,
+    headers: {
+      ...config.headers,
+    },
+  }).then(res => res.data)
+}
+
+export async function getCkptList(ctx: Context, config: Config,)
+  : Promise<StableDiffusionWebUI.ModelListResponse> {
+  return getSdInfo(ctx, config, '/sdapi/v1/sd-models')
+}
+
+export async function getLoraList(ctx: Context, config: Config)
+  : Promise<StableDiffusionWebUI.LoraListResponse> {
+  return getSdInfo(ctx, config, '/sdapi/v1/loras')
+}
+
+export async function getLycoList(ctx: Context, config: Config)
+  : Promise<StableDiffusionWebUI.LycoListResponse> {
+  return getSdInfo(ctx, config, '/sdapi/v1/lycos')
+}
+
+export async function getEmbeddingsList(ctx: Context, config: Config)
+  : Promise<StableDiffusionWebUI.EmbeddingsListResponse> {
+  return getSdInfo(ctx, config, '/sdapi/v1/embeddings')
+}
+
+export async function getHypernetworksList(ctx: Context, config: Config)
+  : Promise<StableDiffusionWebUI.HypernetworkListResponse> {
+  return getSdInfo(ctx, config, '/sdapi/v1/hypernetworks')
 }
