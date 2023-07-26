@@ -583,10 +583,6 @@ export function apply(ctx: Context, config: Config) {
             for (const lora of lorasList) {
               loraRes.push(lora.name)
             }
-            const lycoList = await getLycoList(ctx, config);
-            for (const lyco of lycoList) {
-              loraRes.push(lyco.name)
-            }
             res.push(['lora', '=====', loraRes.join('\n')].join('\n'))
           }
 
