@@ -159,4 +159,56 @@ export namespace StableDiffusionWebUI {
     name: string
     path: string
   }
+
+  export interface CivitaiModelInfo {
+    id: number;
+    modelId: number;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+    trainedWords: any[];
+    baseModel: string;
+    earlyAccessTimeFrame: number;
+    description: string;
+    stats: {
+      downloadCount: number;
+      ratingCount: number;
+      rating: number;
+    };
+    model: {
+      name: string;
+      type: string;
+      nsfw: boolean;
+      poi: boolean;
+    };
+    files: {
+      id: number;
+      url: string;
+      sizeKB: number;
+      name: string;
+      type: string;
+      metadata: {
+        fp: null;
+        size: null;
+        format: string;
+      };
+      pickleScanResult: string;
+      pickleScanMessage: string;
+      virusScanResult: string;
+      virusScanMessage: null;
+      scannedAt: string;
+      hashes: { [key: string]: string };
+      primary: boolean;
+      downloadUrl: string;
+    }[];
+    images: {
+      url: string;
+      nsfw: string;
+      width: number;
+      height: number;
+      hash: string;
+      meta: any | null;
+    }[];
+    downloadUrl: string;
+  }
 }

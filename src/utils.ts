@@ -6,6 +6,8 @@ import {
 import imageSize from 'image-size'
 import { ImageData, Subscription, StableDiffusionWebUI } from './types'
 import { Config } from './config'
+import fs from 'fs'
+import path from 'path'
 
 export function project(object: {}, mapping: {}) {
   const result = {}
@@ -218,4 +220,58 @@ export async function getEmbeddingsList(ctx: Context, config: Config)
 export async function getHypernetworksList(ctx: Context, config: Config)
   : Promise<StableDiffusionWebUI.HypernetworkListResponse> {
   return getSdInfo(ctx, config, '/sdapi/v1/hypernetworks')
+}
+
+async function filterFilesByFilenameNExts(dirname: string, filename: string, exts: string[])
+  : Promise<string> {
+  try {
+    if (!fs.existsSync(dirname)) {
+      console.error(`${dirname} doesn't exist`)
+      return null
+    }
+    const files = await fs.promises.readdir(dirname)
+    const filteredFiles = files.filter(file => {
+      const extension = file.split('.').pop().toLowerCase();
+      return file.startsWith(filename) && exts.some(ext => ext == extension)
+    });
+    return filteredFiles.length > 0 ? path.join(dirname, filteredFiles[0]) : null
+  }
+
+  catch (err) {
+    console.error(err)
+    return null
+  }
+}
+
+export async function loadModelPreviewImage(modelName: string, modelPath: string)
+  : Promise<{ img: Buffer, mime: string }> {
+  const dirname = path.dirname(modelPath)
+  const img = await filterFilesByFilenameNExts(dirname, modelName, ['png', 'jpg'])
+  if (!img) {
+    console.error(`Unable to load model ${modelName}'s preview image`)
+    return null
+  }
+  return {
+    img: fs.readFileSync(img),
+    mime: path.extname(img) === '.jpg' ? 'image/jpg' : 'image/png'
+  }
+}
+
+export async function readModelInfo(modelName: string, modelPath: string)
+  : Promise<StableDiffusionWebUI.CivitaiModelInfo> {
+  const dirname = path.dirname(modelPath)
+  const modelInfoFile = path.join(dirname, `${modelName}.civitai.info`)
+  if (!fs.existsSync(modelInfoFile)) {
+    console.error(`Unable to load model ${modelName} info`)
+    return null
+  }
+  try {
+    const infoContent = fs.readFileSync(modelInfoFile, { encoding: 'utf-8' })
+    const info = JSON.parse(infoContent)
+    return Object.keys(info).length > 0 ? info : null
+  }
+  catch (err) {
+    console.error(`Unable to load model ${modelName} info`)
+    return null
+  }
 }

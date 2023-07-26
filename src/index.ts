@@ -1,9 +1,10 @@
 import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
-import { closestMultiple, download, forceDataPrefix, getEmbeddingsList, getHypernetworksList, getImageSize, getLoraList, getCkptList, login, NetworkError, project, resizeInput, Size, getLycoList } from './utils'
+import { closestMultiple, download, forceDataPrefix, getEmbeddingsList, getHypernetworksList, getImageSize, getLoraList, getCkptList, login, NetworkError, project, resizeInput, Size, getLycoList, loadModelPreviewImage, readModelInfo } from './utils'
 import {} from '@koishijs/translator'
 import {} from '@koishijs/plugin-help'
+import { pathToFileURL } from 'url'
 
 export * from './config'
 
@@ -482,7 +483,7 @@ export function apply(ctx: Context, config: Config) {
       }
     })
 
-  const cmdLsEx = ctx.command('lsmd <name:text>')
+  const cmdLsEx = ctx.command('lsmd <modelName:text>')
     .shortcut('lsckpt', { i18n: true, fuzzy: true, options: { ckpt: true } })
     .shortcut('lslora', { i18n: true, fuzzy: true, options: { lora: true } })
     .shortcut('lsemb', { i18n: true, fuzzy: true, options: { embedding: true } })
@@ -497,6 +498,71 @@ export function apply(ctx: Context, config: Config) {
         options.lora = true
         options.embedding = true
         options.hypernetwork = true
+      } else {
+        let modelName = ''
+        let modelPath = ''
+        let res = []
+
+        if (options.ckpt) {
+          const ckptList = await getCkptList(ctx, config);
+          for (const ckpt of ckptList) {
+            if (ckpt.model_name === input) {
+              modelName = ckpt.model_name
+              modelPath = ckpt.filename
+              res = [
+                `模型：${ckpt.model_name}`,
+                `文件名：${ckpt.title}`,
+              ]
+            }
+          }
+        }
+        else if (options.lora) {
+          const lorasList = await getLoraList(ctx, config);
+          for (const lora of lorasList) {
+            if (lora.name.startsWith(input)) {
+              modelName = lora.name
+              modelPath = lora.path
+              res = [
+                `模型：${lora.name}`,
+                `触发词：${lora.alias}`
+              ]
+            }
+          }
+        }
+        else if (options.embedding) {
+          const embeddingsList = await getEmbeddingsList(ctx, config);
+          for (const embedding in embeddingsList.loaded) {
+            if (embedding.startsWith(input)) {
+              modelName = embedding
+            }
+          }
+        }
+        else if (options.hypernetwork) {
+          const hypernetworksList = await getHypernetworksList(ctx, config);
+          for (const hypernetwork of hypernetworksList) {
+            if (hypernetwork.name.startsWith(input)) {
+              modelName = hypernetwork.name
+              modelPath = hypernetwork.path
+              res = [`模型：${hypernetwork.name}`]
+            }
+          }
+        }
+
+        if (modelName && modelPath) {
+          const previewImg = await loadModelPreviewImage(modelName, modelPath)
+          const modelInfo = await readModelInfo(modelName, modelPath)
+
+          if (modelInfo) res.push(
+            `模型名：${modelInfo.model.name}`,
+            `描述：${modelInfo.description}`,
+            `Civitai地址：https://civitai.com/models/${modelInfo.modelId}`,
+          )
+
+          return previewImg && !modelInfo.model.nsfw
+            ? res.join('\n') + h.image(previewImg.img, previewImg.mime)
+            : res.join('\n')
+        }
+        return res.join('\n')
       }
 
       if (!input) {
