@@ -540,6 +540,7 @@ export function apply(ctx: Context, config: Config) {
           for (const embedding in embeddingsList.loaded) {
             if (++i === index || embedding.startsWith(input)) {
               modelName = embedding
+              res = [`模型：${embedding}`]
             }
           }
         }
