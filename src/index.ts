@@ -500,15 +500,19 @@ export function apply(ctx: Context, config: Config) {
         options.lora = true
         options.embedding = true
         options.hypernetwork = true
-      } else {
+      }
+      if (input) {
         let modelName = ''
         let modelPath = ''
         let res = []
+        let index = /^\d+$/.test(input) ? parseInt(input) : -1
+        let i = 0
 
         if (options.ckpt) {
           const ckptList = await getCkptList(ctx, config);
+
           for (const ckpt of ckptList) {
-            if (ckpt.model_name === input) {
+            if (++i === index || ckpt.model_name === input) {
               modelName = ckpt.model_name
               modelPath = ckpt.filename
               res = [
@@ -521,7 +525,7 @@ export function apply(ctx: Context, config: Config) {
         else if (options.lora) {
           const lorasList = await getLoraList(ctx, config);
           for (const lora of lorasList) {
-            if (lora.name.startsWith(input)) {
+            if (++i === index || lora.name.startsWith(input)) {
               modelName = lora.name
               modelPath = lora.path
               res = [
@@ -534,7 +538,7 @@ export function apply(ctx: Context, config: Config) {
         else if (options.embedding) {
           const embeddingsList = await getEmbeddingsList(ctx, config);
           for (const embedding in embeddingsList.loaded) {
-            if (embedding.startsWith(input)) {
+            if (++i === index || embedding.startsWith(input)) {
               modelName = embedding
             }
           }
@@ -542,7 +546,7 @@ export function apply(ctx: Context, config: Config) {
         else if (options.hypernetwork) {
           const hypernetworksList = await getHypernetworksList(ctx, config);
           for (const hypernetwork of hypernetworksList) {
-            if (hypernetwork.name.startsWith(input)) {
+            if (++i === index || hypernetwork.name.startsWith(input)) {
               modelName = hypernetwork.name
               modelPath = hypernetwork.path
               res = [`模型：${hypernetwork.name}`]
@@ -565,44 +569,46 @@ export function apply(ctx: Context, config: Config) {
             : res.join('\n')
         }
         return res.join('\n')
-      }
-
-      if (!input) {
+      } else {
         try {
           const res = []
 
           if (options.ckpt) {
             const ckptRes = []
+            let i = 0
             const ckptList = await getCkptList(ctx, config);
             for (const ckpt of ckptList) {
-              ckptRes.push(ckpt.model_name)
+              ckptRes.push([++i, ckpt.model_name].join('. '))
             }
             res.push(['ckpt', '=====', ckptRes.join('\n')].join('\n'))
           }
 
           if (options.lora) {
             const loraRes = []
+            let i = 0
             const lorasList = await getLoraList(ctx, config);
             for (const lora of lorasList) {
-              loraRes.push(lora.name)
+              loraRes.push([++i, lora.name].join('. '))
             }
             res.push(['lora', '=====', loraRes.join('\n')].join('\n'))
           }
 
           if (options.embedding) {
             const embeddingRes = []
+            let i = 0
             const embeddingsList = await getEmbeddingsList(ctx, config);
             for (const embedding in embeddingsList.loaded) {
-              embeddingRes.push(embedding)
+              embeddingRes.push([++i, embedding].join('. '))
             }
             res.push(['embedding', '=====', embeddingRes.join('\n')].join('\n'))
           }
 
           if (options.hypernetwork) {
             const hypernetworkRes = []
+            let i = 0
             const hypernetworksList = await getHypernetworksList(ctx, config);
             for (const hypernetwork of hypernetworksList) {
-              hypernetworkRes.push(hypernetwork.name)
+              hypernetworkRes.push([++i, hypernetwork.name].join('. '))
             }
             res.push(['hypernetwork', '=====', hypernetworkRes.join('\n')].join('\n'))
           }
