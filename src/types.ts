@@ -108,9 +108,9 @@ export namespace StableDiffusionWebUI {
     image: string
   }
 
-  export interface ModelListResponse extends Array<Model> { }
+  export interface ModelListResponse extends Array<Ckpt> { }
 
-  export interface Model {
+  export interface Ckpt {
     title: string;
     model_name: string;
     hash: null | string;
