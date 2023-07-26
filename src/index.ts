@@ -4,7 +4,6 @@ import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getEmbeddingsList, getHypernetworksList, getImageSize, getLoraList, getCkptList, login, NetworkError, project, resizeInput, Size, getLycoList, loadModelPreviewImage, readModelInfo } from './utils'
 import {} from '@koishijs/translator'
 import {} from '@koishijs/plugin-help'
-import { pathToFileURL } from 'url'
 
 export * from './config'
 
@@ -491,7 +490,7 @@ export function apply(ctx: Context, config: Config) {
     .option('ckpt', '-c', {})
     .option('lora', '-l', {})
     .option('embedding', '-e', { hidden: some(restricted, thirdParty, noImage) })
-    .option('hypernetwork', '-hn', {})
+    .option('hypernetwork', '-p', {})
     .action(async ({ session, options }, input) => {
       if (Object.keys(options).length === 0 && !input) {
         options.ckpt = true
