@@ -111,46 +111,46 @@ export namespace StableDiffusionWebUI {
   export interface ModelListResponse extends Array<Ckpt> { }
 
   export interface Ckpt {
-    title: string;
-    model_name: string;
-    hash: null | string;
-    sha256: null | string;
-    filename: string;
-    config: string;
+    title: string
+    model_name: string
+    hash: null | string
+    sha256: null | string
+    filename: string
+    config: string
   }
 
   export interface LoraListResponse extends Array<Lora> { }
 
   export interface Lora {
-    name: string;
-    alias: string;
-    path: string;
-    metadata: any | null;
+    name: string
+    alias: string
+    path: string
+    metadata: any | null
   }
 
   export interface LycoListResponse extends Array<Lyco> { }
 
   export interface Lyco {
-    name: string;
-    path: string;
-    metadata: any | null;
+    name: string
+    path: string
+    metadata: any | null
   }
 
   export interface EmbeddingsListResponse {
-    loaded: Embeddings;
-    skipped: Embeddings;
+    loaded: Embeddings
+    skipped: Embeddings
   }
 
   interface Embeddings {
-    [name: string]: Embedding;
+    [name: string]: Embedding
   }
 
   export interface Embedding {
-    step: number | null;
-    sd_checkpoint: null | string;
-    sd_checkpoint_name: null | string;
-    shape: number;
-    vectors: number;
+    step: number | null
+    sd_checkpoint: null | string
+    sd_checkpoint_name: null | string
+    shape: number
+    vectors: number
   }
 
   export interface HypernetworkListResponse extends Array<Hypernetwork> { }
@@ -161,54 +161,54 @@ export namespace StableDiffusionWebUI {
   }
 
   export interface CivitaiModelInfo {
-    id: number;
-    modelId: number;
-    name: string;
-    createdAt: string;
-    updatedAt: string;
-    trainedWords: any[];
-    baseModel: string;
-    earlyAccessTimeFrame: number;
-    description: string;
+    id: number
+    modelId: number
+    name: string
+    createdAt: string
+    updatedAt: string
+    trainedWords: any[]
+    baseModel: string
+    earlyAccessTimeFrame: number
+    description: string
     stats: {
-      downloadCount: number;
-      ratingCount: number;
-      rating: number;
-    };
+      downloadCount: number
+      ratingCount: number
+      rating: number
+    }
     model: {
-      name: string;
-      type: string;
-      nsfw: boolean;
-      poi: boolean;
-    };
+      name: string
+      type: string
+      nsfw: boolean
+      poi: boolean
+    }
     files: {
-      id: number;
-      url: string;
-      sizeKB: number;
-      name: string;
-      type: string;
+      id: number
+      url: string
+      sizeKB: number
+      name: string
+      type: string
       metadata: {
-        fp: null;
-        size: null;
-        format: string;
-      };
-      pickleScanResult: string;
-      pickleScanMessage: string;
-      virusScanResult: string;
-      virusScanMessage: null;
-      scannedAt: string;
-      hashes: { [key: string]: string };
-      primary: boolean;
-      downloadUrl: string;
-    }[];
+        fp: null
+        size: null
+        format: string
+      }
+      pickleScanResult: string
+      pickleScanMessage: string
+      virusScanResult: string
+      virusScanMessage: null
+      scannedAt: string
+      hashes: { [key: string]: string }
+      primary: boolean
+      downloadUrl: string
+    }[]
     images: {
-      url: string;
-      nsfw: string;
-      width: number;
-      height: number;
-      hash: string;
-      meta: any | null;
-    }[];
-    downloadUrl: string;
+      url: string
+      nsfw: string
+      width: number
+      height: number
+      hash: string
+      meta: any | null
+    }[]
+    downloadUrl: string
   }
 }

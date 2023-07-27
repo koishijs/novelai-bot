@@ -388,7 +388,7 @@ export function parseInput(session: Session, input: string, config: Config, over
     return [
       null,
       [session.resolve(config.basePrompt), session.resolve(config.defaultPrompt)].join(','),
-      session.resolve(config.negativePrompt)
+      session.resolve(config.negativePrompt),
     ]
   }
 
