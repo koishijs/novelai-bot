@@ -1,9 +1,12 @@
 import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
-import { closestMultiple, download, forceDataPrefix, getEmbeddingsList, getHypernetworksList, getImageSize, getLoraList, getCkptList, login, NetworkError, project, resizeInput, Size, getLycoList, loadModelPreviewImage, readModelInfo } from './utils'
-import {} from '@koishijs/translator'
-import {} from '@koishijs/plugin-help'
+import {
+  closestMultiple, download, forceDataPrefix, getCkptList, getEmbeddingsList, getHypernetworksList, getImageSize, getLoraList, loadModelPreviewImage,
+  login, NetworkError, project, readModelInfo, resizeInput, Size,
+} from './utils'
+import { } from '@koishijs/translator'
+import { } from '@koishijs/plugin-help'
 
 export * from './config'
 
@@ -114,13 +117,12 @@ export function apply(ctx: Context, config: Config) {
           input = ''
           options = options.resolution ? { resolution: options.resolution } : {}
         }
-      }
-      else if (
-        !config.defaultPromptSw &&
-        session.user.authority < session.resolve(config.authLv)
+      } else if (
+        !config.defaultPromptSw
+        && session.user.authority < session.resolve(config.authLv)
       ) return session.text('internal.low-auth')
 
-      const haveInput = input?.trim() ? true : false
+      const haveInput = !!input?.trim()
       if (!haveInput && !config.defaultPromptSw) return session.execute('help novelai')
 
       // Check if the user is allowed to use this command.
@@ -184,7 +186,7 @@ export function apply(ctx: Context, config: Config) {
       }
 
       const [errPath, prompt, uc] = parseInput(
-        session, input, config, options.override, config.defaultPromptSw
+        session, input, config, options.override, config.defaultPromptSw,
       )
       if (errPath) return session.text(errPath)
 
@@ -505,11 +507,11 @@ export function apply(ctx: Context, config: Config) {
         let modelName = ''
         let modelPath = ''
         let res = []
-        let index = /^\d+$/.test(input) ? parseInt(input) : -1
+        const index = /^\d+$/.test(input) ? parseInt(input) : -1
         let i = 0
 
         if (options.ckpt) {
-          const ckptList = await getCkptList(ctx, config);
+          const ckptList = await getCkptList(ctx, config)
 
           for (const ckpt of ckptList) {
             if (++i === index || ckpt.model_name === input) {
@@ -521,31 +523,28 @@ export function apply(ctx: Context, config: Config) {
               ]
             }
           }
-        }
-        else if (options.lora) {
-          const lorasList = await getLoraList(ctx, config);
+        } else if (options.lora) {
+          const lorasList = await getLoraList(ctx, config)
           for (const lora of lorasList) {
             if (++i === index || lora.name.startsWith(input)) {
               modelName = lora.name
               modelPath = lora.path
               res = [
                 `模型：${lora.name}`,
-                `触发词：${lora.alias}`
+                `触发词：${lora.alias}`,
               ]
             }
           }
-        }
-        else if (options.embedding) {
-          const embeddingsList = await getEmbeddingsList(ctx, config);
+        } else if (options.embedding) {
+          const embeddingsList = await getEmbeddingsList(ctx, config)
           for (const embedding in embeddingsList.loaded) {
             if (++i === index || embedding.startsWith(input)) {
               modelName = embedding
               res = [`模型：${embedding}`]
             }
           }
-        }
-        else if (options.hypernetwork) {
-          const hypernetworksList = await getHypernetworksList(ctx, config);
+        } else if (options.hypernetwork) {
+          const hypernetworksList = await getHypernetworksList(ctx, config)
           for (const hypernetwork of hypernetworksList) {
             if (++i === index || hypernetwork.name.startsWith(input)) {
               modelName = hypernetwork.name
@@ -559,11 +558,13 @@ export function apply(ctx: Context, config: Config) {
           const previewImg = await loadModelPreviewImage(modelName, modelPath)
           const modelInfo = await readModelInfo(modelName, modelPath)
 
-          if (modelInfo) res.push(
-            `模型名：${modelInfo.model.name}`,
-            `描述：${modelInfo.description}`,
-            `Civitai地址：https://civitai.com/models/${modelInfo.modelId}`,
-          )
+          if (modelInfo) {
+            res.push(
+              `模型名：${modelInfo.model.name}`,
+              `描述：${modelInfo.description}`,
+              `Civitai地址：https://civitai.com/models/${modelInfo.modelId}`,
+            )
+          }
 
           return previewImg && !modelInfo.model.nsfw
             ? res.join('\n') + h.image(previewImg.img, previewImg.mime)
@@ -577,7 +578,7 @@ export function apply(ctx: Context, config: Config) {
           if (options.ckpt) {
             const ckptRes = []
             let i = 0
-            const ckptList = await getCkptList(ctx, config);
+            const ckptList = await getCkptList(ctx, config)
             for (const ckpt of ckptList) {
               ckptRes.push([++i, ckpt.model_name].join('. '))
             }
@@ -587,7 +588,7 @@ export function apply(ctx: Context, config: Config) {
           if (options.lora) {
             const loraRes = []
             let i = 0
-            const lorasList = await getLoraList(ctx, config);
+            const lorasList = await getLoraList(ctx, config)
             for (const lora of lorasList) {
               loraRes.push([++i, lora.name].join('. '))
             }
@@ -597,7 +598,7 @@ export function apply(ctx: Context, config: Config) {
           if (options.embedding) {
             const embeddingRes = []
             let i = 0
-            const embeddingsList = await getEmbeddingsList(ctx, config);
+            const embeddingsList = await getEmbeddingsList(ctx, config)
             for (const embedding in embeddingsList.loaded) {
               embeddingRes.push([++i, embedding].join('. '))
             }
@@ -607,7 +608,7 @@ export function apply(ctx: Context, config: Config) {
           if (options.hypernetwork) {
             const hypernetworkRes = []
             let i = 0
-            const hypernetworksList = await getHypernetworksList(ctx, config);
+            const hypernetworksList = await getHypernetworksList(ctx, config)
             for (const hypernetwork of hypernetworksList) {
               hypernetworkRes.push([++i, hypernetwork.name].join('. '))
             }
@@ -615,8 +616,7 @@ export function apply(ctx: Context, config: Config) {
           }
 
           return res.join('\n=====\n\n')
-        }
-        catch (err) {
+        } catch (err) {
           logger.error(err)
           return session.text('.unknown-error')
         }
