@@ -67,3 +67,30 @@ commands:
       expect-image: Expect an image.
       download-error: Parsing image failed.
       unknown-error: An unknown error occurred.
+
+  lsmd:
+    description: List all loaded models.
+    usage: |-
+      List all ckpt, lora, lyco，embedding, hypernetwork models when use without options.
+      Use option to list specific type of models.
+      Use option with model name or model index to get model description.
+
+    options:
+      ckpt: List ckpt models
+      lora: List lora, lyco models
+      embedding: List embedding models
+      hypernetwork: list hypernetwork models
+
+    shortcuts:
+      lsckpt: lsckpt
+      lslora: lslora
+      lsemb: lsemb
+      lshn: lshn
+
+    messages:
+      model: model
+      model-name: model name
+      trigger-word: trigger word
+      description: description
+      civitai-addr: CivitAI address
+      filename: filename

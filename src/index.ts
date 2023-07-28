@@ -494,7 +494,7 @@ export function apply(ctx: Context, config: Config) {
     .shortcut('lshn', { i18n: true, fuzzy: true, options: { hypernetwork: true } })
     .option('ckpt', '-c', {})
     .option('lora', '-l', {})
-    .option('embedding', '-e', { hidden: some(restricted, thirdParty, noImage) })
+    .option('embedding', '-e', {})
     .option('hypernetwork', '-p', {})
     .action(async ({ session, options }, input) => {
       if (Object.keys(options).length === 0 && !input) {
@@ -518,8 +518,8 @@ export function apply(ctx: Context, config: Config) {
               modelName = ckpt.model_name
               modelPath = ckpt.filename
               res = [
-                `模型：${ckpt.model_name}`,
-                `文件名：${ckpt.title}`,
+                `${session.text('.model')}: ${ckpt.model_name}`,
+                `${session.text('.filename')}: ${ckpt.title}`,
               ]
             }
           }
@@ -530,8 +530,8 @@ export function apply(ctx: Context, config: Config) {
               modelName = lora.name
               modelPath = lora.path
               res = [
-                `模型：${lora.name}`,
-                `触发词：${lora.alias}`,
+                `${session.text('.model')}: ${lora.name}`,
+                `${session.text('.trigger-word')}: ${lora.alias}`,
               ]
             }
           }
@@ -540,7 +540,7 @@ export function apply(ctx: Context, config: Config) {
           for (const embedding in embeddingsList.loaded) {
             if (++i === index || embedding.startsWith(input)) {
               modelName = embedding
-              res = [`模型：${embedding}`]
+              res = [`${session.text('.model')}: ${embedding}`]
             }
           }
         } else if (options.hypernetwork) {
@@ -549,7 +549,7 @@ export function apply(ctx: Context, config: Config) {
             if (++i === index || hypernetwork.name.startsWith(input)) {
               modelName = hypernetwork.name
               modelPath = hypernetwork.path
-              res = [`模型：${hypernetwork.name}`]
+              res = [`${session.text('.model')}: ${hypernetwork.name}`]
             }
           }
         }
@@ -560,9 +560,9 @@ export function apply(ctx: Context, config: Config) {
 
           if (modelInfo) {
             res.push(
-              `模型名：${modelInfo.model.name}`,
-              `描述：${modelInfo.description}`,
-              `Civitai地址：https://civitai.com/models/${modelInfo.modelId}`,
+              `${session.text('.model-name')}: ${modelInfo.model.name}`,
+              `${session.text('.description')}: ${modelInfo.description}`,
+              `${session.text('.civitai-addr')}: https://civitai.com/models/${modelInfo.modelId}`,
             )
           }
 
@@ -592,7 +592,7 @@ export function apply(ctx: Context, config: Config) {
             for (const lora of lorasList) {
               loraRes.push([++i, lora.name].join('. '))
             }
-            res.push(['lora', '=====', loraRes.join('\n')].join('\n'))
+            res.push(['lora&lyco', '=====', loraRes.join('\n')].join('\n'))
           }
 
           if (options.embedding) {

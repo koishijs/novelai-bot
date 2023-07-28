@@ -83,3 +83,30 @@ commands:
       expect-image: 请输入图片。
       download-error: 图片解析失败。
       unknown-error: 发生未知错误。
+
+  lsmd:
+    description: 列出已加载的模型列表
+    usage: |-
+      直接使用会列出所有 ckpt, lora, lyco，embedding, hypernetwork 的模型列表。
+      使用选项可以分别列出对应的模型列表。
+      使用 选项+模型名/序号 时可以查看模型的详细信息。
+
+    options:
+      ckpt: 列出 ckpt 模型列表
+      lora: 列出 lora，lyco 模型列表
+      embedding: 列出 embedding 模型列表
+      hypernetwork: 列出 hypernetwork 模型列表
+
+    shortcuts:
+      lsckpt: 列出ckpt
+      lslora: 列出lora
+      lsemb: 列出emb
+      lshn: 列出hn
+
+    messages:
+      model: 模型
+      model-name: 模型名
+      trigger-word: 触发词
+      description: 描述
+      civitai-addr: CivitAI 地址
+      filename: 文件名
