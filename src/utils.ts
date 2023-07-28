@@ -243,7 +243,7 @@ export async function loadModelPreviewImage(modelName: string, modelPath: string
   }
   return {
     img: fs.readFileSync(img),
-    mime: path.extname(img) === '.jpg' ? 'image/jpg' : 'image/png',
+    mime: path.extname(img) === '.png' ? 'image/png' : 'image/jpeg',
   }
 }
 
