@@ -34,17 +34,13 @@ const MAX_CONTENT_SIZE = 10485760
 const ALLOWED_TYPES = ['image/jpeg', 'image/png']
 
 export async function download(ctx: Context, url: string, headers = {}): Promise<ImageData> {
-  if (url.startsWith('data:')) {
-    const [, type, base64] = url.match(/^data:(image\/\w+);base64,(.*)$/)
-    if (!ALLOWED_TYPES.includes(type)) {
+  if (url.startsWith('data:') || url.startsWith('file:')) {
+    const { mime, data } = await ctx.http.file(url)
+    if (!ALLOWED_TYPES.includes(mime)) {
       throw new NetworkError('.unsupported-file-type')
     }
-    const binary = atob(base64)
-    const result = new Uint8Array(binary.length)
-    for (let i = 0; i < binary.length; i++) {
-      result[i] = binary.charCodeAt(i)
-    }
-    return { buffer: result, base64, dataUrl: url }
+    const base64 = arrayBufferToBase64(data)
+    return { buffer: data, base64, dataUrl: `data:${mime};base64,${base64}` }
   } else {
     const head = await ctx.http.head(url, { headers })
     if (+head['content-length'] > MAX_CONTENT_SIZE) {
