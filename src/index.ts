@@ -29,11 +29,11 @@ function handleError(session: Session, err: Error) {
 }
 
 export function apply(ctx: Context, config: Config) {
-  ctx.i18n.define('zh', require('./locales/zh-CN'))
+  ctx.i18n.define('zh-CN', require('./locales/zh-CN'))
   ctx.i18n.define('zh-TW', require('./locales/zh-TW'))
-  ctx.i18n.define('en', require('./locales/en-US'))
-  ctx.i18n.define('fr', require('./locales/fr-FR'))
-  ctx.i18n.define('ja', require('./locales/ja-JP'))
+  ctx.i18n.define('en-US', require('./locales/en-US'))
+  ctx.i18n.define('fr-FR', require('./locales/fr-FR'))
+  ctx.i18n.define('ja-JP', require('./locales/ja-JP'))
 
   const tasks: Dict<Set<string>> = Object.create(null)
   const globalTasks = new Set<string>()
