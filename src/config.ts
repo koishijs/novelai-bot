@@ -149,6 +149,7 @@ export interface PromptConfig {
   latinOnly?: Computed<boolean>
   translator?: boolean
   maxWords?: Computed<number>
+  lowercase?: boolean
 }
 
 export const PromptConfig: Schema<PromptConfig> = Schema.object({
@@ -164,6 +165,7 @@ export const PromptConfig: Schema<PromptConfig> = Schema.object({
   translator: Schema.boolean().description('是否启用自动翻译。').default(true),
   latinOnly: Schema.computed(Schema.boolean(), options).description('是否只接受英文输入。').default(false),
   maxWords: Schema.computed(Schema.natural(), options).description('允许的最大单词数量。').default(0),
+  lowercase: Schema.boolean().description('是否将输入的标签转换为小写。').default(true),
 }).description('输入设置')
 
 interface FeatureConfig {
@@ -418,11 +420,13 @@ export function parseInput(session: Session, input: string, config: Config, over
 
   const negative = []
   const placement = session.resolve(config.placement)
+  const lowercase = session.resolve(config.lowercase)
   const appendToList = (words: string[], input = '') => {
     const tags = input.split(/,\s*/g)
     if (placement === 'before') tags.reverse()
     for (let tag of tags) {
-      tag = tag.trim()  // .toLowerCase()
+      tag = tag.trim()
+      if (lowercase) tag = tag.toLowerCase()
       if (!tag || words.includes(tag)) continue
       if (placement === 'before') {
         words.unshift(tag)
