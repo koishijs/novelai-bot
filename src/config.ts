@@ -425,7 +425,7 @@ export function parseInput(session: Session, input: string, config: Config, over
     if (placement === 'before') tags.reverse()
     for (let tag of tags) {
       tag = tag.trim()
-      if (config.lowercase) tag = tag.toLowerCase()
+      if (config.lowerCase) tag = tag.toLowerCase()
       if (!tag || words.includes(tag)) continue
       if (placement === 'before') {
         words.unshift(tag)
