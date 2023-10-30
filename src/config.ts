@@ -148,7 +148,7 @@ export interface PromptConfig {
   placement?: Computed<'before' | 'after'>
   latinOnly?: Computed<boolean>
   translator?: boolean
-  lowercase?: boolean
+  lowerCase?: boolean
   maxWords?: Computed<number>
 }
 
