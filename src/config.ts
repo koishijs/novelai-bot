@@ -164,7 +164,7 @@ export const PromptConfig: Schema<PromptConfig> = Schema.object({
   ]), options).description('默认附加标签的位置。').default('after'),
   translator: Schema.boolean().description('是否启用自动翻译。').default(true),
   latinOnly: Schema.computed(Schema.boolean(), options).description('是否只接受英文输入。').default(false),
-  lowercase: Schema.boolean().description('是否将输入的标签转换为小写。').default(true),
+  lowerCase: Schema.boolean().description('是否将输入的标签转换为小写。').default(true),
   maxWords: Schema.computed(Schema.natural(), options).description('允许的最大单词数量。').default(0),
 }).description('输入设置')
 
