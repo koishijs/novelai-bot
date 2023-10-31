@@ -28,6 +28,10 @@ function handleError(session: Session, err: Error) {
   return session.text('.unknown-error')
 }
 
+export const inject = {
+  optional: ['translator'],
+}
+
 export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh-CN', require('./locales/zh-CN'))
   ctx.i18n.define('zh-TW', require('./locales/zh-TW'))
@@ -85,7 +89,8 @@ export function apply(ctx: Context, config: Config) {
   }
 
   const cmd = ctx.command('novelai <prompts:text>')
-    .alias('nai', 'imagine')
+    .alias('nai')
+    .alias('imagine')
     .userFields(['authority'])
     .shortcut('imagine', { i18n: true, fuzzy: true })
     .shortcut('enhance', { i18n: true, fuzzy: true, options: { enhance: true } })
@@ -114,13 +119,12 @@ export function apply(ctx: Context, config: Config) {
           input = ''
           options = options.resolution ? { resolution: options.resolution } : {}
         }
-      }
-      else if (
-        !config.defaultPromptSw &&
-        session.user.authority < session.resolve(config.authLv)
+      } else if (
+        !config.defaultPromptSw
+        && session.user.authority < session.resolve(config.authLv)
       ) return session.text('internal.low-auth')
 
-      const haveInput = input?.trim() ? true : false
+      const haveInput = !!input?.trim()
       if (!haveInput && !config.defaultPromptSw) return session.execute('help novelai')
 
       // Check if the user is allowed to use this command.
@@ -184,7 +188,7 @@ export function apply(ctx: Context, config: Config) {
       }
 
       const [errPath, prompt, uc] = parseInput(
-        session, input, config, options.override, config.defaultPromptSw
+        session, input, config, options.override, config.defaultPromptSw,
       )
       if (errPath) return session.text(errPath)
 

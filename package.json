@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-novelai",
   "description": "Generate images by diffusion models",
-  "version": "1.18.4",
+  "version": "1.19.1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -63,22 +63,22 @@
     "generate"
   ],
   "peerDependencies": {
-    "koishi": "^4.15.0"
+    "koishi": "^4.15.3"
   },
   "devDependencies": {
-    "@koishijs/plugin-help": "^2.3.2",
+    "@koishijs/plugin-help": "^2.3.3",
     "@koishijs/translator": "^1.1.1",
     "@koishijs/vitepress": "^3.0.1",
-    "@types/libsodium-wrappers-sumo": "^0.7.5",
-    "@types/node": "^20.4.2",
+    "@types/libsodium-wrappers-sumo": "^0.7.7",
+    "@types/node": "^20.8.9",
     "atsc": "^1.2.2",
-    "koishi": "^4.15.0",
-    "sass": "^1.63.6",
-    "typescript": "^5.1.6",
+    "koishi": "^4.15.3",
+    "sass": "^1.69.5",
+    "typescript": "^5.2.2",
     "vitepress": "1.0.0-rc.4"
   },
   "dependencies": {
     "image-size": "^1.0.2",
-    "libsodium-wrappers-sumo": "^0.7.11"
+    "libsodium-wrappers-sumo": "^0.7.13"
   }
 }
