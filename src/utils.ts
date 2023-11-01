@@ -1,10 +1,13 @@
-import { arrayBufferToBase64, Context, Dict, pick, Quester } from 'koishi'
+import { arrayBufferToBase64, Context, Dict, pick, Quester, trimSlash } from 'koishi'
 import {
   crypto_generichash, crypto_pwhash,
   crypto_pwhash_ALG_ARGON2ID13, crypto_pwhash_SALTBYTES, ready,
 } from 'libsodium-wrappers-sumo'
 import imageSize from 'image-size'
-import { ImageData, Subscription } from './types'
+import { ImageData, StableDiffusionWebUI, Subscription } from './types'
+import { Config } from './config'
+import fs from 'fs'
+import path from 'path'
 
 export function project(object: {}, mapping: {}) {
   const result = {}
@@ -177,4 +180,82 @@ export function forceDataPrefix(url: string, mime = 'image/png') {
   // https://github.com/koishijs/novelai-bot/issues/90
   if (url.startsWith('data:')) return url
   return `data:${mime};base64,` + url
+}
+
+async function getSdInfo(ctx: Context, config: Config, path: string): Promise<any> {
+  return ctx.http.axios(trimSlash(config.endpoint) + path, {
+    method: 'GET',
+    timeout: config.requestTimeout,
+    headers: {
+      ...config.headers,
+    },
+  }).then(res => res.data)
+}
+
+export async function getCkptList(ctx: Context, config: Config): Promise<StableDiffusionWebUI.ModelListResponse> {
+  return getSdInfo(ctx, config, '/sdapi/v1/sd-models')
+}
+
+export async function getLoraList(ctx: Context, config: Config): Promise<StableDiffusionWebUI.LoraListResponse> {
+  return getSdInfo(ctx, config, '/sdapi/v1/loras')
+}
+
+export async function getLycoList(ctx: Context, config: Config): Promise<StableDiffusionWebUI.LycoListResponse> {
+  return getSdInfo(ctx, config, '/sdapi/v1/lycos')
+}
+
+export async function getEmbeddingsList(ctx: Context, config: Config): Promise<StableDiffusionWebUI.EmbeddingsListResponse> {
+  return getSdInfo(ctx, config, '/sdapi/v1/embeddings')
+}
+
+export async function getHypernetworksList(ctx: Context, config: Config): Promise<StableDiffusionWebUI.HypernetworkListResponse> {
+  return getSdInfo(ctx, config, '/sdapi/v1/hypernetworks')
+}
+
+async function filterFilesByFilenameNExts(dirname: string, filename: string, exts: string[]): Promise<string> {
+  try {
+    if (!fs.existsSync(dirname)) {
+      console.error(`${dirname} doesn't exist`)
+      return null
+    }
+    const files = await fs.promises.readdir(dirname)
+    const filteredFiles = files.filter(file => {
+      const extension = file.split('.').pop().toLowerCase()
+      return file.startsWith(filename) && exts.some(ext => ext === extension)
+    })
+    return filteredFiles.length > 0 ? path.join(dirname, filteredFiles[0]) : null
+  } catch (err) {
+    console.error(err)
+    return null
+  }
+}
+
+export async function loadModelPreviewImage(modelName: string, modelPath: string): Promise<{ img: Buffer; mime: string }> {
+  const dirname = path.dirname(modelPath)
+  const img = await filterFilesByFilenameNExts(dirname, modelName, ['png', 'jpg'])
+  if (!img) {
+    console.error(`Unable to load model ${modelName}'s preview image`)
+    return null
+  }
+  return {
+    img: fs.readFileSync(img),
+    mime: path.extname(img) === '.png' ? 'image/png' : 'image/jpeg',
+  }
+}
+
+export async function readModelInfo(modelName: string, modelPath: string): Promise<StableDiffusionWebUI.CivitaiModelInfo> {
+  const dirname = path.dirname(modelPath)
+  const modelInfoFile = path.join(dirname, `${modelName}.civitai.info`)
+  if (!fs.existsSync(modelInfoFile)) {
+    console.error(`Unable to load model ${modelName} info`)
+    return null
+  }
+  try {
+    const infoContent = fs.readFileSync(modelInfoFile, { encoding: 'utf-8' })
+    const info = JSON.parse(infoContent)
+    return Object.keys(info).length > 0 ? info : null
+  } catch (err) {
+    console.error(`Unable to load model ${modelName} info`)
+    return null
+  }
 }

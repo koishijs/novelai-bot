@@ -1,9 +1,12 @@
 import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
-import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
-import {} from '@koishijs/translator'
-import {} from '@koishijs/plugin-help'
+import {
+  closestMultiple, download, forceDataPrefix, getCkptList, getEmbeddingsList, getHypernetworksList, getImageSize, getLoraList, loadModelPreviewImage,
+  login, NetworkError, project, readModelInfo, resizeInput, Size,
+} from './utils'
+import { } from '@koishijs/translator'
+import { } from '@koishijs/plugin-help'
 
 export * from './config'
 
@@ -485,6 +488,142 @@ export function apply(ctx: Context, config: Config) {
         } catch (err) {
           container.forEach(cleanUp)
           throw err
+        }
+      }
+    })
+
+  const cmdLsEx = ctx.command('lsmd <modelName:text>')
+    .shortcut('lsckpt', { i18n: true, fuzzy: true, options: { ckpt: true } })
+    .shortcut('lslora', { i18n: true, fuzzy: true, options: { lora: true } })
+    .shortcut('lsemb', { i18n: true, fuzzy: true, options: { embedding: true } })
+    .shortcut('lshn', { i18n: true, fuzzy: true, options: { hypernetwork: true } })
+    .option('ckpt', '-c', {})
+    .option('lora', '-l', {})
+    .option('embedding', '-e', {})
+    .option('hypernetwork', '-p', {})
+    .action(async ({ session, options }, input) => {
+      if (Object.keys(options).length === 0 && !input) {
+        options.ckpt = true
+        options.lora = true
+        options.embedding = true
+        options.hypernetwork = true
+      }
+      if (input) {
+        let modelName = ''
+        let modelPath = ''
+        let res = []
+        const index = /^\d+$/.test(input) ? parseInt(input) : -1
+        let i = 0
+
+        if (options.ckpt) {
+          const ckptList = await getCkptList(ctx, config)
+
+          for (const ckpt of ckptList) {
+            if (++i === index || ckpt.model_name === input) {
+              modelName = ckpt.model_name
+              modelPath = ckpt.filename
+              res = [
+                `${session.text('.model')}: ${ckpt.model_name}`,
+                `${session.text('.filename')}: ${ckpt.title}`,
+              ]
+            }
+          }
+        } else if (options.lora) {
+          const lorasList = await getLoraList(ctx, config)
+          for (const lora of lorasList) {
+            if (++i === index || lora.name.startsWith(input)) {
+              modelName = lora.name
+              modelPath = lora.path
+              res = [
+                `${session.text('.model')}: ${lora.name}`,
+                `${session.text('.trigger-word')}: ${lora.alias}`,
+              ]
+            }
+          }
+        } else if (options.embedding) {
+          const embeddingsList = await getEmbeddingsList(ctx, config)
+          for (const embedding in embeddingsList.loaded) {
+            if (++i === index || embedding.startsWith(input)) {
+              modelName = embedding
+              res = [`${session.text('.model')}: ${embedding}`]
+            }
+          }
+        } else if (options.hypernetwork) {
+          const hypernetworksList = await getHypernetworksList(ctx, config)
+          for (const hypernetwork of hypernetworksList) {
+            if (++i === index || hypernetwork.name.startsWith(input)) {
+              modelName = hypernetwork.name
+              modelPath = hypernetwork.path
+              res = [`${session.text('.model')}: ${hypernetwork.name}`]
+            }
+          }
+        }
+
+        if (modelName && modelPath) {
+          const previewImg = await loadModelPreviewImage(modelName, modelPath)
+          const modelInfo = await readModelInfo(modelName, modelPath)
+
+          if (modelInfo) {
+            res.push(
+              `${session.text('.model-name')}: ${modelInfo.model.name}`,
+              `${session.text('.description')}: ${modelInfo.description}`,
+              `${session.text('.civitai-addr')}: https://civitai.com/models/${modelInfo.modelId}`,
+            )
+          }
+
+          return previewImg && !modelInfo.model.nsfw
+            ? res.join('\n') + h.image(previewImg.img, previewImg.mime)
+            : res.join('\n')
+        }
+        return res.join('\n')
+      } else {
+        try {
+          const res = []
+
+          if (options.ckpt) {
+            const ckptRes = []
+            let i = 0
+            const ckptList = await getCkptList(ctx, config)
+            for (const ckpt of ckptList) {
+              ckptRes.push([++i, ckpt.model_name].join('. '))
+            }
+            res.push(['ckpt', '=====', ckptRes.join('\n')].join('\n'))
+          }
+
+          if (options.lora) {
+            const loraRes = []
+            let i = 0
+            const lorasList = await getLoraList(ctx, config)
+            for (const lora of lorasList) {
+              loraRes.push([++i, lora.name].join('. '))
+            }
+            res.push(['lora&lyco', '=====', loraRes.join('\n')].join('\n'))
+          }
+
+          if (options.embedding) {
+            const embeddingRes = []
+            let i = 0
+            const embeddingsList = await getEmbeddingsList(ctx, config)
+            for (const embedding in embeddingsList.loaded) {
+              embeddingRes.push([++i, embedding].join('. '))
+            }
+            res.push(['embedding', '=====', embeddingRes.join('\n')].join('\n'))
+          }
+
+          if (options.hypernetwork) {
+            const hypernetworkRes = []
+            let i = 0
+            const hypernetworksList = await getHypernetworksList(ctx, config)
+            for (const hypernetwork of hypernetworksList) {
+              hypernetworkRes.push([++i, hypernetwork.name].join('. '))
+            }
+            res.push(['hypernetwork', '=====', hypernetworkRes.join('\n')].join('\n'))
+          }
+
+          return res.join('\n=====\n\n')
+        } catch (err) {
+          logger.error(err)
+          return session.text('.unknown-error')
         }
       }
     })
