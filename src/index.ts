@@ -399,17 +399,6 @@ export function apply(ctx: Context, config: Config) {
             data: getPayload(),
           })
 
-          if (res.headers['content-type'] === 'application/x-zip-compressed') {
-            const buffer = Buffer.from(res.data, 'binary');  // Ensure 'binary' encoding
-            const zip = new AdmZip(buffer);
-
-            // Gets all files in the ZIP file
-            const zipEntries = zip.getEntries();
-            const firstImageBuffer = zip.readFile(zipEntries[0]);
-            const b64 = Buffer.from(firstImageBuffer).toString('base64')
-            return forceDataPrefix(b64, "image/png")
-          }
-
           if (config.type === 'sd-webui') {
             finalPrompt = (JSON.parse((res.data as StableDiffusionWebUI.Response).info)).prompt
             return forceDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
@@ -436,6 +425,18 @@ export function apply(ctx: Context, config: Config) {
           // event: newImage
           // id: 1
           // data:
+
+          if (res.headers['content-type'] === 'application/x-zip-compressed') {
+            const buffer = Buffer.from(res.data, 'binary');  // Ensure 'binary' encoding
+            const zip = new AdmZip(buffer);
+
+            // Gets all files in the ZIP file
+            const zipEntries = zip.getEntries();
+            const firstImageBuffer = zip.readFile(zipEntries[0]);
+            const b64 = Buffer.from(firstImageBuffer).toString('base64')
+            return forceDataPrefix(b64, "image/png")
+          }
+          
           return forceDataPrefix(res.data?.slice(27))
         }
 
