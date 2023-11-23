@@ -69,6 +69,7 @@
     "@koishijs/plugin-help": "^2.3.3",
     "@koishijs/translator": "^1.1.1",
     "@koishijs/vitepress": "^3.0.1",
+    "@types/adm-zip": "^0.5.5",
     "@types/libsodium-wrappers-sumo": "^0.7.7",
     "@types/node": "^20.8.9",
     "atsc": "^1.2.2",
@@ -78,6 +79,7 @@
     "vitepress": "1.0.0-rc.4"
   },
   "dependencies": {
+    "adm-zip": "^0.5.10",
     "image-size": "^1.0.2",
     "libsodium-wrappers-sumo": "^0.7.13"
   }
