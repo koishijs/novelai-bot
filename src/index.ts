@@ -312,9 +312,8 @@ export function apply(ctx: Context, config: Config) {
             parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
             if (config.type === 'naifu') return parameters
             // The latest interface changes uc to negative_prompt, so that needs to be changed here as well
-            if (config.type === 'naifu') return parameters
-            parameters.uc = parameters.negative_prompt
-            delete parameters.negative_prompt
+            parameters.negative_prompt = parameters.uc
+            delete parameters.uc
             return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
           }
           case 'sd-webui': {
