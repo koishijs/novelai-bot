@@ -310,10 +310,11 @@ export function apply(ctx: Context, config: Config) {
           case 'naifu': {
             parameters.sampler = sampler.sd2nai(options.sampler)
             parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
+            if (config.type === 'naifu') return parameters
             // The latest interface changes uc to negative_prompt, so that needs to be changed here as well
             if (config.type === 'naifu') return parameters
-            parameters.negative_prompt = parameters.uc
-            delete parameters.uc
+            parameters.uc = parameters.negative_prompt
+            delete parameters.negative_prompt
             return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
           }
           case 'sd-webui': {
