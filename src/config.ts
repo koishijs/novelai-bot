@@ -407,10 +407,9 @@ export function parseInput(session: Session, input: string, config: Config, over
       .split('\\{').map(s => s.replace(/\{/g, '(')).join('\\{')
       .split('\\}').map(s => s.replace(/\}/g, ')')).join('\\}')
   } else {
-    // emmmmm doesn't know why substituting curly brackets makes the picture ugly, so it's temporarily commented
-    // input = input
-    //   .split('\\(').map(s => s.replace(/\(/g, '{')).join('\\(')
-    //   .split('\\)').map(s => s.replace(/\)/g, '}')).join('\\)')
+    input = input
+      .split('\\(').map(s => s.replace(/\(/g, '{')).join('\\(')
+      .split('\\)').map(s => s.replace(/\)/g, '}')).join('\\)')
   }
 
   input = input
