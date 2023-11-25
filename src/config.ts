@@ -9,6 +9,7 @@ export const modelMap = {
   safe: 'safe-diffusion',
   nai: 'nai-diffusion',
   furry: 'nai-diffusion-furry',
+  'nai-v3': 'nai-diffusion-3',
 } as const
 
 export const orientMap = {
@@ -20,9 +21,10 @@ export const orientMap = {
 export const hordeModels = require('../data/horde-models.json') as string[]
 
 const ucPreset = [
-  'nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers',
-  'extra digit, fewer digits, cropped, worst quality, low quality',
-  'normal quality, jpeg artifacts, signature, watermark, username, blurry',
+  // Replace with the prompt words that come with novelai
+  'nsfw, lowres, {bad}, error, fewer, extra, missing, worst quality',
+  'jpeg artifacts, bad quality, watermark, unfinished, displeasing',
+  'chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]',
 ].join(', ')
 
 type Model = keyof typeof modelMap

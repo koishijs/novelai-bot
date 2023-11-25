@@ -4,6 +4,7 @@ import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
 import {} from '@koishijs/translator'
 import {} from '@koishijs/plugin-help'
+import AdmZip from 'adm-zip'
 
 export * from './config'
 
@@ -310,6 +311,9 @@ export function apply(ctx: Context, config: Config) {
             parameters.sampler = sampler.sd2nai(options.sampler)
             parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
             if (config.type === 'naifu') return parameters
+            // The latest interface changes uc to negative_prompt, so that needs to be changed here as well
+            parameters.negative_prompt = parameters.uc
+            delete parameters.uc
             return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
           }
           case 'sd-webui': {
@@ -379,6 +383,8 @@ export function apply(ctx: Context, config: Config) {
           const res = await ctx.http.axios(trimSlash(config.endpoint) + path, {
             method: 'POST',
             timeout: config.requestTimeout,
+            // Since novelai's latest interface returns an application/x-zip-compressed, a responseType must be passed in
+            responseType: ['login', 'token'].includes(config.type) ? 'arraybuffer' : 'json',
             headers: {
               ...config.headers,
               ...getHeaders(),
@@ -412,6 +418,18 @@ export function apply(ctx: Context, config: Config) {
           // event: newImage
           // id: 1
           // data:
+
+          if (res.headers['content-type'] === 'application/x-zip-compressed') {
+            const buffer = Buffer.from(res.data, 'binary')  // Ensure 'binary' encoding
+            const zip = new AdmZip(buffer)
+
+            // Gets all files in the ZIP file
+            const zipEntries = zip.getEntries()
+            const firstImageBuffer = zip.readFile(zipEntries[0])
+            const b64 = Buffer.from(firstImageBuffer).toString('base64')
+            return forceDataPrefix(b64, 'image/png')
+          }
+          
           return forceDataPrefix(res.data?.slice(27))
         }
 
