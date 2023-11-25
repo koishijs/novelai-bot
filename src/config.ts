@@ -24,7 +24,7 @@ const ucPreset = [
   // Replace with the prompt words that come with novelai
   'nsfw, lowres, {bad}, error, fewer, extra, missing, worst quality',
   'jpeg artifacts, bad quality, watermark, unfinished, displeasing',
-  'chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]'
+  'chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]',
 ].join(', ')
 
 type Model = keyof typeof modelMap

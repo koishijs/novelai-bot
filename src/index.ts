@@ -420,14 +420,14 @@ export function apply(ctx: Context, config: Config) {
           // data:
 
           if (res.headers['content-type'] === 'application/x-zip-compressed') {
-            const buffer = Buffer.from(res.data, 'binary');  // Ensure 'binary' encoding
-            const zip = new AdmZip(buffer);
+            const buffer = Buffer.from(res.data, 'binary')  // Ensure 'binary' encoding
+            const zip = new AdmZip(buffer)
 
             // Gets all files in the ZIP file
-            const zipEntries = zip.getEntries();
-            const firstImageBuffer = zip.readFile(zipEntries[0]);
+            const zipEntries = zip.getEntries()
+            const firstImageBuffer = zip.readFile(zipEntries[0])
             const b64 = Buffer.from(firstImageBuffer).toString('base64')
-            return forceDataPrefix(b64, "image/png")
+            return forceDataPrefix(b64, 'image/png')
           }
           
           return forceDataPrefix(res.data?.slice(27))
