@@ -395,7 +395,9 @@ export function apply(ctx: Context, config: Config) {
           if (config.type === 'sd-webui') {
             try {
               finalPrompt = (JSON.parse((res.data as StableDiffusionWebUI.Response).info)).prompt
-            } catch { }
+            } catch (err) {
+              logger.warn(err)
+            }
             return forceDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
           }
           if (config.type === 'stable-horde') {
