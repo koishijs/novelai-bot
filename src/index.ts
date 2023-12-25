@@ -396,7 +396,8 @@ export function apply(ctx: Context, config: Config) {
             try {
               finalPrompt = (JSON.parse((res.data as StableDiffusionWebUI.Response).info)).prompt
             } catch (err) {
-              logger.warn(err)
+              const output = session.resolve(options.output ?? config.output)
+              if (output !== 'minimal') logger.warn(err)
             }
             return forceDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
           }
