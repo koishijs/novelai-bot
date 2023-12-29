@@ -42,6 +42,15 @@ export namespace sampler {
     'plms': 'PLMS',
   }
 
+  export const nai3 = {
+    'k_euler': 'Euler',
+    'k_euler_a': 'Euler ancestral',
+    'k_dpmpp_2s_ancestral': 'DPM++ 2S ancestral',
+    'k_dpmpp_2m': 'DPM++ 2M',
+    'k_dpmpp_sde': 'DPM++ SDE',
+    'ddim_v3': 'DDIM V3',
+  }
+
   // samplers in stable-diffusion-webui
   // https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/master/modules/sd_samplers_compvis.py#L12
   // https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/master/modules/sd_samplers_kdiffusion.py#L12
@@ -103,8 +112,9 @@ export namespace sampler {
     })).loose().description('默认的采样器。').default('k_euler_a')
   }
 
-  export function sd2nai(sampler: string): string {
+  export function sd2nai(sampler: string, model: string): string {
     if (sampler === 'k_euler_a') return 'k_euler_ancestral'
+    if (model === 'nai-v3' && sampler in nai3) return sampler
     if (sampler in nai) return sampler
     return 'k_euler_ancestral'
   }

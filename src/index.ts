@@ -308,7 +308,7 @@ export function apply(ctx: Context, config: Config) {
           case 'login':
           case 'token':
           case 'naifu': {
-            parameters.sampler = sampler.sd2nai(options.sampler)
+            parameters.sampler = sampler.sd2nai(options.sampler, model)
             parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
             if (config.type === 'naifu') return parameters
             // The latest interface changes uc to negative_prompt, so that needs to be changed here as well
@@ -429,7 +429,7 @@ export function apply(ctx: Context, config: Config) {
             const b64 = Buffer.from(firstImageBuffer).toString('base64')
             return forceDataPrefix(b64, 'image/png')
           }
-          
+
           return forceDataPrefix(res.data?.slice(27))
         }
 
@@ -515,7 +515,7 @@ export function apply(ctx: Context, config: Config) {
         case 'stable-horde':
           return sampler.horde
         default:
-          return sampler.nai
+          return { ...sampler.nai, ...sampler.nai3 }
       }
     }
 
