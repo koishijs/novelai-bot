@@ -393,8 +393,17 @@ export function apply(ctx: Context, config: Config) {
           })
 
           if (config.type === 'sd-webui') {
-            finalPrompt = (JSON.parse((res.data as StableDiffusionWebUI.Response).info)).prompt
-            return forceDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
+            const data = res.data as StableDiffusionWebUI.Response
+            if (data?.info?.prompt) {
+              finalPrompt = data.info.prompt
+            } else {
+              try {
+                finalPrompt = (JSON.parse(data.info)).prompt
+              } catch (err) {
+                logger.warn(err)
+              }
+            }
+            return forceDataPrefix(data.images[0])
           }
           if (config.type === 'stable-horde') {
             const uuid = res.data.id
