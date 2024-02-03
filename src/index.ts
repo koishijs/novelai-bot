@@ -400,8 +400,7 @@ export function apply(ctx: Context, config: Config) {
               try {
                 finalPrompt = (JSON.parse(data.info)).prompt
               } catch (err) {
-                const output = session.resolve(options.output ?? config.output)
-                if (output !== 'minimal') logger.warn(err)
+                logger.warn(err)
               }
             }
             return forceDataPrefix(data.images[0])
