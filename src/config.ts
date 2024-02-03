@@ -387,7 +387,7 @@ export function parseForbidden(input: string) {
 
 const backslash = /@@__BACKSLASH__@@/g
 
-export function parseInput(session: Session, input: string, config: Config, override: boolean, addDefault: boolean): string[] {
+export function parseInput(session: Session, input: string, config: Config, override: boolean): string[] {
   if (!input) {
     return [
       null,
@@ -401,6 +401,8 @@ export function parseInput(session: Session, input: string, config: Config, over
     .replace(/，/g, ',')
     .replace(/（/g, '(')
     .replace(/）/g, ')')
+    .replace(/《/g, '<')
+    .replace(/》/g, '>')
 
   if (config.type === 'sd-webui') {
     input = input
@@ -470,7 +472,7 @@ export function parseInput(session: Session, input: string, config: Config, over
   if (!override) {
     appendToList(positive, session.resolve(config.basePrompt))
     appendToList(negative, session.resolve(config.negativePrompt))
-    if (addDefault) appendToList(positive, session.resolve(config.defaultPrompt))
+    if (config.defaultPromptSw) appendToList(positive, session.resolve(config.defaultPrompt))
   }
 
   return [null, positive.join(', '), negative.join(', ')]
