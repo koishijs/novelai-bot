@@ -1,9 +1,9 @@
 import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
-import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers } from './config'
+import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers, scheduler } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
-import {} from '@koishijs/translator'
-import {} from '@koishijs/plugin-help'
+import { } from '@koishijs/translator'
+import { } from '@koishijs/plugin-help'
 import AdmZip from 'adm-zip'
 
 export * from './config'
@@ -107,6 +107,9 @@ export function apply(ctx: Context, config: Config) {
     .option('noise', '-n <noise:number>', { hidden: some(restricted, thirdParty) })
     .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('hiresFix', '-H', { hidden: () => config.type !== 'sd-webui' })
+    .option('smea', '-S', { hidden: () => config.model !== 'nai-v3' })
+    .option('smeaDyn', '-d', { hidden: () => config.model !== 'nai-v3' })
+    .option('scheduler', '-C <scheduler> ', { hidden: () => config.model !== 'nai-v3', type: scheduler })
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
     .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
@@ -312,6 +315,19 @@ export function apply(ctx: Context, config: Config) {
             // The latest interface changes uc to negative_prompt, so that needs to be changed here as well
             parameters.negative_prompt = parameters.uc
             delete parameters.uc
+            if (model === 'nai-diffusion-3') {
+              parameters.sm = options.smea ?? config.smea
+              parameters.sm_dyn = options.smeaDyn ?? config.dyn
+              parameters.noise_schedule = options.scheduler ?? config.scheduler
+              if (parameters.sampler === 'ddim_v3') {
+                parameters.sm = false
+                parameters.sm_dyn = false
+                delete parameters.noise_schedule
+              }
+              if (parameters.sampler === 'k_dpmpp_2m' && !options.scheduler) {
+                parameters.noise_schedule = 'exponential'
+              }
+            }
             return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
           }
           case 'sd-webui': {
