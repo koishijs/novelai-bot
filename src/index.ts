@@ -188,9 +188,7 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
-      const [errPath, prompt, uc] = parseInput(
-        session, input, config, options.override, config.defaultPromptSw,
-      )
+      const [errPath, prompt, uc] = parseInput(session, input, config, options.override)
       if (errPath) return session.text(errPath)
 
       let token: string
@@ -393,8 +391,17 @@ export function apply(ctx: Context, config: Config) {
           })
 
           if (config.type === 'sd-webui') {
-            finalPrompt = (JSON.parse((res.data as StableDiffusionWebUI.Response).info)).prompt
-            return forceDataPrefix((res.data as StableDiffusionWebUI.Response).images[0])
+            const data = res.data as StableDiffusionWebUI.Response
+            if (data?.info?.prompt) {
+              finalPrompt = data.info.prompt
+            } else {
+              try {
+                finalPrompt = (JSON.parse(data.info)).prompt
+              } catch (err) {
+                logger.warn(err)
+              }
+            }
+            return forceDataPrefix(data.images[0])
           }
           if (config.type === 'stable-horde') {
             const uuid = res.data.id
@@ -477,9 +484,9 @@ export function apply(ctx: Context, config: Config) {
             }
           }
           result.children.push(h('message', attrs, lines.join('\n')))
-          result.children.push(h('message', attrs, `prompt = ${finalPrompt}`))
+          result.children.push(h('message', attrs, `prompt = ${h.escape(finalPrompt)}`))
           if (output === 'verbose') {
-            result.children.push(h('message', attrs, `undesired = ${uc}`))
+            result.children.push(h('message', attrs, `undesired = ${h.escape(uc)}`))
           }
           result.children.push(h('message', attrs, h.image(dataUrl)))
           return result
