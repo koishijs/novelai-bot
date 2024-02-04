@@ -335,10 +335,18 @@ export const Config = Schema.intersect([
       type: Schema.const('naifu').required(),
       sampler: sampler.createSchema(sampler.nai),
     }),
-    Schema.object({
-      sampler: sampler.createSchema(sampler.nai),
-      model: Schema.union(models).loose().description('默认的生成模型。').default('nai'),
-    }),
+    Schema.intersect([
+      Schema.object({
+        model: Schema.union(models).loose().description('默认的生成模型。').default('nai'),
+      }),
+      Schema.union([
+        Schema.object({
+          model: Schema.const('nai-v3').required(),
+          sampler: sampler.createSchema(sampler.nai3),
+        }),
+        Schema.object({ sampler: sampler.createSchema(sampler.nai) }),
+      ])
+    ]),
   ] as const),
 
   Schema.object({
