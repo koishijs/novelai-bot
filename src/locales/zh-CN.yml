@@ -26,6 +26,9 @@ commands:
       noTranslator: 禁用自动翻译
       iterations: 设置绘制次数
       batch: 设置绘制批次大小
+      smea: 启用 SMEA
+      smeaDyn: 启用 DYN
+      scheduler: 设置调度器
 
     messages:
       exceed-max-iteration: 超过最大绘制次数。
