@@ -318,6 +318,7 @@ export function apply(ctx: Context, config: Config) {
             if (model === 'nai-diffusion-3') {
               parameters.sm = options.smea ?? config.smea
               parameters.sm_dyn = options.smeaDyn ?? config.dyn
+              if (parameters.sm_dyn) parameters.sm = true
               parameters.noise_schedule = options.scheduler ?? config.scheduler
               if (parameters.sampler === 'ddim_v3') {
                 parameters.sm = false
