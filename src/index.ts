@@ -314,11 +314,11 @@ export function apply(ctx: Context, config: Config) {
             parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
             if (config.type === 'naifu') return parameters
             // The latest interface changes uc to negative_prompt, so that needs to be changed here as well
-            if (parameters.uc){
+            if (parameters.uc) {
               parameters.negative_prompt = parameters.uc
               delete parameters.uc
             }
-            parameters.decrisper = options.decrisper ?? config.decrisper
+            parameters.dynamic_thresholding = options.decrisper ?? config.decrisper
             if (model === 'nai-diffusion-3') {
               parameters.sm_dyn = options.smeaDyn ?? config.smeaDyn
               parameters.sm = (options.smea ?? config.smea) || parameters.sm_dyn
@@ -399,8 +399,6 @@ export function apply(ctx: Context, config: Config) {
       let finalPrompt = prompt
       const iterate = async () => {
         const request = async () => {
-          const data = getPayload()
-          logger.info('request', data)
           const res = await ctx.http.axios(trimSlash(config.endpoint) + path, {
             method: 'POST',
             timeout: config.requestTimeout,
@@ -410,7 +408,7 @@ export function apply(ctx: Context, config: Config) {
               ...config.headers,
               ...getHeaders(),
             },
-            data: data,
+            data: getPayload(),
           })
 
           if (config.type === 'sd-webui') {
