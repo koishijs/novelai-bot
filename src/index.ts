@@ -110,6 +110,7 @@ export function apply(ctx: Context, config: Config) {
     .option('smea', '-S', { hidden: () => config.model !== 'nai-v3' })
     .option('smeaDyn', '-d', { hidden: () => config.model !== 'nai-v3' })
     .option('scheduler', '-C <scheduler> ', { hidden: () => config.model !== 'nai-v3', type: scheduler })
+    .option('decrisper', '-D', { hidden: thirdParty })
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
     .option('iterations', '-i <iterations:posint>', { fallback: 1, hidden: () => config.maxIterations <= 1 })
@@ -313,19 +314,23 @@ export function apply(ctx: Context, config: Config) {
             parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
             if (config.type === 'naifu') return parameters
             // The latest interface changes uc to negative_prompt, so that needs to be changed here as well
-            parameters.negative_prompt = parameters.uc
-            delete parameters.uc
+            if (parameters.uc){
+              parameters.negative_prompt = parameters.uc
+              delete parameters.uc
+            }
+            parameters.decrisper = options.decrisper ?? config.decrisper
             if (model === 'nai-diffusion-3') {
-              parameters.sm_dyn = options.smeaDyn ?? config.dyn
+              parameters.sm_dyn = options.smeaDyn ?? config.smeaDyn
               parameters.sm = (options.smea ?? config.smea) || parameters.sm_dyn
               parameters.noise_schedule = options.scheduler ?? config.scheduler
+              if (['k_euler_ancestral', 'k_dpmpp_2s_ancestral'].includes(parameters.sampler)
+                && parameters.noise_schedule === 'karras') {
+                parameters.noise_schedule = 'native'
+              }
               if (parameters.sampler === 'ddim_v3') {
                 parameters.sm = false
                 parameters.sm_dyn = false
                 delete parameters.noise_schedule
-              }
-              if (parameters.sampler === 'k_dpmpp_2m' && !options.scheduler) {
-                parameters.noise_schedule = 'exponential'
               }
             }
             return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
@@ -394,6 +399,8 @@ export function apply(ctx: Context, config: Config) {
       let finalPrompt = prompt
       const iterate = async () => {
         const request = async () => {
+          const data = getPayload()
+          logger.info('request', data)
           const res = await ctx.http.axios(trimSlash(config.endpoint) + path, {
             method: 'POST',
             timeout: config.requestTimeout,
@@ -403,7 +410,7 @@ export function apply(ctx: Context, config: Config) {
               ...config.headers,
               ...getHeaders(),
             },
-            data: getPayload(),
+            data: data,
           })
 
           if (config.type === 'sd-webui') {

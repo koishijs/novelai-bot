@@ -32,7 +32,7 @@ type Orient = keyof typeof orientMap
 
 export const models = Object.keys(modelMap) as Model[]
 export const orients = Object.keys(orientMap) as Orient[]
-export const scheduler = ['native', 'karras', 'experimental', 'polyexperimental'] as const
+export const scheduler = ['native', 'karras', 'exponential', 'polyexponential'] as const
 
 export namespace sampler {
   export const nai = {
@@ -205,8 +205,9 @@ interface ParamConfig {
   model?: Model
   sampler?: string
   smea?: boolean
-  dyn?: boolean
+  smeaDyn?: boolean
   scheduler?: string
+  decrisper?: boolean
   upscaler?: string
   restoreFaces?: boolean
   hiresFix?: boolean
@@ -347,12 +348,13 @@ export const Config = Schema.intersect([
         Schema.object({
           model: Schema.const('nai-v3').required(),
           sampler: sampler.createSchema(sampler.nai3),
-          smea: Schema.boolean().description('是否启用 SMEA。'),
-          dyn: Schema.boolean().description('是否启用 SMEA 采样器的 DYN 变体。'),
+          smea: Schema.boolean().description('默认启用 SMEA。'),
+          smeaDyn: Schema.boolean().description('默认启用 SMEA 采样器的 DYN 变体。'),
           scheduler: Schema.union(scheduler).description('默认的调度器。').default('native'),
         }),
         Schema.object({ sampler: sampler.createSchema(sampler.nai) }),
-      ])
+      ]),
+      Schema.object({ decrisper: Schema.boolean().description('默认启用 decrisper') }),
     ]),
   ] as const),
 
