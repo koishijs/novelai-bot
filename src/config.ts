@@ -115,7 +115,7 @@ export namespace sampler {
   export function sd2nai(sampler: string, model: string): string {
     if (sampler === 'k_euler_a') return 'k_euler_ancestral'
     if (model === 'nai-v3' && sampler in nai3) return sampler
-    if (sampler in nai) return sampler
+    else if (sampler in nai) return sampler
     return 'k_euler_ancestral'
   }
 }
