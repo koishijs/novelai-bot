@@ -32,6 +32,7 @@ type Orient = keyof typeof orientMap
 
 export const models = Object.keys(modelMap) as Model[]
 export const orients = Object.keys(orientMap) as Orient[]
+export const scheduler = ['native', 'karras', 'exponential', 'polyexponential'] as const
 
 export namespace sampler {
   export const nai = {
@@ -40,6 +41,15 @@ export namespace sampler {
     'k_lms': 'LMS',
     'ddim': 'DDIM',
     'plms': 'PLMS',
+  }
+
+  export const nai3 = {
+    'k_euler': 'Euler',
+    'k_euler_a': 'Euler ancestral',
+    'k_dpmpp_2s_ancestral': 'DPM++ 2S ancestral',
+    'k_dpmpp_2m': 'DPM++ 2M',
+    'k_dpmpp_sde': 'DPM++ SDE',
+    'ddim_v3': 'DDIM V3',
   }
 
   // samplers in stable-diffusion-webui
@@ -103,9 +113,10 @@ export namespace sampler {
     })).loose().description('默认的采样器。').default('k_euler_a')
   }
 
-  export function sd2nai(sampler: string): string {
+  export function sd2nai(sampler: string, model: string): string {
     if (sampler === 'k_euler_a') return 'k_euler_ancestral'
-    if (sampler in nai) return sampler
+    if (model === 'nai-v3' && sampler in nai3) return sampler
+    else if (sampler in nai) return sampler
     return 'k_euler_ancestral'
   }
 }
@@ -193,6 +204,10 @@ const features = Schema.object({
 interface ParamConfig {
   model?: Model
   sampler?: string
+  smea?: boolean
+  smeaDyn?: boolean
+  scheduler?: string
+  decrisper?: boolean
   upscaler?: string
   restoreFaces?: boolean
   hiresFix?: boolean
@@ -325,10 +340,22 @@ export const Config = Schema.intersect([
       type: Schema.const('naifu').required(),
       sampler: sampler.createSchema(sampler.nai),
     }),
-    Schema.object({
-      sampler: sampler.createSchema(sampler.nai),
-      model: Schema.union(models).loose().description('默认的生成模型。').default('nai'),
-    }),
+    Schema.intersect([
+      Schema.object({
+        model: Schema.union(models).loose().description('默认的生成模型。').default('nai'),
+      }),
+      Schema.union([
+        Schema.object({
+          model: Schema.const('nai-v3').required(),
+          sampler: sampler.createSchema(sampler.nai3),
+          smea: Schema.boolean().description('默认启用 SMEA。'),
+          smeaDyn: Schema.boolean().description('默认启用 SMEA 采样器的 DYN 变体。'),
+          scheduler: Schema.union(scheduler).description('默认的调度器。').default('native'),
+        }),
+        Schema.object({ sampler: sampler.createSchema(sampler.nai) }),
+      ]),
+      Schema.object({ decrisper: Schema.boolean().description('默认启用 decrisper') }),
+    ]),
   ] as const),
 
   Schema.object({
