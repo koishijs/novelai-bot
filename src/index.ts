@@ -1,4 +1,4 @@
-import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
+import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, sleep, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers, scheduler } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
@@ -285,6 +285,12 @@ export function apply(ctx: Context, config: Config) {
       session.send(globalTasks.size
         ? session.text('.pending', [globalTasks.size])
         : session.text('.waiting'))
+      
+      if (config.globalConcurrency) {
+        while (globalTasks.size >= config.globalConcurrency) {
+          await sleep(100)
+        }
+      }
 
       container.forEach((id) => globalTasks.add(id))
       const cleanUp = (id: string) => {
@@ -428,7 +434,6 @@ export function apply(ctx: Context, config: Config) {
             const uuid = res.data.id
 
             const check = () => ctx.http.get(trimSlash(config.endpoint) + '/api/v2/generate/check/' + uuid).then((res) => res.done)
-            const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
             while (await check() === false) {
               await sleep(config.pollInterval)
             }
