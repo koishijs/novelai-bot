@@ -92,6 +92,8 @@ export namespace sampler {
     k_dpmpp_2m: 'DPM++ 2M',
     k_dpmpp_2s_a: 'DPM++ 2S a',
     k_dpmpp_sde: 'DPM++ SDE',
+    dpmsolver: 'DPM solver',
+    lcm: 'LCM',
     DDIM: 'DDIM',
     k_lms_ka: 'LMS Karras',
     k_heun_ka: 'Heun Karras',
@@ -104,6 +106,8 @@ export namespace sampler {
     k_dpmpp_2m_ka: 'DPM++ 2M Karras',
     k_dpmpp_2s_a_ka: 'DPM++ 2S a Karras',
     k_dpmpp_sde_ka: 'DPM++ SDE Karras',
+    dpmsolver_ka: 'DPM++ solver Karras',
+    lcm_ka: 'LCM Karras',
     DDIM_ka: 'DDIM Karras',
   }
 
