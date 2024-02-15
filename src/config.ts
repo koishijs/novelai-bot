@@ -80,6 +80,9 @@ export namespace sampler {
     'unipc': 'UniPC',
   }
 
+  // samplers in AI horde
+  // https://stablehorde.net/api/
+  // (under Models - ModelGenerationInputStable - sampler_name)
   export const horde = {
     k_lms: 'LMS',
     k_heun: 'Heun',
@@ -93,18 +96,6 @@ export namespace sampler {
     k_dpmpp_2s_a: 'DPM++ 2S a',
     k_dpmpp_sde: 'DPM++ SDE',
     DDIM: 'DDIM',
-    k_lms_ka: 'LMS Karras',
-    k_heun_ka: 'Heun Karras',
-    k_euler_ka: 'Euler Karras',
-    k_euler_a_ka: 'Euler a Karras',
-    k_dpm_2_ka: 'DPM2 Karras',
-    k_dpm_2_a_ka: 'DPM2 a Karras',
-    k_dpm_fast_ka: 'DPM fast Karras',
-    k_dpm_adaptive_ka: 'DPM adaptive Karras',
-    k_dpmpp_2m_ka: 'DPM++ 2M Karras',
-    k_dpmpp_2s_a_ka: 'DPM++ 2S a Karras',
-    k_dpmpp_sde_ka: 'DPM++ SDE Karras',
-    DDIM_ka: 'DDIM Karras',
   }
 
   export function createSchema(map: Dict<string>) {

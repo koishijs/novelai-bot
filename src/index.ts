@@ -110,6 +110,7 @@ export function apply(ctx: Context, config: Config) {
     .option('smea', '-S', { hidden: () => config.model !== 'nai-v3' })
     .option('smeaDyn', '-d', { hidden: () => config.model !== 'nai-v3' })
     .option('scheduler', '-C <scheduler> ', { hidden: () => config.model !== 'nai-v3', type: scheduler })
+    .option('karras', '-K', { hidden: useBackend('stable-horde') })
     .option('decrisper', '-D', { hidden: thirdParty })
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
@@ -359,14 +360,14 @@ export function apply(ctx: Context, config: Config) {
             return {
               prompt: parameters.prompt,
               params: {
-                sampler_name: options.sampler.replace('_ka', ''),
+                sampler_name: options.sampler,
                 cfg_scale: parameters.scale,
                 denoising_strength: parameters.strength,
                 seed: parameters.seed.toString(),
                 height: parameters.height,
                 width: parameters.width,
                 post_processing: [],
-                karras: options.sampler.includes('_ka'),
+                karras: options.karras,
                 hires_fix: options.hiresFix ?? config.hiresFix ?? false,
                 steps: parameters.steps,
                 n: parameters.n_samples,
