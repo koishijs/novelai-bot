@@ -81,6 +81,8 @@ export namespace sampler {
     'k_dpmpp_2m_sde_ka': 'DPM++ 2M SDE Karras',
     'k_dpmpp_2m_sde_heun_ka': 'DPM++ 2M SDE Heun Karras',
     'k_dpmpp_3m_sde_ka': 'DPM++ 3M SDE Karras',
+    'restart': 'Restart',
+    'restart_ka': 'Restart Karras',
     'ddim': 'DDIM',
     'plms': 'PLMS',
     'unipc': 'UniPC',
