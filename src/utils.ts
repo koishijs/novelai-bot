@@ -34,6 +34,9 @@ const MAX_CONTENT_SIZE = 10485760
 const ALLOWED_TYPES = ['image/jpeg', 'image/png']
 
 export async function download(ctx: Context, url: string, headers = {}): Promise<ImageData> {
+  if (!url) {
+    throw new NetworkError('.invalid-url')
+  }
   if (url.startsWith('data:') || url.startsWith('file:')) {
     const { mime, data } = await ctx.http.file(url)
     if (!ALLOWED_TYPES.includes(mime)) {
@@ -173,6 +176,9 @@ export function resizeInput(size: Size): Size {
 }
 
 export function forceDataPrefix(url: string, mime = 'image/png') {
+  if (!url) {
+    throw new NetworkError('.invalid-url')
+  }
   // workaround for different gradio versions
   // https://github.com/koishijs/novelai-bot/issues/90
   if (url.startsWith('data:')) return url
