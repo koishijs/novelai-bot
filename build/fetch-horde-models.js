@@ -17,5 +17,5 @@ const DATA_JSON_PATH = path.join(__dirname, '..', 'data', 'horde-models.json')
   const models = db.map((model) => model.name)
 
   const json = JSON.stringify(models, null, 2)
-  await fsp.writeFile(DATA_JSON_PATH, json)
+  await fsp.writeFile(DATA_JSON_PATH, json + '\n')
 })()
