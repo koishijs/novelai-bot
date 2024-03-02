@@ -441,13 +441,13 @@ export function apply(ctx: Context, config: Config) {
             }
             const imgRes = await ctx.http.axios(imgUrl, { responseType: 'arraybuffer' })
             const b64 = Buffer.from(imgRes.data).toString('base64')
-            return forceDataPrefix(b64, imgRes.headers['content-type'])
+            return forceDataPrefix(b64, imgRes.headers.get('content-type'))
           }
           // event: newImage
           // id: 1
           // data:
 
-          if (res.headers['content-type'] === 'application/x-zip-compressed') {
+          if (res.headers.get('content-type') === 'application/x-zip-compressed') {
             const buffer = Buffer.from(res.data, 'binary')  // Ensure 'binary' encoding
             const zip = new AdmZip(buffer)
 
