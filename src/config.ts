@@ -146,7 +146,7 @@ export interface PromptConfig {
 }
 
 export const PromptConfig: Schema<PromptConfig> = Schema.object({
-  basePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的标签。').default('masterpiece, best quality'),
+  basePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的标签。').default('best quality, amazing quality, very aesthetic, absurdres'),
   negativePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的反向标签。').default(ucPreset),
   forbidden: Schema.computed(Schema.string().role('textarea'), options).description('违禁词列表。请求中的违禁词将会被自动删除。').default(''),
   defaultPromptSw: Schema.boolean().description('是否启用默认标签。').default(false),
