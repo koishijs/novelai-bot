@@ -310,7 +310,7 @@ export function apply(ctx: Context, config: Config) {
           case 'login':
           case 'token':
           case 'naifu': {
-            parameters.params_version = 1;
+            parameters.params_version = 1
             parameters.sampler = sampler.sd2nai(options.sampler, model)
             parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
             if (config.type === 'naifu') return parameters
