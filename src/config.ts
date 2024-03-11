@@ -13,9 +13,9 @@ export const modelMap = {
 } as const
 
 export const orientMap = {
-  landscape: { height: 512, width: 768 },
-  portrait: { height: 768, width: 512 },
-  square: { height: 640, width: 640 },
+  landscape: { height: 832, width: 1216 },
+  portrait: { height: 1216, width: 832 },
+  square: { height: 1024, width: 1024 },
 } as const
 
 export const hordeModels = require('../data/horde-models.json') as string[]
@@ -90,7 +90,7 @@ export namespace sampler {
   export function createSchema(map: Dict<string>) {
     return Schema.union(Object.entries(map).map(([key, value]) => {
       return Schema.const(key).description(value)
-    })).loose().description('默认的采样器。').default('k_euler_a')
+    })).loose().description('默认的采样器。').default('k_euler')
   }
 
   export function sd2nai(sampler: string, model: string): string {
@@ -146,7 +146,7 @@ export interface PromptConfig {
 }
 
 export const PromptConfig: Schema<PromptConfig> = Schema.object({
-  basePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的标签。').default('masterpiece, best quality'),
+  basePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的标签。').default('best quality, amazing quality, very aesthetic, absurdres'),
   negativePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的反向标签。').default(ucPreset),
   forbidden: Schema.computed(Schema.string().role('textarea'), options).description('违禁词列表。请求中的违禁词将会被自动删除。').default(''),
   defaultPromptSw: Schema.boolean().description('是否启用默认标签。').default(false),
@@ -322,7 +322,7 @@ export const Config = Schema.intersect([
     }),
     Schema.intersect([
       Schema.object({
-        model: Schema.union(models).loose().description('默认的生成模型。').default('nai'),
+        model: Schema.union(models).loose().description('默认的生成模型。').default('nai-v3'),
       }),
       Schema.union([
         Schema.object({
@@ -339,21 +339,21 @@ export const Config = Schema.intersect([
   ] as const),
 
   Schema.object({
-    scale: Schema.computed(Schema.number(), options).description('默认对输入的服从度。').default(11),
+    scale: Schema.computed(Schema.number(), options).description('默认对输入的服从度。').default(5),
     textSteps: Schema.computed(Schema.natural(), options).description('文本生图时默认的迭代步数。').default(28),
     imageSteps: Schema.computed(Schema.natural(), options).description('以图生图时默认的迭代步数。').default(50),
     maxSteps: Schema.computed(Schema.natural(), options).description('允许的最大迭代步数。').default(64),
     strength: Schema.computed(Schema.number(), options).min(0).max(1).description('默认的重绘强度。').default(0.7),
     resolution: Schema.computed(Schema.union([
-      Schema.const('portrait').description('肖像 (768x512)'),
-      Schema.const('landscape').description('风景 (512x768)'),
-      Schema.const('square').description('方形 (640x640)'),
+      Schema.const('portrait').description('肖像 (832x2326)'),
+      Schema.const('landscape').description('风景 (1216x832)'),
+      Schema.const('square').description('方形 (1024x1024)'),
       Schema.object({
-        width: Schema.natural().description('图片宽度。').default(640),
-        height: Schema.natural().description('图片高度。').default(640),
+        width: Schema.natural().description('图片宽度。').default(1024),
+        height: Schema.natural().description('图片高度。').default(1024),
       }).description('自定义'),
     ]), options).description('默认生成的图片尺寸。').default('portrait'),
-    maxResolution: Schema.computed(Schema.natural(), options).description('允许生成的宽高最大值。').default(1024),
+    maxResolution: Schema.computed(Schema.natural(), options).description('允许生成的宽高最大值。').default(1920),
   }),
 
   PromptConfig,

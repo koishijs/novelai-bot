@@ -310,6 +310,7 @@ export function apply(ctx: Context, config: Config) {
           case 'login':
           case 'token':
           case 'naifu': {
+            parameters.params_version = 1
             parameters.sampler = sampler.sd2nai(options.sampler, model)
             parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
             if (config.type === 'naifu') return parameters
@@ -320,6 +321,8 @@ export function apply(ctx: Context, config: Config) {
             }
             parameters.dynamic_thresholding = options.decrisper ?? config.decrisper
             if (model === 'nai-diffusion-3') {
+              parameters.legacy = false
+              parameters.legacy_v3_extend = false
               parameters.sm_dyn = options.smeaDyn ?? config.smeaDyn
               parameters.sm = (options.smea ?? config.smea) || parameters.sm_dyn
               parameters.noise_schedule = options.scheduler ?? config.scheduler
@@ -331,6 +334,12 @@ export function apply(ctx: Context, config: Config) {
                 parameters.sm = false
                 parameters.sm_dyn = false
                 delete parameters.noise_schedule
+              }
+              // Max scale for nai-v3 is 10, but not 20.
+              // If the given value is greater than 10,
+              // we can assume it is configured with an older version (max 20)
+              if (parameters.scale > 10) {
+                parameters.scale = parameters.scale / 2
               }
             }
             return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
@@ -446,8 +455,8 @@ export function apply(ctx: Context, config: Config) {
           // event: newImage
           // id: 1
           // data:
-
-          if (res.headers.get('content-type') === 'application/x-zip-compressed') {
+          //                                                                        ↓ nai-v3
+          if (res.headers.get('content-type') === 'application/x-zip-compressed' || res.headers.get('content-disposition')?.includes('.zip')) {
             const buffer = Buffer.from(res.data, 'binary')  // Ensure 'binary' encoding
             const zip = new AdmZip(buffer)
 
