@@ -91,7 +91,7 @@ export class NetworkError extends Error {
   }
 
   static catch = (mapping: Dict<string>) => (e: any) => {
-    if (Quester.isAxiosError(e)) {
+    if (Quester.Error.is(e)) {
       const code = e.response?.status
       for (const key in mapping) {
         if (code === +key) {

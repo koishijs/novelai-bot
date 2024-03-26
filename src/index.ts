@@ -14,7 +14,7 @@ export const name = 'novelai'
 const logger = new Logger('novelai')
 
 function handleError(session: Session, err: Error) {
-  if (Quester.isAxiosError(err)) {
+  if (Quester.Error.is(err)) {
     if (err.response?.status === 402) {
       return session.text('.unauthorized')
     } else if (err.response?.status) {
@@ -408,7 +408,7 @@ export function apply(ctx: Context, config: Config) {
       let finalPrompt = prompt
       const iterate = async () => {
         const request = async () => {
-          const res = await ctx.http.axios(trimSlash(config.endpoint) + path, {
+          const res = await ctx.http(trimSlash(config.endpoint) + path, {
             method: 'POST',
             timeout: config.requestTimeout,
             // Since novelai's latest interface returns an application/x-zip-compressed, a responseType must be passed in
@@ -448,7 +448,7 @@ export function apply(ctx: Context, config: Config) {
               // in case some client doesn't support r2 upload and follow the ye olde way.
               return forceDataPrefix(result.generations[0].img, 'image/webp')
             }
-            const imgRes = await ctx.http.axios(imgUrl, { responseType: 'arraybuffer' })
+            const imgRes = await ctx.http(imgUrl, { responseType: 'arraybuffer' })
             const b64 = Buffer.from(imgRes.data).toString('base64')
             return forceDataPrefix(b64, imgRes.headers.get('content-type'))
           }
@@ -476,7 +476,7 @@ export function apply(ctx: Context, config: Config) {
             dataUrl = await request()
             break
           } catch (err) {
-            if (Quester.isAxiosError(err)) {
+            if (Quester.Error.is(err)) {
               if (err.code && err.code !== 'ETIMEDOUT' && ++count < config.maxRetryCount) {
                 continue
               }
@@ -609,7 +609,7 @@ export function apply(ctx: Context, config: Config) {
       }
 
       try {
-        const { data } = await ctx.http.axios<StableDiffusionWebUI.ExtraSingleImageResponse>(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
+        const { data } = await ctx.http<StableDiffusionWebUI.ExtraSingleImageResponse>(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
           method: 'POST',
           timeout: config.requestTimeout,
           headers: {
