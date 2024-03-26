@@ -63,7 +63,7 @@
     "generate"
   ],
   "peerDependencies": {
-    "koishi": "^4.17.0-alpha.0"
+    "koishi": "^4.17.3"
   },
   "devDependencies": {
     "@cordisjs/vitepress": "^3.2.6",
@@ -73,7 +73,7 @@
     "@types/libsodium-wrappers-sumo": "^0.7.8",
     "@types/node": "^20.11.19",
     "atsc": "^1.2.2",
-    "koishi": "^4.17.0",
+    "koishi": "^4.17.3",
     "sass": "^1.71.0",
     "typescript": "^5.3.3",
     "vitepress": "1.0.0-rc.40"
