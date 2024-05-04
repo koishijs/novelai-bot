@@ -32,7 +32,11 @@ type Orient = keyof typeof orientMap
 
 export const models = Object.keys(modelMap) as Model[]
 export const orients = Object.keys(orientMap) as Orient[]
-export const scheduler = ['native', 'karras', 'exponential', 'polyexponential'] as const
+export namespace scheduler {
+  export const nai = ['native', 'karras', 'exponential', 'polyexponential'] as const
+  export const sd = ['Automatic', 'Uniform', 'Karras', 'Exponential', 'Polyexponential', 'SGM Uniform'] as const
+  export const horde = ['karras'] as const
+}
 
 export namespace sampler {
   export const nai = {
@@ -71,20 +75,6 @@ export namespace sampler {
     dpmsolver: 'DPM solver',
     lcm: 'LCM',
     DDIM: 'DDIM',
-    k_lms_ka: 'LMS Karras',
-    k_heun_ka: 'Heun Karras',
-    k_euler_ka: 'Euler Karras',
-    k_euler_a_ka: 'Euler a Karras',
-    k_dpm_2_ka: 'DPM2 Karras',
-    k_dpm_2_a_ka: 'DPM2 a Karras',
-    k_dpm_fast_ka: 'DPM fast Karras',
-    k_dpm_adaptive_ka: 'DPM adaptive Karras',
-    k_dpmpp_2m_ka: 'DPM++ 2M Karras',
-    k_dpmpp_2s_a_ka: 'DPM++ 2S a Karras',
-    k_dpmpp_sde_ka: 'DPM++ SDE Karras',
-    dpmsolver_ka: 'DPM++ solver Karras',
-    lcm_ka: 'LCM Karras',
-    DDIM_ka: 'DDIM Karras',
   }
 
   export function createSchema(map: Dict<string>) {
@@ -310,11 +300,13 @@ export const Config = Schema.intersect([
       upscaler: Schema.union(upscalers).description('默认的放大算法。').default('Lanczos'),
       restoreFaces: Schema.boolean().description('是否启用人脸修复。').default(false),
       hiresFix: Schema.boolean().description('是否启用高分辨率修复。').default(false),
+      scheduler: Schema.union(scheduler.sd).description('默认的调度器。').default('Automatic'),
     }),
     Schema.object({
       type: Schema.const('stable-horde').required(),
       sampler: sampler.createSchema(sampler.horde),
       model: Schema.union(hordeModels).loose().description('默认的生成模型。'),
+      scheduler: Schema.union(scheduler.horde).description('默认的调度器。').default('karras'),
     }),
     Schema.object({
       type: Schema.const('naifu').required(),
@@ -330,7 +322,7 @@ export const Config = Schema.intersect([
           sampler: sampler.createSchema(sampler.nai3),
           smea: Schema.boolean().description('默认启用 SMEA。'),
           smeaDyn: Schema.boolean().description('默认启用 SMEA 采样器的 DYN 变体。'),
-          scheduler: Schema.union(scheduler).description('默认的调度器。').default('native'),
+          scheduler: Schema.union(scheduler.nai).description('默认的调度器。').default('native'),
         }),
         Schema.object({ sampler: sampler.createSchema(sampler.nai) }),
       ]),
