@@ -105,13 +105,13 @@ export class NetworkError extends Error {
 
 export async function login(ctx: Context): Promise<string> {
   if (ctx.config.type === 'token') {
-    await ctx.http.get<Subscription>(ctx.config.endpoint + '/user/subscription', {
+    await ctx.http.get<Subscription>(ctx.config.authEndpoint + '/user/subscription', {
       timeout: 30000,
       headers: { authorization: 'Bearer ' + ctx.config.token },
     }).catch(NetworkError.catch({ 401: '.invalid-token' }))
     return ctx.config.token
   } else if (ctx.config.type === 'login' && process.env.KOISHI_ENV !== 'browser') {
-    return ctx.http.post(ctx.config.endpoint + '/user/login', {
+    return ctx.http.post(ctx.config.authEndpoint + '/user/login', {
       timeout: 30000,
       key: await calcAccessKey(ctx.config.email, ctx.config.password),
     }).catch(NetworkError.catch({ 401: '.invalid-password' })).then(res => res.accessToken)

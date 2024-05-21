@@ -209,6 +209,7 @@ export interface Config extends PromptConfig, ParamConfig {
   authLvDefault?: Computed<number>
   output?: Computed<'minimal' | 'default' | 'verbose'>
   features?: FeatureConfig
+  authEndpoint?: string
   endpoint?: string
   headers?: Dict<string>
   nsfw?: Computed<'disallow' | 'censor' | 'allow'>
@@ -246,7 +247,8 @@ export const Config = Schema.intersect([
         }),
       ]),
       Schema.object({
-        endpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
+        authEndpoint: Schema.string().description('API 服务器地址。').default('https://api.novelai.net'),
+        endpoint: Schema.string().description('图片生成服务器地址。').default('https://image.novelai.net'),
         headers: Schema.dict(String).role('table').description('要附加的额外请求头。').default({
           'referer': 'https://novelai.net/',
           'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
