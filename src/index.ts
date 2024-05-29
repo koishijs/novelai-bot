@@ -30,6 +30,7 @@ function handleError(session: Session, err: Error) {
 }
 
 export const inject = {
+  required: ['http'],
   optional: ['translator'],
 }
 
