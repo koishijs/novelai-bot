@@ -43,10 +43,10 @@ export async function download(ctx: Context, url: string, headers = {}): Promise
     return { buffer: data, base64, dataUrl: `data:${mime};base64,${base64}` }
   } else {
     const head = await ctx.http.head(url, { headers })
-    if (+head['content-length'] > MAX_CONTENT_SIZE) {
+    if (+head.get('content-length') > MAX_CONTENT_SIZE) {
       throw new NetworkError('.file-too-large')
     }
-    const mimetype = head['content-type']
+    const mimetype = head.get('content-type')
     if (!ALLOWED_TYPES.includes(mimetype)) {
       throw new NetworkError('.unsupported-file-type')
     }
