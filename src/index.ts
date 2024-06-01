@@ -153,10 +153,10 @@ export function apply(ctx: Context, config: Config) {
       let imgUrl: string, image: ImageData
       if (!restricted(session) && haveInput) {
         input = h('', h.transform(h.parse(input), {
-          image(attrs) {
+          img(attrs) {
             if (!allowImage) throw new SessionError('commands.novelai.messages.invalid-content')
             if (imgUrl) throw new SessionError('commands.novelai.messages.too-many-images')
-            imgUrl = attrs.url
+            imgUrl = attrs.src
             return ''
           },
         })).toString(true)
