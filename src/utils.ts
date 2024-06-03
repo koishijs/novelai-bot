@@ -42,15 +42,15 @@ export async function download(ctx: Context, url: string, headers = {}): Promise
     const base64 = arrayBufferToBase64(data)
     return { buffer: data, base64, dataUrl: `data:${mime};base64,${base64}` }
   } else {
-    const head = await ctx.http.head(url, { headers })
-    if (+head.get('content-length') > MAX_CONTENT_SIZE) {
+    const image = await ctx.http(url, { responseType: 'arraybuffer', headers })
+    if (+image.headers.get('content-length') > MAX_CONTENT_SIZE) {
       throw new NetworkError('.file-too-large')
     }
-    const mimetype = head.get('content-type')
+    const mimetype = image.headers.get('content-type')
     if (!ALLOWED_TYPES.includes(mimetype)) {
       throw new NetworkError('.unsupported-file-type')
     }
-    const buffer = await ctx.http.get(url, { responseType: 'arraybuffer', headers })
+    const buffer = image.data
     const base64 = arrayBufferToBase64(buffer)
     return { buffer, base64, dataUrl: `data:${mimetype};base64,${base64}` }
   }
