@@ -523,6 +523,7 @@ export function apply(ctx: Context, config: Config) {
           return result
         }
 
+        logger.debug(`${session.uid}: ${finalPrompt}`)
         const messageIds = await session.send(getContent())
         if (messageIds.length && config.recallTimeout) {
           ctx.setTimeout(() => {
