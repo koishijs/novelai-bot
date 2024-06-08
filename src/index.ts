@@ -467,10 +467,7 @@ export function apply(ctx: Context, config: Config) {
             const b64 = Buffer.from(firstImageBuffer).toString('base64')
             return forceDataPrefix(b64, 'image/png')
           }
-          if (config.type === 'naifu') {
-            return forceDataPrefix(res.data?.trimEnd().slice(27))
-          }
-          return forceDataPrefix(res.data?.slice(27))
+          return forceDataPrefix(res.data?.trimEnd().slice(27))
         }
 
         let dataUrl: string, count = 0
