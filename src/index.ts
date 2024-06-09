@@ -413,7 +413,7 @@ export function apply(ctx: Context, config: Config) {
             method: 'POST',
             timeout: config.requestTimeout,
             // Since novelai's latest interface returns an application/x-zip-compressed, a responseType must be passed in
-            responseType: ['login', 'token'].includes(config.type) ? 'arraybuffer' : 'json',
+            responseType: config.type === 'naifu' ? 'text' : ['login', 'token'].includes(config.type) ? 'arraybuffer' : 'json',
             headers: {
               ...config.headers,
               ...getHeaders(),
@@ -467,8 +467,7 @@ export function apply(ctx: Context, config: Config) {
             const b64 = Buffer.from(firstImageBuffer).toString('base64')
             return forceDataPrefix(b64, 'image/png')
           }
-
-          return forceDataPrefix(res.data?.slice(27))
+          return forceDataPrefix(res.data?.trimEnd().slice(27))
         }
 
         let dataUrl: string, count = 0
