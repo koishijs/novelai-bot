@@ -538,20 +538,20 @@ export function apply(ctx: Context, config: Config) {
               await sleep(config.pollInterval)
             }
             // get images by filename
-            const imagesOutput: ArrayBuffer[] = []
+            const imagesOutput: { data: ArrayBuffer, mime: string }[] = [];
             for (const nodeId in outputs) {
               const nodeOutput = outputs[nodeId]
               if ('images' in nodeOutput) {
                 for (const image of nodeOutput['images']) {
                   const urlValues = new URLSearchParams({ filename: image['filename'], subfolder: image['subfolder'], type: image['type'] }).toString()
-                  const imageData = await ctx.http.get(trimSlash(config.endpoint) + '/view?' + urlValues)
-                  imagesOutput.push(imageData)
+                  const imgRes = await ctx.http(trimSlash(config.endpoint) + '/view?' + urlValues)
+                  imagesOutput.push({data: imgRes.data, mime: imgRes.headers.get('content-type')})
                   break
                 }
               }
             }
             // return first image
-            return forceDataPrefix(Buffer.from(imagesOutput[0]).toString('base64'))
+            return forceDataPrefix(Buffer.from(imagesOutput[0].data).toString('base64'),imagesOutput[0].mime)
           }
           // event: newImage
           // id: 1
