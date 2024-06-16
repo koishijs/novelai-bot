@@ -414,7 +414,7 @@ export function apply(ctx: Context, config: Config) {
               if (ext) name += `.${ext}`
               const imageFile = new Blob([image.buffer], {type:mime})
               body.append("image", imageFile, name)
-              const res = await ctx.http(trimSlash(config.endpoint) + "/upload/image", {
+              const res = await ctx.http(trimSlash(config.endpoint) + '/upload/image', {
                 method: 'POST',
                 headers: {
                   ...config.headers,
@@ -424,7 +424,7 @@ export function apply(ctx: Context, config: Config) {
               if (res.status === 200) {
                 const data = res.data
                 let imagePath = data.name
-                if (data.subfolder) imagePath = data.subfolder + "/" + imagePath
+                if (data.subfolder) imagePath = data.subfolder + '/' + imagePath
       
                 for (const nodeId in prompt) {
                   if (prompt[nodeId].class_type === 'LoadImage') {
@@ -538,14 +538,15 @@ export function apply(ctx: Context, config: Config) {
               await sleep(config.pollInterval)
             }
             // get images by filename
-            const imagesOutput: Buffer[] = []
+            const imagesOutput: ArrayBuffer[] = []
             for (const nodeId in outputs) {
               const nodeOutput = outputs[nodeId]
               if ('images' in nodeOutput) {
                 for (const image of nodeOutput['images']) {
                   const urlValues = new URLSearchParams({ filename: image['filename'], subfolder: image['subfolder'], type: image['type'] }).toString()
-                  const imageData = await ctx.http.get(trimSlash(config.endpoint) + `/view?` + urlValues)
+                  const imageData = await ctx.http.get(trimSlash(config.endpoint) + '/view?' + urlValues)
                   imagesOutput.push(imageData)
+                  break
                 }
               }
             }
