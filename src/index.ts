@@ -545,13 +545,13 @@ export function apply(ctx: Context, config: Config) {
                 for (const image of nodeOutput['images']) {
                   const urlValues = new URLSearchParams({ filename: image['filename'], subfolder: image['subfolder'], type: image['type'] }).toString()
                   const imgRes = await ctx.http(trimSlash(config.endpoint) + '/view?' + urlValues)
-                  imagesOutput.push({data: imgRes.data, mime: imgRes.headers.get('content-type')})
+                  imagesOutput.push({ data: imgRes.data, mime: imgRes.headers.get('content-type') })
                   break
                 }
               }
             }
             // return first image
-            return forceDataPrefix(Buffer.from(imagesOutput[0].data).toString('base64'),imagesOutput[0].mime)
+            return forceDataPrefix(Buffer.from(imagesOutput[0].data).toString('base64'), imagesOutput[0].mime)
           }
           // event: newImage
           // id: 1
