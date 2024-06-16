@@ -359,7 +359,7 @@ export const Config = Schema.intersect([
     }),
     Schema.object({
       type: Schema.const('comfyui').required(),
-      sampler: sampler.createSchema(sampler.comfyui).description('默认的采样器。'),
+      sampler: sampler.createSchema(sampler.comfyui).description('默认的采样器。').required(),
       model: Schema.string().description('默认的生成模型的文件名。').required(),
       workflowText2Image: Schema.path({
         filters: [{ name: '', extensions: ['.json'] }],
