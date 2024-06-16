@@ -405,15 +405,15 @@ export function apply(ctx: Context, config: Config) {
 
             // have to upload image to the comfyui server first
             if (image) {
-              const body = new FormData();
+              const body = new FormData()
               const capture = /^data:([\w/.+-]+);base64,(.*)$/.exec(image.dataUrl)
               const [, mime,] = capture
               
               let name = Date.now().toString() 
-              const ext = mime === 'image/jpeg' ? 'jpg' : mime === 'image/png' ? 'png' : '';
+              const ext = mime === 'image/jpeg' ? 'jpg' : mime === 'image/png' ? 'png' : ''
               if (ext) name += `.${ext}`
               const imageFile = new Blob([image.buffer], {type:mime})
-              body.append("image", imageFile, name);
+              body.append("image", imageFile, name)
               const res = await ctx.http(trimSlash(config.endpoint) + "/upload/image", {
                 method: 'POST',
                 headers: {
@@ -422,9 +422,9 @@ export function apply(ctx: Context, config: Config) {
                 data: body,
               })
               if (res.status === 200) {
-                const data = res.data;
-                let imagePath = data.name;
-                if (data.subfolder) imagePath = data.subfolder + "/" + imagePath;
+                const data = res.data
+                let imagePath = data.name
+                if (data.subfolder) imagePath = data.subfolder + "/" + imagePath
       
                 for (const nodeId in prompt) {
                   if (prompt[nodeId].class_type === 'LoadImage') {
@@ -537,15 +537,15 @@ export function apply(ctx: Context, config: Config) {
             while (!(outputs = await check())) {
               await sleep(config.pollInterval)
             }
-            //get images by filename
+            // get images by filename
             const imagesOutput: Buffer[] = []
             for (const nodeId in outputs) {
-              const nodeOutput = outputs[nodeId];
+              const nodeOutput = outputs[nodeId]
               if ('images' in nodeOutput) {
                 for (const image of nodeOutput['images']) {
-                  const urlValues = new URLSearchParams({ filename: image['filename'], subfolder: image['subfolder'], type: image['type'] }).toString();
-                  const imageData = await ctx.http.get(trimSlash(config.endpoint) + `/view?` + urlValues);
-                  imagesOutput.push(imageData);
+                  const urlValues = new URLSearchParams({ filename: image['filename'], subfolder: image['subfolder'], type: image['type'] }).toString()
+                  const imageData = await ctx.http.get(trimSlash(config.endpoint) + `/view?` + urlValues)
+                  imagesOutput.push(imageData)
                 }
               }
             }
