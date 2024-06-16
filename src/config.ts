@@ -33,6 +33,7 @@ type Orient = keyof typeof orientMap
 export const models = Object.keys(modelMap) as Model[]
 export const orients = Object.keys(orientMap) as Orient[]
 export const scheduler = ['native', 'karras', 'exponential', 'polyexponential'] as const
+export const schedulerComfyUI = ['normal', 'karras', 'exponential', 'sgm_uniform', 'simple', 'ddim_uniform'] as const
 
 export namespace sampler {
   export const nai = {
@@ -85,6 +86,31 @@ export namespace sampler {
     dpmsolver_ka: 'DPM++ solver Karras',
     lcm_ka: 'LCM Karras',
     DDIM_ka: 'DDIM Karras',
+  }
+
+  export const comfyui = {
+    euler: 'Euler',
+    euler_ancestral: 'Euler ancestral',
+    heun: 'Heun',
+    heunpp2: 'Heun++ 2',
+    dpm_2: 'DPM 2',
+    dpm_2_ancestral: 'DPM 2 ancestral',
+    lms: 'LMS',
+    dpm_fast: 'DPM fast',
+    dpm_adaptive: 'DPM adaptive',
+    dpmpp_2s_ancestral: 'DPM++ 2S ancestral',
+    dpmpp_sde: 'DPM++ SDE',
+    dpmpp_sde_gpu: 'DPM++ SDE GPU',
+    dpmpp_2m: 'DPM++ 2M',
+    dpmpp_2m_sde: 'DPM++ 2M SDE',
+    dpmpp_2m_sde_gpu: 'DPM++ 2M SDE GPU',
+    dpmpp_3m_sde: 'DPM++ 3M SDE',
+    dpmpp_3m_sde_gpu: 'DPM++ 3M SDE GPU',
+    ddpm: 'DDPM',
+    lcm: 'LCM',
+    ddim: 'DDIM',
+    uni_pc: 'UniPC',
+    uni_pc_bh2: 'UniPC BH2',
   }
 
   export function createSchema(map: Dict<string>) {
@@ -201,7 +227,7 @@ interface ParamConfig {
 }
 
 export interface Config extends PromptConfig, ParamConfig {
-  type: 'token' | 'login' | 'naifu' | 'sd-webui' | 'stable-horde'
+  type: 'token' | 'login' | 'naifu' | 'sd-webui' | 'stable-horde' | 'comfyui'
   token?: string
   email?: string
   password?: string
@@ -220,6 +246,8 @@ export interface Config extends PromptConfig, ParamConfig {
   maxConcurrency?: number
   pollInterval?: number
   trustedWorkers?: boolean
+  workflowText2Image?: string
+  workflowImage2Image?: string
 }
 
 export const Config = Schema.intersect([
@@ -230,6 +258,7 @@ export const Config = Schema.intersect([
       Schema.const('naifu').description('naifu'),
       Schema.const('sd-webui').description('sd-webui'),
       Schema.const('stable-horde').description('Stable Horde'),
+      Schema.const('comfyui').description('ComfyUI'),
     ]).default('token').description('登录方式。'),
   }).description('登录设置'),
 
@@ -278,6 +307,12 @@ export const Config = Schema.intersect([
       trustedWorkers: Schema.boolean().description('是否只请求可信任工作节点。').default(false),
       pollInterval: Schema.number().role('time').description('轮询进度间隔时长。').default(Time.second),
     }),
+    Schema.object({
+      type: Schema.const('comfyui'),
+      endpoint: Schema.string().description('API 服务器地址。').required(),
+      headers: Schema.dict(String).role('table').description('要附加的额外请求头。'),
+      pollInterval: Schema.number().role('time').description('轮询进度间隔时长。').default(Time.second),
+    }),
   ]),
 
   Schema.object({
@@ -321,6 +356,20 @@ export const Config = Schema.intersect([
     Schema.object({
       type: Schema.const('naifu').required(),
       sampler: sampler.createSchema(sampler.nai),
+    }),
+    Schema.object({
+      type: Schema.const('comfyui').required(),
+      sampler: sampler.createSchema(sampler.comfyui).description('默认的采样器。').required(),
+      model: Schema.string().description('默认的生成模型的文件名。').required(),
+      workflowText2Image: Schema.path({
+        filters: [{ name: '', extensions: ['.json'] }],
+        allowCreate: true,
+      }).description('API 格式的文本到图像工作流。'),
+      workflowImage2Image: Schema.path({
+        filters: [{ name: '', extensions: ['.json'] }],
+        allowCreate: true,
+      }).description('API 格式的图像到图像工作流。'),
+      scheduler: Schema.union(schedulerComfyUI).description('默认的调度器。').default('normal'),
     }),
     Schema.intersect([
       Schema.object({
