@@ -397,8 +397,8 @@ export function apply(ctx: Context, config: Config) {
             }
           }
           case 'comfyui': {
-            const workflowText2Image = config.workflowText2Image ? resolve(ctx.baseDir, config.workflowText2Image) : '../data/default-comfyui-t2i-wf.json'
-            const workflowImage2Image = config.workflowImage2Image ? resolve(ctx.baseDir, config.workflowImage2Image) : '../data/default-comfyui-i2i-wf.json'
+            const workflowText2Image = config.workflowText2Image ? resolve(ctx.baseDir, config.workflowText2Image) : resolve(__dirname,'../data/default-comfyui-t2i-wf.json')
+            const workflowImage2Image = config.workflowImage2Image ? resolve(ctx.baseDir, config.workflowImage2Image) : resolve(__dirname,'../data/default-comfyui-i2i-wf.json')
             const workflow = image ? workflowImage2Image : workflowText2Image
             logger.debug('workflow:', workflow)
             const prompt = JSON.parse(await readFile(workflow, 'utf8'))
@@ -549,7 +549,7 @@ export function apply(ctx: Context, config: Config) {
                 }
               }
             }
-            //return first image
+            // return first image
             return forceDataPrefix(Buffer.from(imagesOutput[0]).toString('base64'))
           }
           // event: newImage
