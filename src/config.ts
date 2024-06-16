@@ -33,7 +33,7 @@ type Orient = keyof typeof orientMap
 export const models = Object.keys(modelMap) as Model[]
 export const orients = Object.keys(orientMap) as Orient[]
 export const scheduler = ['native', 'karras', 'exponential', 'polyexponential'] as const
-export const schedulerComfyUI = ["normal", "karras", "exponential", "sgm_uniform", "simple", "ddim_uniform"] as const
+export const schedulerComfyUI = ['normal', 'karras', 'exponential', 'sgm_uniform', 'simple', 'ddim_uniform'] as const
 
 export namespace sampler {
   export const nai = {
