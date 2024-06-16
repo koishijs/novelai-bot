@@ -6,6 +6,7 @@ import { } from '@koishijs/translator'
 import { } from '@koishijs/plugin-help'
 import AdmZip from 'adm-zip'
 import { resolve } from 'path'
+import { readFile } from 'fs/promises'
 
 export * from './config'
 
@@ -400,12 +401,12 @@ export function apply(ctx: Context, config: Config) {
             const workflowImage2Image = config.workflowImage2Image ? resolve(ctx.baseDir, config.workflowImage2Image) : '../data/default-comfyui-i2i-wf.json'
             const workflow = image ? workflowImage2Image : workflowText2Image
             logger.debug('workflow:', workflow)
-            const prompt= require(workflow)
+            const prompt = JSON.parse(await readFile(workflow, 'utf8'))
 
             // have to upload image to the comfyui server first
             if (image) {
               const body = new FormData();
-              const capture = /^data:([\w/-]+);base64,(.*)$/.exec(image.dataUrl)
+              const capture = /^data:([\w/.+-]+);base64,(.*)$/.exec(image.dataUrl)
               const [, mime,] = capture
               
               let name = Date.now().toString() 
@@ -463,7 +464,7 @@ export function apply(ctx: Context, config: Config) {
               }
             }
             logger.debug('prompt:', prompt)
-            return  { "prompt" : prompt }
+            return  { prompt }
           }
         }
       }
@@ -527,7 +528,7 @@ export function apply(ctx: Context, config: Config) {
             return forceDataPrefix(b64, imgRes.headers.get('content-type'))
           }
           if (config.type === 'comfyui') {
-            //get filenames from history
+            // get filenames from history
             const promptId = res.data.prompt_id
             const check = () => ctx.http.get(trimSlash(config.endpoint) + '/history/' + promptId)
               .then((res) => res[promptId] && res[promptId].outputs)
@@ -537,7 +538,7 @@ export function apply(ctx: Context, config: Config) {
               await sleep(config.pollInterval)
             }
             //get images by filename
-            const imagesOutput: Buffer[] = [];
+            const imagesOutput: Buffer[] = []
             for (const nodeId in outputs) {
               const nodeOutput = outputs[nodeId];
               if ('images' in nodeOutput) {

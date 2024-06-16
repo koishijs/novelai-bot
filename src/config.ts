@@ -364,11 +364,11 @@ export const Config = Schema.intersect([
       workflowText2Image: Schema.path({
         filters: [{ name: '', extensions: ['.json'] }],
         allowCreate: true,
-      }).description('API格式的图像到图像工作流。'),
+      }).description('API 格式的文本到图像工作流。'),
       workflowImage2Image: Schema.path({
         filters: [{ name: '', extensions: ['.json'] }],
         allowCreate: true,
-      }).description('API格式的图像到图像工作流。'),
+      }).description('API 格式的图像到图像工作流。'),
       scheduler: Schema.union(schedulerComfyUI).description('默认的调度器。').default('normal'),
     }),
     Schema.intersect([
