@@ -438,7 +438,7 @@ export function parseForbidden(input: string) {
     .map<Forbidden>((pattern: string) => {
       const strict = pattern.endsWith('!')
       if (strict) pattern = pattern.slice(0, -1)
-      pattern = pattern.replace(/[^a-z0-9\u00ff-\uffff]+/g, ' ').trim()
+      pattern = pattern.replace(/[^a-z0-9\u00ff-\uffff:]+/g, ' ').trim()
       return { pattern, strict }
     })
 }
