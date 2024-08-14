@@ -32,12 +32,13 @@ type Orient = keyof typeof orientMap
 
 export const models = Object.keys(modelMap) as Model[]
 export const orients = Object.keys(orientMap) as Orient[]
+
 export namespace scheduler {
   export const nai = ['native', 'karras', 'exponential', 'polyexponential'] as const
   export const sd = ['Automatic', 'Uniform', 'Karras', 'Exponential', 'Polyexponential', 'SGM Uniform'] as const
   export const horde = ['karras'] as const
+  export const comfyUI = ['normal', 'karras', 'exponential', 'sgm_uniform', 'simple', 'ddim_uniform'] as const
 }
-export const schedulerComfyUI = ['normal', 'karras', 'exponential', 'sgm_uniform', 'simple', 'ddim_uniform'] as const
 
 export namespace sampler {
   export const nai = {
@@ -361,7 +362,7 @@ export const Config = Schema.intersect([
         filters: [{ name: '', extensions: ['.json'] }],
         allowCreate: true,
       }).description('API 格式的图像到图像工作流。'),
-      scheduler: Schema.union(schedulerComfyUI).description('默认的调度器。').default('normal'),
+      scheduler: Schema.union(scheduler.comfyUI).description('默认的调度器。').default('normal'),
     }),
     Schema.intersect([
       Schema.object({
