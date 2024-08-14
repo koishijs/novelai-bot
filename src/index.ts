@@ -5,6 +5,8 @@ import { closestMultiple, download, forceDataPrefix, getImageSize, login, Networ
 import { } from '@koishijs/translator'
 import { } from '@koishijs/plugin-help'
 import AdmZip from 'adm-zip'
+import { resolve } from 'path'
+import { readFile } from 'fs/promises'
 
 export * from './config'
 
@@ -30,6 +32,7 @@ function handleError(session: Session, err: Error) {
 }
 
 export const inject = {
+  required: ['http'],
   optional: ['translator'],
 }
 
@@ -161,10 +164,10 @@ export function apply(ctx: Context, config: Config) {
       let imgUrl: string, image: ImageData
       if (!restricted(session) && haveInput) {
         input = h('', h.transform(h.parse(input), {
-          image(attrs) {
+          img(attrs) {
             if (!allowImage) throw new SessionError('commands.novelai.messages.invalid-content')
             if (imgUrl) throw new SessionError('commands.novelai.messages.too-many-images')
-            imgUrl = attrs.url
+            imgUrl = attrs.src
             return ''
           },
         })).toString(true)
@@ -309,12 +312,14 @@ export function apply(ctx: Context, config: Config) {
             return '/api/v2/generate/async'
           case 'naifu':
             return '/generate-stream'
+          case 'comfyui':
+            return '/prompt'
           default:
             return '/ai/generate-image'
         }
       })()
 
-      const getPayload = () => {
+      const getPayload = async () => {
         switch (config.type) {
           case 'login':
           case 'token':
@@ -401,6 +406,76 @@ export function apply(ctx: Context, config: Config) {
               r2: true,
             }
           }
+          case 'comfyui': {
+            const workflowText2Image = config.workflowText2Image ? resolve(ctx.baseDir, config.workflowText2Image) : resolve(__dirname,'../data/default-comfyui-t2i-wf.json')
+            const workflowImage2Image = config.workflowImage2Image ? resolve(ctx.baseDir, config.workflowImage2Image) : resolve(__dirname,'../data/default-comfyui-i2i-wf.json')
+            const workflow = image ? workflowImage2Image : workflowText2Image
+            logger.debug('workflow:', workflow)
+            const prompt = JSON.parse(await readFile(workflow, 'utf8'))
+
+            // have to upload image to the comfyui server first
+            if (image) {
+              const body = new FormData()
+              const capture = /^data:([\w/.+-]+);base64,(.*)$/.exec(image.dataUrl)
+              const [, mime,] = capture
+              
+              let name = Date.now().toString() 
+              const ext = mime === 'image/jpeg' ? 'jpg' : mime === 'image/png' ? 'png' : ''
+              if (ext) name += `.${ext}`
+              const imageFile = new Blob([image.buffer], {type:mime})
+              body.append("image", imageFile, name)
+              const res = await ctx.http(trimSlash(config.endpoint) + '/upload/image', {
+                method: 'POST',
+                headers: {
+                  ...config.headers,
+                },
+                data: body,
+              })
+              if (res.status === 200) {
+                const data = res.data
+                let imagePath = data.name
+                if (data.subfolder) imagePath = data.subfolder + '/' + imagePath
+      
+                for (const nodeId in prompt) {
+                  if (prompt[nodeId].class_type === 'LoadImage') {
+                    prompt[nodeId].inputs.image = imagePath
+                    break
+                  }
+                }
+              } else {
+                throw new SessionError('commands.novelai.messages.unknown-error')
+              }
+            }
+
+            // only change the first node in the workflow
+            for (const nodeId in prompt) {
+              if (prompt[nodeId].class_type === 'KSampler') {
+                prompt[nodeId].inputs.seed = parameters.seed
+                prompt[nodeId].inputs.steps = parameters.steps
+                prompt[nodeId].inputs.cfg = parameters.scale
+                prompt[nodeId].inputs.sampler_name = options.sampler
+                prompt[nodeId].inputs.denoise = options.strength ?? config.strength
+                prompt[nodeId].inputs.scheduler = options.scheduler ?? config.scheduler
+                const positiveNodeId = prompt[nodeId].inputs.positive[0]
+                const negativeeNodeId = prompt[nodeId].inputs.negative[0]
+                const latentImageNodeId = prompt[nodeId].inputs.latent_image[0]
+                prompt[positiveNodeId].inputs.text = parameters.prompt
+                prompt[negativeeNodeId].inputs.text = parameters.uc    
+                prompt[latentImageNodeId].inputs.width = parameters.width
+                prompt[latentImageNodeId].inputs.height = parameters.height
+                prompt[latentImageNodeId].inputs.batch_size = parameters.n_samples
+                break
+              }
+            }
+            for (const nodeId in prompt) {
+              if (prompt[nodeId].class_type === 'CheckpointLoaderSimple') {
+                prompt[nodeId].inputs.ckpt_name = options.model ?? config.model
+                break
+              }
+            }
+            logger.debug('prompt:', prompt)
+            return  { prompt }
+          }
         }
       }
 
@@ -422,12 +497,12 @@ export function apply(ctx: Context, config: Config) {
             method: 'POST',
             timeout: config.requestTimeout,
             // Since novelai's latest interface returns an application/x-zip-compressed, a responseType must be passed in
-            responseType: ['login', 'token'].includes(config.type) ? 'arraybuffer' : 'json',
+            responseType: config.type === 'naifu' ? 'text' : ['login', 'token'].includes(config.type) ? 'arraybuffer' : 'json',
             headers: {
               ...config.headers,
               ...getHeaders(),
             },
-            data: getPayload(),
+            data: await getPayload(),
           })
 
           if (config.type === 'sd-webui') {
@@ -462,6 +537,32 @@ export function apply(ctx: Context, config: Config) {
             const b64 = Buffer.from(imgRes.data).toString('base64')
             return forceDataPrefix(b64, imgRes.headers.get('content-type'))
           }
+          if (config.type === 'comfyui') {
+            // get filenames from history
+            const promptId = res.data.prompt_id
+            const check = () => ctx.http.get(trimSlash(config.endpoint) + '/history/' + promptId)
+              .then((res) => res[promptId] && res[promptId].outputs)
+            const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+            let outputs
+            while (!(outputs = await check())) {
+              await sleep(config.pollInterval)
+            }
+            // get images by filename
+            const imagesOutput: { data: ArrayBuffer, mime: string }[] = [];
+            for (const nodeId in outputs) {
+              const nodeOutput = outputs[nodeId]
+              if ('images' in nodeOutput) {
+                for (const image of nodeOutput['images']) {
+                  const urlValues = new URLSearchParams({ filename: image['filename'], subfolder: image['subfolder'], type: image['type'] }).toString()
+                  const imgRes = await ctx.http(trimSlash(config.endpoint) + '/view?' + urlValues)
+                  imagesOutput.push({ data: imgRes.data, mime: imgRes.headers.get('content-type') })
+                  break
+                }
+              }
+            }
+            // return first image
+            return forceDataPrefix(Buffer.from(imagesOutput[0].data).toString('base64'), imagesOutput[0].mime)
+          }
           // event: newImage
           // id: 1
           // data:
@@ -476,8 +577,7 @@ export function apply(ctx: Context, config: Config) {
             const b64 = Buffer.from(firstImageBuffer).toString('base64')
             return forceDataPrefix(b64, 'image/png')
           }
-
-          return forceDataPrefix(res.data?.slice(27))
+          return forceDataPrefix(res.data?.trimEnd().slice(27))
         }
 
         let dataUrl: string, count = 0
@@ -532,6 +632,7 @@ export function apply(ctx: Context, config: Config) {
           return result
         }
 
+        logger.debug(`${session.uid}: ${finalPrompt}`)
         const messageIds = await session.send(getContent())
         if (messageIds.length && config.recallTimeout) {
           ctx.setTimeout(() => {
