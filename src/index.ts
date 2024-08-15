@@ -309,9 +309,11 @@ export function apply(ctx: Context, config: Config) {
         if (globalTasks.size >= config.globalConcurrency) {
           const pendingId = container.pop()
           globalPending.add(pendingId)
-          await new Promise<void>((resolve) => ctx.once('novelai/finish', (id) => {
-            if (id === pendingId) {
+          await new Promise<void>((resolve) => {
+            const dispose = ctx.on('novelai/finish', (id) => {
+              if (id !== pendingId) return
               resolve()
+              dispose()
             }
           }))
         }
