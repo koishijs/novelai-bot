@@ -2,6 +2,7 @@ import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionErro
 import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers, scheduler } from './config'
 import { ImageData, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
+import { genExtensionsArgs } from './webuiExtension'
 import { } from '@koishijs/translator'
 import { } from '@koishijs/plugin-help'
 import AdmZip from 'adm-zip'
@@ -118,10 +119,10 @@ export function apply(ctx: Context, config: Config) {
       type: ['token', 'login'].includes(config.type)
         ? scheduler.nai
         : config.type === 'sd-webui'
-        ? scheduler.sd
-        : config.type === 'stable-horde'
-        ? scheduler.horde
-        : [],
+          ? scheduler.sd
+          : config.type === 'stable-horde'
+            ? scheduler.horde
+            : [],
     })
     .option('decrisper', '-D', { hidden: thirdParty })
     .option('undesired', '-u <undesired>')
@@ -360,6 +361,7 @@ export function apply(ctx: Context, config: Config) {
             return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
           }
           case 'sd-webui': {
+            const extensionsArgs = genExtensionsArgs(session, config)
             return {
               sampler_index: sampler.sd[options.sampler],
               scheduler: options.scheduler,
@@ -368,6 +370,7 @@ export function apply(ctx: Context, config: Config) {
               enable_hr: options.hiresFix ?? config.hiresFix ?? false,
               hr_second_pass_steps: options.hiresFixSteps ?? 0,
               hr_upscaler: config.hiresFixUpscaler ?? 'None',
+              alwayson_scripts: extensionsArgs,
               ...project(parameters, {
                 prompt: 'prompt',
                 batch_size: 'n_samples',
