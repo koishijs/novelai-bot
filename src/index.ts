@@ -367,6 +367,7 @@ export function apply(ctx: Context, config: Config) {
               restore_faces: config.restoreFaces ?? false,
               enable_hr: options.hiresFix ?? config.hiresFix ?? false,
               hr_second_pass_steps: options.hiresFixSteps ?? 0,
+              hr_upscaler: config.hiresFixUpscaler ?? 'None',
               ...project(parameters, {
                 prompt: 'prompt',
                 batch_size: 'n_samples',
@@ -420,8 +421,8 @@ export function apply(ctx: Context, config: Config) {
               const body = new FormData()
               const capture = /^data:([\w/.+-]+);base64,(.*)$/.exec(image.dataUrl)
               const [, mime,] = capture
-              
-              let name = Date.now().toString() 
+
+              let name = Date.now().toString()
               const ext = mime === 'image/jpeg' ? 'jpg' : mime === 'image/png' ? 'png' : ''
               if (ext) name += `.${ext}`
               const imageFile = new Blob([image.buffer], {type:mime})
@@ -437,7 +438,7 @@ export function apply(ctx: Context, config: Config) {
                 const data = res.data
                 let imagePath = data.name
                 if (data.subfolder) imagePath = data.subfolder + '/' + imagePath
-      
+
                 for (const nodeId in prompt) {
                   if (prompt[nodeId].class_type === 'LoadImage') {
                     prompt[nodeId].inputs.image = imagePath
@@ -462,7 +463,7 @@ export function apply(ctx: Context, config: Config) {
                 const negativeeNodeId = prompt[nodeId].inputs.negative[0]
                 const latentImageNodeId = prompt[nodeId].inputs.latent_image[0]
                 prompt[positiveNodeId].inputs.text = parameters.prompt
-                prompt[negativeeNodeId].inputs.text = parameters.uc    
+                prompt[negativeeNodeId].inputs.text = parameters.uc
                 prompt[latentImageNodeId].inputs.width = parameters.width
                 prompt[latentImageNodeId].inputs.height = parameters.height
                 prompt[latentImageNodeId].inputs.batch_size = parameters.n_samples
