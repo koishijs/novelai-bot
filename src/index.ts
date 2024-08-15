@@ -306,10 +306,11 @@ export function apply(ctx: Context, config: Config) {
         : session.text('.waiting'))
 
       if (config.globalConcurrency) {
-        while (globalTasks.size >= config.globalConcurrency) {
-          globalPending.add(container.pop())
+        if (globalTasks.size >= config.globalConcurrency) {
+          const pendingId = container.pop()
+          globalPending.add(pendingId)
           await new Promise<void>((resolve) => ctx.once('novelai/finish', (id) => {
-            if (id === id) {
+            if (id === pendingId) {
               resolve()
             }
           }))
