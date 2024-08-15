@@ -10,11 +10,9 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+        uses: actions/setup-node@v4
       - name: Install
         run: yarn
       - name: Build
