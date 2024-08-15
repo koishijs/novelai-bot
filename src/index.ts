@@ -10,6 +10,12 @@ import { readFile } from 'fs/promises'
 
 export * from './config'
 
+declare module 'koishi' {
+  interface Events {
+    'novelai/finish'(id: string): void
+  }
+}
+
 export const reactive = true
 export const name = 'novelai'
 
@@ -45,6 +51,7 @@ export function apply(ctx: Context, config: Config) {
 
   const tasks: Dict<Set<string>> = Object.create(null)
   const globalTasks = new Set<string>()
+  const globalPending = new Set<string>()
 
   let tokenTask: Promise<string> = null
   const getToken = () => tokenTask ||= login(ctx)
@@ -297,10 +304,15 @@ export function apply(ctx: Context, config: Config) {
       session.send(globalTasks.size
         ? session.text('.pending', [globalTasks.size])
         : session.text('.waiting'))
-      
+
       if (config.globalConcurrency) {
         while (globalTasks.size >= config.globalConcurrency) {
-          await sleep(100)
+          globalPending.add(container.pop())
+          await new Promise<void>((resolve) => ctx.once('novelai/finish', (id) => {
+            if (id === id) {
+              resolve()
+            }
+          }))
         }
       }
 
@@ -308,6 +320,11 @@ export function apply(ctx: Context, config: Config) {
       const cleanUp = (id: string) => {
         tasks[session.cid]?.delete(id)
         globalTasks.delete(id)
+        if (globalPending.size) {
+          const id = globalPending.values().next().value
+          globalPending.delete(id)
+          ctx.parallel('novelai/finish', id)
+        }
       }
 
       const path = (() => {
@@ -424,8 +441,8 @@ export function apply(ctx: Context, config: Config) {
               const body = new FormData()
               const capture = /^data:([\w/.+-]+);base64,(.*)$/.exec(image.dataUrl)
               const [, mime,] = capture
-              
-              let name = Date.now().toString() 
+
+              let name = Date.now().toString()
               const ext = mime === 'image/jpeg' ? 'jpg' : mime === 'image/png' ? 'png' : ''
               if (ext) name += `.${ext}`
               const imageFile = new Blob([image.buffer], {type:mime})
@@ -441,7 +458,7 @@ export function apply(ctx: Context, config: Config) {
                 const data = res.data
                 let imagePath = data.name
                 if (data.subfolder) imagePath = data.subfolder + '/' + imagePath
-      
+
                 for (const nodeId in prompt) {
                   if (prompt[nodeId].class_type === 'LoadImage') {
                     prompt[nodeId].inputs.image = imagePath
@@ -466,7 +483,7 @@ export function apply(ctx: Context, config: Config) {
                 const negativeeNodeId = prompt[nodeId].inputs.negative[0]
                 const latentImageNodeId = prompt[nodeId].inputs.latent_image[0]
                 prompt[positiveNodeId].inputs.text = parameters.prompt
-                prompt[negativeeNodeId].inputs.text = parameters.uc    
+                prompt[negativeeNodeId].inputs.text = parameters.uc
                 prompt[latentImageNodeId].inputs.width = parameters.width
                 prompt[latentImageNodeId].inputs.height = parameters.height
                 prompt[latentImageNodeId].inputs.batch_size = parameters.n_samples
