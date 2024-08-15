@@ -110,6 +110,7 @@ export function apply(ctx: Context, config: Config) {
     .option('noise', '-n <noise:number>', { hidden: some(restricted, thirdParty) })
     .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('hiresFix', '-H', { hidden: () => config.type !== 'sd-webui' })
+    .option('hiresFixSteps', { hidden: () => config.type !== 'sd-webui' })
     .option('smea', '-S', { hidden: () => config.model !== 'nai-v3' })
     .option('smeaDyn', '-d', { hidden: () => config.model !== 'nai-v3' })
     .option('scheduler', '-C <scheduler:string>', {
@@ -365,6 +366,7 @@ export function apply(ctx: Context, config: Config) {
               init_images: image && [image.dataUrl], // sd-webui accepts data URLs with base64 encoded image
               restore_faces: config.restoreFaces ?? false,
               enable_hr: options.hiresFix ?? config.hiresFix ?? false,
+              hr_second_pass_steps: options.hiresFixSteps ?? 0,
               ...project(parameters, {
                 prompt: 'prompt',
                 batch_size: 'n_samples',
