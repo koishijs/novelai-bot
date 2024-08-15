@@ -407,8 +407,12 @@ export function apply(ctx: Context, config: Config) {
             }
           }
           case 'comfyui': {
-            const workflowText2Image = config.workflowText2Image ? resolve(ctx.baseDir, config.workflowText2Image) : resolve(__dirname,'../data/default-comfyui-t2i-wf.json')
-            const workflowImage2Image = config.workflowImage2Image ? resolve(ctx.baseDir, config.workflowImage2Image) : resolve(__dirname,'../data/default-comfyui-i2i-wf.json')
+            const workflowText2Image = config.workflowText2Image
+              ? resolve(ctx.baseDir, config.workflowText2Image)
+              : resolve(__dirname, '../data/default-comfyui-t2i-wf.json')
+            const workflowImage2Image = config.workflowImage2Image
+              ? resolve(ctx.baseDir, config.workflowImage2Image)
+              : resolve(__dirname, '../data/default-comfyui-i2i-wf.json')
             const workflow = image ? workflowImage2Image : workflowText2Image
             logger.debug('workflow:', workflow)
             const prompt = JSON.parse(await readFile(workflow, 'utf8'))
@@ -418,11 +422,11 @@ export function apply(ctx: Context, config: Config) {
               const body = new FormData()
               const capture = /^data:([\w/.+-]+);base64,(.*)$/.exec(image.dataUrl)
               const [, mime,] = capture
-              
-              let name = Date.now().toString() 
+
+              let name = Date.now().toString()
               const ext = mime === 'image/jpeg' ? 'jpg' : mime === 'image/png' ? 'png' : ''
               if (ext) name += `.${ext}`
-              const imageFile = new Blob([image.buffer], {type:mime})
+              const imageFile = new Blob([image.buffer], { type: mime })
               body.append("image", imageFile, name)
               const res = await ctx.http(trimSlash(config.endpoint) + '/upload/image', {
                 method: 'POST',
@@ -435,7 +439,7 @@ export function apply(ctx: Context, config: Config) {
                 const data = res.data
                 let imagePath = data.name
                 if (data.subfolder) imagePath = data.subfolder + '/' + imagePath
-      
+
                 for (const nodeId in prompt) {
                   if (prompt[nodeId].class_type === 'LoadImage') {
                     prompt[nodeId].inputs.image = imagePath
@@ -460,7 +464,7 @@ export function apply(ctx: Context, config: Config) {
                 const negativeeNodeId = prompt[nodeId].inputs.negative[0]
                 const latentImageNodeId = prompt[nodeId].inputs.latent_image[0]
                 prompt[positiveNodeId].inputs.text = parameters.prompt
-                prompt[negativeeNodeId].inputs.text = parameters.uc    
+                prompt[negativeeNodeId].inputs.text = parameters.uc
                 prompt[latentImageNodeId].inputs.width = parameters.width
                 prompt[latentImageNodeId].inputs.height = parameters.height
                 prompt[latentImageNodeId].inputs.batch_size = parameters.n_samples
@@ -474,7 +478,7 @@ export function apply(ctx: Context, config: Config) {
               }
             }
             logger.debug('prompt:', prompt)
-            return  { prompt }
+            return { prompt }
           }
         }
       }
