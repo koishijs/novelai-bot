@@ -137,6 +137,15 @@ export const upscalers = [
   'SwinIR 4x',
 ] as const
 
+export const latentUpscalers = [
+  'Latent',
+  'Latent (antialiased)',
+  'Latent (bicubic)',
+  'Latent (bicubic antialiased)',
+  'Latent (nearest)',
+  'Latent (nearest-exact)',
+]
+
 export interface Options {
   enhance: boolean
   model: string
@@ -208,6 +217,7 @@ interface ParamConfig {
   upscaler?: string
   restoreFaces?: boolean
   hiresFix?: boolean
+  hiresFixUpscaler: string
   scale?: Computed<number>
   textSteps?: Computed<number>
   imageSteps?: Computed<number>
@@ -338,6 +348,7 @@ export const Config = Schema.intersect([
       upscaler: Schema.union(upscalers).description('默认的放大算法。').default('Lanczos'),
       restoreFaces: Schema.boolean().description('是否启用人脸修复。').default(false),
       hiresFix: Schema.boolean().description('是否启用高分辨率修复。').default(false),
+      hiresFixUpscaler: Schema.union(latentUpscalers.concat(upscalers)).description('高分辨率修复的放大算法。').default('Latent'),
       scheduler: Schema.union(scheduler.sd).description('默认的调度器。').default('Automatic'),
     }),
     Schema.object({
