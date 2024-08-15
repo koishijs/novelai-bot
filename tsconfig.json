@@ -3,13 +3,14 @@
     "rootDir": "src",
     "outDir": "lib",
     "target": "es2022",
-    "module": "commonjs",
+    "module": "esnext",
     "declaration": true,
+    "emitDeclarationOnly": true,
     "composite": true,
     "incremental": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "bundler"
   },
   "include": [
     "src"

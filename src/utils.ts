@@ -42,15 +42,15 @@ export async function download(ctx: Context, url: string, headers = {}): Promise
     const base64 = arrayBufferToBase64(data)
     return { buffer: data, base64, dataUrl: `data:${mime};base64,${base64}` }
   } else {
-    const head = await ctx.http.head(url, { headers })
-    if (+head['content-length'] > MAX_CONTENT_SIZE) {
+    const image = await ctx.http(url, { responseType: 'arraybuffer', headers })
+    if (+image.headers.get('content-length') > MAX_CONTENT_SIZE) {
       throw new NetworkError('.file-too-large')
     }
-    const mimetype = head['content-type']
+    const mimetype = image.headers.get('content-type')
     if (!ALLOWED_TYPES.includes(mimetype)) {
       throw new NetworkError('.unsupported-file-type')
     }
-    const buffer = await ctx.http.get(url, { responseType: 'arraybuffer', headers })
+    const buffer = image.data
     const base64 = arrayBufferToBase64(buffer)
     return { buffer, base64, dataUrl: `data:${mimetype};base64,${base64}` }
   }
@@ -91,7 +91,7 @@ export class NetworkError extends Error {
   }
 
   static catch = (mapping: Dict<string>) => (e: any) => {
-    if (Quester.isAxiosError(e)) {
+    if (Quester.Error.is(e)) {
       const code = e.response?.status
       for (const key in mapping) {
         if (code === +key) {
@@ -105,13 +105,13 @@ export class NetworkError extends Error {
 
 export async function login(ctx: Context): Promise<string> {
   if (ctx.config.type === 'token') {
-    await ctx.http.get<Subscription>(ctx.config.endpoint + '/user/subscription', {
+    await ctx.http.get<Subscription>(ctx.config.apiEndpoint + '/user/subscription', {
       timeout: 30000,
       headers: { authorization: 'Bearer ' + ctx.config.token },
     }).catch(NetworkError.catch({ 401: '.invalid-token' }))
     return ctx.config.token
   } else if (ctx.config.type === 'login' && process.env.KOISHI_ENV !== 'browser') {
-    return ctx.http.post(ctx.config.endpoint + '/user/login', {
+    return ctx.http.post(ctx.config.apiEndpoint + '/user/login', {
       timeout: 30000,
       key: await calcAccessKey(ctx.config.email, ctx.config.password),
     }).catch(NetworkError.catch({ 401: '.invalid-password' })).then(res => res.accessToken)

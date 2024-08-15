@@ -1,0 +1,21 @@
+{
+  "k_dpmpp_2m": "DPM++ 2M",
+  "k_dpmpp_sde": "DPM++ SDE",
+  "k_dpmpp_2m_sde": "DPM++ 2M SDE",
+  "k_dpmpp_2m_sde_heun": "DPM++ 2M SDE Heun",
+  "k_dpmpp_2s_a": "DPM++ 2S a",
+  "k_dpmpp_3m_sde": "DPM++ 3M SDE",
+  "k_euler_a": "Euler a",
+  "k_euler": "Euler",
+  "k_lms": "LMS",
+  "k_heun": "Heun",
+  "k_dpm_2": "DPM2",
+  "k_dpm_2_a": "DPM2 a",
+  "k_dpm_fast": "DPM fast",
+  "k_dpm_ad": "DPM adaptive",
+  "restart": "Restart",
+  "ddim": "DDIM",
+  "plms": "PLMS",
+  "unipc": "UniPC",
+  "k_lcm": "LCM"
+}

@@ -5,6 +5,8 @@ import { closestMultiple, download, forceDataPrefix, getImageSize, login, Networ
 import { } from '@koishijs/translator'
 import { } from '@koishijs/plugin-help'
 import AdmZip from 'adm-zip'
+import { resolve } from 'path'
+import { readFile } from 'fs/promises'
 
 export * from './config'
 
@@ -14,7 +16,7 @@ export const name = 'novelai'
 const logger = new Logger('novelai')
 
 function handleError(session: Session, err: Error) {
-  if (Quester.isAxiosError(err)) {
+  if (Quester.Error.is(err)) {
     if (err.response?.status === 402) {
       return session.text('.unauthorized')
     } else if (err.response?.status) {
@@ -30,6 +32,7 @@ function handleError(session: Session, err: Error) {
 }
 
 export const inject = {
+  required: ['http'],
   optional: ['translator'],
 }
 
@@ -109,7 +112,16 @@ export function apply(ctx: Context, config: Config) {
     .option('hiresFix', '-H', { hidden: () => config.type !== 'sd-webui' })
     .option('smea', '-S', { hidden: () => config.model !== 'nai-v3' })
     .option('smeaDyn', '-d', { hidden: () => config.model !== 'nai-v3' })
-    .option('scheduler', '-C <scheduler> ', { hidden: () => config.model !== 'nai-v3', type: scheduler })
+    .option('scheduler', '-C <scheduler:string>', {
+      hidden: () => config.type === 'naifu',
+      type: ['token', 'login'].includes(config.type)
+        ? scheduler.nai
+        : config.type === 'sd-webui'
+        ? scheduler.sd
+        : config.type === 'stable-horde'
+        ? scheduler.horde
+        : [],
+    })
     .option('decrisper', '-D', { hidden: thirdParty })
     .option('undesired', '-u <undesired>')
     .option('noTranslator', '-T', { hidden: () => !ctx.translator || !config.translator })
@@ -152,10 +164,10 @@ export function apply(ctx: Context, config: Config) {
       let imgUrl: string, image: ImageData
       if (!restricted(session) && haveInput) {
         input = h('', h.transform(h.parse(input), {
-          image(attrs) {
+          img(attrs) {
             if (!allowImage) throw new SessionError('commands.novelai.messages.invalid-content')
             if (imgUrl) throw new SessionError('commands.novelai.messages.too-many-images')
-            imgUrl = attrs.url
+            imgUrl = attrs.src
             return ''
           },
         })).toString(true)
@@ -306,16 +318,19 @@ export function apply(ctx: Context, config: Config) {
             return '/api/v2/generate/async'
           case 'naifu':
             return '/generate-stream'
+          case 'comfyui':
+            return '/prompt'
           default:
             return '/ai/generate-image'
         }
       })()
 
-      const getPayload = () => {
+      const getPayload = async () => {
         switch (config.type) {
           case 'login':
           case 'token':
           case 'naifu': {
+            parameters.params_version = 1
             parameters.sampler = sampler.sd2nai(options.sampler, model)
             parameters.image = image?.base64 // NovelAI / NAIFU accepts bare base64 encoded image
             if (config.type === 'naifu') return parameters
@@ -326,6 +341,8 @@ export function apply(ctx: Context, config: Config) {
             }
             parameters.dynamic_thresholding = options.decrisper ?? config.decrisper
             if (model === 'nai-diffusion-3') {
+              parameters.legacy = false
+              parameters.legacy_v3_extend = false
               parameters.sm_dyn = options.smeaDyn ?? config.smeaDyn
               parameters.sm = (options.smea ?? config.smea) || parameters.sm_dyn
               parameters.noise_schedule = options.scheduler ?? config.scheduler
@@ -338,12 +355,19 @@ export function apply(ctx: Context, config: Config) {
                 parameters.sm_dyn = false
                 delete parameters.noise_schedule
               }
+              // Max scale for nai-v3 is 10, but not 20.
+              // If the given value is greater than 10,
+              // we can assume it is configured with an older version (max 20)
+              if (parameters.scale > 10) {
+                parameters.scale = parameters.scale / 2
+              }
             }
             return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
           }
           case 'sd-webui': {
             return {
               sampler_index: sampler.sd[options.sampler],
+              scheduler: options.scheduler,
               init_images: image && [image.dataUrl], // sd-webui accepts data URLs with base64 encoded image
               restore_faces: config.restoreFaces ?? false,
               enable_hr: options.hiresFix ?? config.hiresFix ?? false,
@@ -365,14 +389,14 @@ export function apply(ctx: Context, config: Config) {
             return {
               prompt: parameters.prompt,
               params: {
-                sampler_name: options.sampler.replace('_ka', ''),
+                sampler_name: options.sampler,
                 cfg_scale: parameters.scale,
                 denoising_strength: parameters.strength,
                 seed: parameters.seed.toString(),
                 height: parameters.height,
                 width: parameters.width,
                 post_processing: [],
-                karras: options.sampler.includes('_ka'),
+                karras: options.scheduler?.toLowerCase() === 'karras',
                 hires_fix: options.hiresFix ?? config.hiresFix ?? false,
                 steps: parameters.steps,
                 n: parameters.n_samples,
@@ -387,6 +411,76 @@ export function apply(ctx: Context, config: Config) {
               // https://github.com/koishijs/novelai-bot/issues/163
               r2: true,
             }
+          }
+          case 'comfyui': {
+            const workflowText2Image = config.workflowText2Image ? resolve(ctx.baseDir, config.workflowText2Image) : resolve(__dirname,'../data/default-comfyui-t2i-wf.json')
+            const workflowImage2Image = config.workflowImage2Image ? resolve(ctx.baseDir, config.workflowImage2Image) : resolve(__dirname,'../data/default-comfyui-i2i-wf.json')
+            const workflow = image ? workflowImage2Image : workflowText2Image
+            logger.debug('workflow:', workflow)
+            const prompt = JSON.parse(await readFile(workflow, 'utf8'))
+
+            // have to upload image to the comfyui server first
+            if (image) {
+              const body = new FormData()
+              const capture = /^data:([\w/.+-]+);base64,(.*)$/.exec(image.dataUrl)
+              const [, mime,] = capture
+              
+              let name = Date.now().toString() 
+              const ext = mime === 'image/jpeg' ? 'jpg' : mime === 'image/png' ? 'png' : ''
+              if (ext) name += `.${ext}`
+              const imageFile = new Blob([image.buffer], {type:mime})
+              body.append("image", imageFile, name)
+              const res = await ctx.http(trimSlash(config.endpoint) + '/upload/image', {
+                method: 'POST',
+                headers: {
+                  ...config.headers,
+                },
+                data: body,
+              })
+              if (res.status === 200) {
+                const data = res.data
+                let imagePath = data.name
+                if (data.subfolder) imagePath = data.subfolder + '/' + imagePath
+      
+                for (const nodeId in prompt) {
+                  if (prompt[nodeId].class_type === 'LoadImage') {
+                    prompt[nodeId].inputs.image = imagePath
+                    break
+                  }
+                }
+              } else {
+                throw new SessionError('commands.novelai.messages.unknown-error')
+              }
+            }
+
+            // only change the first node in the workflow
+            for (const nodeId in prompt) {
+              if (prompt[nodeId].class_type === 'KSampler') {
+                prompt[nodeId].inputs.seed = parameters.seed
+                prompt[nodeId].inputs.steps = parameters.steps
+                prompt[nodeId].inputs.cfg = parameters.scale
+                prompt[nodeId].inputs.sampler_name = options.sampler
+                prompt[nodeId].inputs.denoise = options.strength ?? config.strength
+                prompt[nodeId].inputs.scheduler = options.scheduler ?? config.scheduler
+                const positiveNodeId = prompt[nodeId].inputs.positive[0]
+                const negativeeNodeId = prompt[nodeId].inputs.negative[0]
+                const latentImageNodeId = prompt[nodeId].inputs.latent_image[0]
+                prompt[positiveNodeId].inputs.text = parameters.prompt
+                prompt[negativeeNodeId].inputs.text = parameters.uc    
+                prompt[latentImageNodeId].inputs.width = parameters.width
+                prompt[latentImageNodeId].inputs.height = parameters.height
+                prompt[latentImageNodeId].inputs.batch_size = parameters.n_samples
+                break
+              }
+            }
+            for (const nodeId in prompt) {
+              if (prompt[nodeId].class_type === 'CheckpointLoaderSimple') {
+                prompt[nodeId].inputs.ckpt_name = options.model ?? config.model
+                break
+              }
+            }
+            logger.debug('prompt:', prompt)
+            return  { prompt }
           }
         }
       }
@@ -405,16 +499,16 @@ export function apply(ctx: Context, config: Config) {
       let finalPrompt = prompt
       const iterate = async () => {
         const request = async () => {
-          const res = await ctx.http.axios(trimSlash(config.endpoint) + path, {
+          const res = await ctx.http(trimSlash(config.endpoint) + path, {
             method: 'POST',
             timeout: config.requestTimeout,
             // Since novelai's latest interface returns an application/x-zip-compressed, a responseType must be passed in
-            responseType: ['login', 'token'].includes(config.type) ? 'arraybuffer' : 'json',
+            responseType: config.type === 'naifu' ? 'text' : ['login', 'token'].includes(config.type) ? 'arraybuffer' : 'json',
             headers: {
               ...config.headers,
               ...getHeaders(),
             },
-            data: getPayload(),
+            data: await getPayload(),
           })
 
           if (config.type === 'sd-webui') {
@@ -444,15 +538,41 @@ export function apply(ctx: Context, config: Config) {
               // in case some client doesn't support r2 upload and follow the ye olde way.
               return forceDataPrefix(result.generations[0].img, 'image/webp')
             }
-            const imgRes = await ctx.http.axios(imgUrl, { responseType: 'arraybuffer' })
+            const imgRes = await ctx.http(imgUrl, { responseType: 'arraybuffer' })
             const b64 = Buffer.from(imgRes.data).toString('base64')
-            return forceDataPrefix(b64, imgRes.headers['content-type'])
+            return forceDataPrefix(b64, imgRes.headers.get('content-type'))
+          }
+          if (config.type === 'comfyui') {
+            // get filenames from history
+            const promptId = res.data.prompt_id
+            const check = () => ctx.http.get(trimSlash(config.endpoint) + '/history/' + promptId)
+              .then((res) => res[promptId] && res[promptId].outputs)
+            const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+            let outputs
+            while (!(outputs = await check())) {
+              await sleep(config.pollInterval)
+            }
+            // get images by filename
+            const imagesOutput: { data: ArrayBuffer, mime: string }[] = [];
+            for (const nodeId in outputs) {
+              const nodeOutput = outputs[nodeId]
+              if ('images' in nodeOutput) {
+                for (const image of nodeOutput['images']) {
+                  const urlValues = new URLSearchParams({ filename: image['filename'], subfolder: image['subfolder'], type: image['type'] }).toString()
+                  const imgRes = await ctx.http(trimSlash(config.endpoint) + '/view?' + urlValues)
+                  imagesOutput.push({ data: imgRes.data, mime: imgRes.headers.get('content-type') })
+                  break
+                }
+              }
+            }
+            // return first image
+            return forceDataPrefix(Buffer.from(imagesOutput[0].data).toString('base64'), imagesOutput[0].mime)
           }
           // event: newImage
           // id: 1
           // data:
-
-          if (res.headers['content-type'] === 'application/x-zip-compressed') {
+          //                                                                        ↓ nai-v3
+          if (res.headers.get('content-type') === 'application/x-zip-compressed' || res.headers.get('content-disposition')?.includes('.zip')) {
             const buffer = Buffer.from(res.data, 'binary')  // Ensure 'binary' encoding
             const zip = new AdmZip(buffer)
 
@@ -462,8 +582,7 @@ export function apply(ctx: Context, config: Config) {
             const b64 = Buffer.from(firstImageBuffer).toString('base64')
             return forceDataPrefix(b64, 'image/png')
           }
-
-          return forceDataPrefix(res.data?.slice(27))
+          return forceDataPrefix(res.data?.trimEnd().slice(27))
         }
 
         let dataUrl: string, count = 0
@@ -472,7 +591,7 @@ export function apply(ctx: Context, config: Config) {
             dataUrl = await request()
             break
           } catch (err) {
-            if (Quester.isAxiosError(err)) {
+            if (Quester.Error.is(err)) {
               if (err.code && err.code !== 'ETIMEDOUT' && ++count < config.maxRetryCount) {
                 continue
               }
@@ -518,6 +637,7 @@ export function apply(ctx: Context, config: Config) {
           return result
         }
 
+        logger.debug(`${session.uid}: ${finalPrompt}`)
         const messageIds = await session.send(getContent())
         if (messageIds.length && config.recallTimeout) {
           ctx.setTimeout(() => {
@@ -605,7 +725,7 @@ export function apply(ctx: Context, config: Config) {
       }
 
       try {
-        const { data } = await ctx.http.axios<StableDiffusionWebUI.ExtraSingleImageResponse>(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
+        const { data } = await ctx.http<StableDiffusionWebUI.ExtraSingleImageResponse>(trimSlash(config.endpoint) + '/sdapi/v1/extra-single-image', {
           method: 'POST',
           timeout: config.requestTimeout,
           headers: {

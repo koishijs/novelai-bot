@@ -1,4 +1,4 @@
-import { defineConfig } from '@koishijs/vitepress'
+import { defineConfig } from '@cordisjs/vitepress'
 
 export default defineConfig({
   lang: 'zh-CN',
