@@ -370,7 +370,7 @@ export const Config = Schema.intersect([
       }),
       Schema.union([
         Schema.object({
-          model: Schema.const('nai-v3').required(),
+          model: Schema.const('nai-v3'),
           sampler: sampler.createSchema(sampler.nai3),
           smea: Schema.boolean().description('默认启用 SMEA。'),
           smeaDyn: Schema.boolean().description('默认启用 SMEA 采样器的 DYN 变体。'),
