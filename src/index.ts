@@ -110,7 +110,7 @@ export function apply(ctx: Context, config: Config) {
     .option('noise', '-n <noise:number>', { hidden: some(restricted, thirdParty) })
     .option('strength', '-N <strength:number>', { hidden: restricted })
     .option('hiresFix', '-H', { hidden: () => config.type !== 'sd-webui' })
-    .option('hiresFixSteps', { hidden: () => config.type !== 'sd-webui' })
+    .option('hiresFixSteps', '<step>', { type: step, hidden: () => config.type !== 'sd-webui' })
     .option('smea', '-S', { hidden: () => config.model !== 'nai-v3' })
     .option('smeaDyn', '-d', { hidden: () => config.model !== 'nai-v3' })
     .option('scheduler', '-C <scheduler:string>', {
