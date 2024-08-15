@@ -410,8 +410,12 @@ export function apply(ctx: Context, config: Config) {
             }
           }
           case 'comfyui': {
-            const workflowText2Image = config.workflowText2Image ? resolve(ctx.baseDir, config.workflowText2Image) : resolve(__dirname,'../data/default-comfyui-t2i-wf.json')
-            const workflowImage2Image = config.workflowImage2Image ? resolve(ctx.baseDir, config.workflowImage2Image) : resolve(__dirname,'../data/default-comfyui-i2i-wf.json')
+            const workflowText2Image = config.workflowText2Image
+              ? resolve(ctx.baseDir, config.workflowText2Image)
+              : resolve(__dirname, '../data/default-comfyui-t2i-wf.json')
+            const workflowImage2Image = config.workflowImage2Image
+              ? resolve(ctx.baseDir, config.workflowImage2Image)
+              : resolve(__dirname, '../data/default-comfyui-i2i-wf.json')
             const workflow = image ? workflowImage2Image : workflowText2Image
             logger.debug('workflow:', workflow)
             const prompt = JSON.parse(await readFile(workflow, 'utf8'))
@@ -425,7 +429,7 @@ export function apply(ctx: Context, config: Config) {
               let name = Date.now().toString()
               const ext = mime === 'image/jpeg' ? 'jpg' : mime === 'image/png' ? 'png' : ''
               if (ext) name += `.${ext}`
-              const imageFile = new Blob([image.buffer], {type:mime})
+              const imageFile = new Blob([image.buffer], { type: mime })
               body.append("image", imageFile, name)
               const res = await ctx.http(trimSlash(config.endpoint) + '/upload/image', {
                 method: 'POST',
@@ -477,7 +481,7 @@ export function apply(ctx: Context, config: Config) {
               }
             }
             logger.debug('prompt:', prompt)
-            return  { prompt }
+            return { prompt }
           }
         }
       }
