@@ -361,7 +361,7 @@ export function apply(ctx: Context, config: Config) {
             return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
           }
           case 'sd-webui': {
-            const extensionsArgs = genExtensionsArgs(session, config)
+            const extensionsArgs = genExtensionsArgs(session, config, parameters.prompt)
             return {
               sampler_index: sampler.sd[options.sampler],
               scheduler: options.scheduler,

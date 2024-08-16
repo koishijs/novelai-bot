@@ -214,6 +214,7 @@ const dtgTagLengths = ['very short', 'short', 'long', 'very long'] as const
 
 export interface DanTagGenConfig {
   enabled: boolean
+  disableAfterLen?: number
   totalTagLength?: 'very short' | 'short' | 'long' | 'very long'
   banTags?: string
   promptFormat?: string
@@ -229,6 +230,7 @@ export interface DanTagGenConfig {
 
 export const danTagGenConfig = Schema.object({
   enabled: Schema.const(true).required(),
+  disableAfterLen: Schema.number().role('slider').min(0).max(20).description('在原始输入tag个数大于该值后不再启用tag生成。').default(5),
   totalTagLength: Schema.union(dtgTagLengths).description('生成的tag长度。').default('short'),
   banTags: Schema.string().role('textarea').description('禁止生成的tag，使用","分隔，支持Regex。').default(''),
   promptFormat: Schema.string().role('textarea').description('生成的格式。').default('<|special|>, <|characters|>,<|artist|>, <|general|>, <|meta|>, <|rating|>'),

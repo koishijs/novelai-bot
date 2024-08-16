@@ -1,4 +1,4 @@
-import { Session } from "koishi"
+import { Dict, Session } from "koishi"
 import { Config, DanTagGenConfig } from "./config"
 
 type WebUiExtensionArgs = Array<boolean | number | string | object | null>
@@ -12,9 +12,11 @@ interface WebUiExtensionParams {
     [key: string]: { args: WebUiExtensionArgs }
 }
 
-function danTagGen(session: Session, config: Config): ExtensionGenRes | false {
+function danTagGen(session: Session, config: Config, prompt: string): ExtensionGenRes | false {
     if (!config.danTagGen || !config.danTagGen.enabled) return false
 
+    const disableAfterLen = config.danTagGen.disableAfterLen
+    if (disableAfterLen > 0 && disableAfterLen > prompt.length) return false
     const danTagGenConfig = config.danTagGen as DanTagGenConfig
     return {
         name: 'DanTagGen',
@@ -37,17 +39,16 @@ function danTagGen(session: Session, config: Config): ExtensionGenRes | false {
     }
 }
 
-const webUiExtensions: Array<(session: Session, config: Config) => ExtensionGenRes | false> = [danTagGen]
+const webUiExtensions: Array<(session: Session, config: Config, prompt: string) => ExtensionGenRes | false> = [danTagGen]
 
-export function genExtensionsArgs(session: Session, config: Config): WebUiExtensionParams {
+export function genExtensionsArgs(session: Session, config: Config, prompt: string): WebUiExtensionParams {
     if (!config.danTagGen) return {}
     const args: WebUiExtensionParams = {}
     for (const extension of webUiExtensions) {
-        const _args = extension(session, config)
+        const _args = extension(session, config, prompt)
         if (_args) {
             args[_args.name] = { args: _args.args }
         }
     }
     return args
 }
-
