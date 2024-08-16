@@ -206,7 +206,7 @@ export function apply(ctx: Context, config: Config) {
         }
       }
 
-      const [errPath, prompt, uc] = parseInput(session, input, config, options.override)
+      const [errPath, prompt, uc, sanitizedInput] = parseInput(session, input, config, options.override)
       if (errPath) return session.text(errPath)
 
       let token: string
@@ -361,7 +361,7 @@ export function apply(ctx: Context, config: Config) {
             return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
           }
           case 'sd-webui': {
-            const extensionsArgs = genExtensionsArgs(session, config, parameters.prompt)
+            const extensionsArgs = genExtensionsArgs(session, config, sanitizedInput)
             return {
               sampler_index: sampler.sd[options.sampler],
               scheduler: options.scheduler,

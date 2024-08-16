@@ -614,7 +614,7 @@ export function parseInput(session: Session, input: string, config: Config, over
     if (config.defaultPromptSw) appendToList(positive, session.resolve(config.defaultPrompt))
   }
 
-  return [null, positive.join(', '), negative.join(', ')]
+  return [null, positive.join(', '), negative.join(', '), input]
 }
 
 function getWordCount(words: string[]) {
