@@ -16,7 +16,7 @@ function danTagGen(session: Session, config: Config, prompt: string): ExtensionG
     if (!config.danTagGen || !config.danTagGen.enabled) return false
 
     const disableAfterLen = config.danTagGen.disableAfterLen
-    if (disableAfterLen > 0 && disableAfterLen > prompt.length) return false
+    if (disableAfterLen > 0 && (prompt && prompt.length > disableAfterLen)) return false
     const danTagGenConfig = config.danTagGen as DanTagGenConfig
     return {
         name: 'DanTagGen',
