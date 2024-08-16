@@ -608,13 +608,14 @@ export function parseInput(session: Session, input: string, config: Config, over
     return ['.too-many-words']
   }
 
+  const sanitizedInput = positive.join(',')
   if (!override) {
     appendToList(positive, session.resolve(config.basePrompt))
     appendToList(negative, session.resolve(config.negativePrompt))
     if (config.defaultPromptSw) appendToList(positive, session.resolve(config.defaultPrompt))
   }
 
-  return [null, positive.join(', '), negative.join(', '), input]
+  return [null, positive.join(', '), negative.join(', '), sanitizedInput]
 }
 
 function getWordCount(words: string[]) {
