@@ -10,6 +10,7 @@ export const modelMap = {
   nai: 'nai-diffusion',
   furry: 'nai-diffusion-furry',
   'nai-v3': 'nai-diffusion-3',
+  'nai-v4-curated-preview': 'nai-diffusion-4-curated-preview',
 } as const
 
 export const orientMap = {
@@ -35,6 +36,7 @@ export const orients = Object.keys(orientMap) as Orient[]
 
 export namespace scheduler {
   export const nai = ['native', 'karras', 'exponential', 'polyexponential'] as const
+  export const nai4 = ['karras', 'exponential', 'polyexponential'] as const
   export const sd = ['Automatic', 'Uniform', 'Karras', 'Exponential', 'Polyexponential', 'SGM Uniform'] as const
   export const horde = ['karras'] as const
   export const comfyUI = ['normal', 'karras', 'exponential', 'sgm_uniform', 'simple', 'ddim_uniform'] as const
@@ -56,6 +58,17 @@ export namespace sampler {
     'k_dpmpp_2m': 'DPM++ 2M',
     'k_dpmpp_sde': 'DPM++ SDE',
     'ddim_v3': 'DDIM V3',
+  }
+
+  export const nai4 = {
+    // recommended
+    'k_euler': 'Euler',
+    'k_euler_a': 'Euler ancestral',
+    'k_dpmpp_2s_ancestral': 'DPM++ 2S ancestral',
+    'k_dpmpp_2m_sde': 'DPM++ 2M SDE',
+    // other
+    'k_dpmpp_2m': 'DPM++ 2M',
+    'k_dpmpp_sde': 'DPM++ SDE',
   }
 
   // samplers in stable-diffusion-webui
@@ -386,6 +399,11 @@ export const Config = Schema.intersect([
           smea: Schema.boolean().description('默认启用 SMEA。'),
           smeaDyn: Schema.boolean().description('默认启用 SMEA 采样器的 DYN 变体。'),
           scheduler: Schema.union(scheduler.nai).description('默认的调度器。').default('native'),
+        }),
+        Schema.object({
+          model: Schema.const('nai-v4-curated-preview'),
+          sampler: sampler.createSchema(sampler.nai4),
+          scheduler: Schema.union(scheduler.nai4).description('默认的调度器。').default('karras'),
         }),
         Schema.object({ sampler: sampler.createSchema(sampler.nai) }),
       ]),
