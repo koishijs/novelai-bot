@@ -1,6 +1,6 @@
 import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers, scheduler } from './config'
-import { ImageData, StableDiffusionWebUI } from './types'
+import { ImageData, NovelAI, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
 import { } from '@koishijs/translator'
 import { } from '@koishijs/plugin-help'
@@ -13,9 +13,7 @@ export * from './config'
 export const reactive = true
 export const name = 'novelai'
 
-const logger = new Logger('novelai')
-
-function handleError(session: Session, err: Error) {
+function handleError({ logger }: Context, session: Session, err: Error) {
   if (Quester.Error.is(err)) {
     if (err.response?.status === 402) {
       return session.text('.unauthorized')
@@ -201,7 +199,7 @@ export function apply(ctx: Context, config: Config) {
         try {
           input = await ctx.translator.translate({ input, target: 'en' })
         } catch (err) {
-          logger.warn(err)
+          ctx.logger.warn(err)
         }
       }
 
@@ -215,7 +213,7 @@ export function apply(ctx: Context, config: Config) {
         if (err instanceof NetworkError) {
           return session.text(err.message, err.params)
         }
-        logger.error(err)
+        ctx.logger.error(err)
         return session.text('.unknown-error')
       }
 
@@ -243,7 +241,7 @@ export function apply(ctx: Context, config: Config) {
           if (err instanceof NetworkError) {
             return session.text(err.message, err.params)
           }
-          logger.error(err)
+          ctx.logger.error(err)
           return session.text('.download-error')
         }
 
@@ -335,29 +333,49 @@ export function apply(ctx: Context, config: Config) {
               delete parameters.uc
             }
             parameters.dynamic_thresholding = options.decrisper ?? config.decrisper
-            if (model === 'nai-diffusion-3') {
+            if (model === 'nai-diffusion-3' || model === 'nai-diffusion-4-curated-preview') {
               parameters.legacy = false
-              parameters.legacy_v3_extend = false
-              parameters.sm_dyn = options.smeaDyn ?? config.smeaDyn
-              parameters.sm = (options.smea ?? config.smea) || parameters.sm_dyn
               parameters.noise_schedule = options.scheduler ?? config.scheduler
-              if (['k_euler_ancestral', 'k_dpmpp_2s_ancestral'].includes(parameters.sampler)
-                && parameters.noise_schedule === 'karras') {
-                parameters.noise_schedule = 'native'
-              }
-              if (parameters.sampler === 'ddim_v3') {
-                parameters.sm = false
-                parameters.sm_dyn = false
-                delete parameters.noise_schedule
-              }
               // Max scale for nai-v3 is 10, but not 20.
               // If the given value is greater than 10,
               // we can assume it is configured with an older version (max 20)
               if (parameters.scale > 10) {
                 parameters.scale = parameters.scale / 2
               }
+              if (model === 'nai-diffusion-3') {
+                parameters.legacy_v3_extend = false
+                parameters.sm_dyn = options.smeaDyn ?? config.smeaDyn
+                parameters.sm = (options.smea ?? config.smea) || parameters.sm_dyn
+                if (['k_euler_ancestral', 'k_dpmpp_2s_ancestral'].includes(parameters.sampler)
+                  && parameters.noise_schedule === 'karras') {
+                  parameters.noise_schedule = 'native'
+                }
+                if (parameters.sampler === 'ddim_v3') {
+                  parameters.sm = false
+                  parameters.sm_dyn = false
+                  delete parameters.noise_schedule
+                }
+              }
+              if (model === 'nai-diffusion-4-curated-preview') {
+                parameters.use_coords = false  // unknown
+                parameters.characterPrompts = [] satisfies NovelAI.V4CharacterPrompt[]
+                parameters.v4_prompt = {
+                  caption: {
+                    base_caption: prompt,
+                    char_captions: [],
+                  },
+                  use_coords: parameters.use_coords,
+                  use_order: true,
+                } satisfies NovelAI.V4PromptPositive
+                parameters.v4_negative_prompt = {
+                  caption: {
+                    base_caption: parameters.negative_prompt,
+                    char_captions: [],
+                  },
+                } satisfies NovelAI.V4Prompt
+              }
             }
-            return { model, input: prompt, parameters: omit(parameters, ['prompt']) }
+            return { model, input: prompt, action: 'generate', parameters: omit(parameters, ['prompt']) }
           }
           case 'sd-webui': {
             return {
@@ -417,7 +435,7 @@ export function apply(ctx: Context, config: Config) {
               ? resolve(ctx.baseDir, config.workflowImage2Image)
               : resolve(__dirname, '../data/default-comfyui-i2i-wf.json')
             const workflow = image ? workflowImage2Image : workflowText2Image
-            logger.debug('workflow:', workflow)
+            ctx.logger.debug('workflow:', workflow)
             const prompt = JSON.parse(await readFile(workflow, 'utf8'))
 
             // have to upload image to the comfyui server first
@@ -480,7 +498,7 @@ export function apply(ctx: Context, config: Config) {
                 break
               }
             }
-            logger.debug('prompt:', prompt)
+            ctx.logger.debug('prompt:', prompt)
             return { prompt }
           }
         }
@@ -520,7 +538,7 @@ export function apply(ctx: Context, config: Config) {
               try {
                 finalPrompt = (JSON.parse(data.info)).prompt
               } catch (err) {
-                logger.warn(err)
+                ctx.logger.warn(err)
               }
             }
             return forceDataPrefix(data.images[0])
@@ -598,8 +616,7 @@ export function apply(ctx: Context, config: Config) {
                 continue
               }
             }
-
-            return await session.send(handleError(session, err))
+            return await session.send(handleError(ctx, session, err))
           }
         }
 
@@ -639,7 +656,7 @@ export function apply(ctx: Context, config: Config) {
           return result
         }
 
-        logger.debug(`${session.uid}: ${finalPrompt}`)
+        ctx.logger.debug(`${session.uid}: ${finalPrompt}`)
         const messageIds = await session.send(getContent())
         if (messageIds.length && config.recallTimeout) {
           ctx.setTimeout(() => {
@@ -708,7 +725,7 @@ export function apply(ctx: Context, config: Config) {
         if (err instanceof NetworkError) {
           return session.text(err.message, err.params)
         }
-        logger.error(err)
+        ctx.logger.error(err)
         return session.text('.download-error')
       }
 
@@ -737,7 +754,7 @@ export function apply(ctx: Context, config: Config) {
         })
         return h.image(forceDataPrefix(data.image))
       } catch (e) {
-        logger.warn(e)
+        ctx.logger.warn(e)
         return session.text('.unknown-error')
       }
     })

@@ -44,6 +44,39 @@ export interface ImageData {
   dataUrl: string
 }
 
+export namespace NovelAI {
+  /** 0.5, 0.5 means make ai choose */
+  export interface V4CharacterPromptCenter {
+    x: number
+    y: number
+  }
+
+  export interface V4CharacterPrompt {
+    prompt: string
+    uc: string
+    center: V4CharacterPromptCenter
+  }
+
+  export interface V4CharCaption {
+    char_caption: string
+    centers: V4CharacterPromptCenter[]
+  }
+
+  export interface V4PromptCaption {
+    base_caption: string
+    char_captions: V4CharCaption[]
+  }
+
+  export interface V4Prompt {
+    caption: V4PromptCaption
+  }
+
+  export interface V4PromptPositive extends V4Prompt {
+    use_coords: boolean
+    use_order: boolean
+  }
+}
+
 export namespace StableDiffusionWebUI {
   export interface Request {
     prompt: string
