@@ -261,7 +261,7 @@ export function apply(ctx: Context, config: Config) {
           Object.assign(parameters, {
             height: options.resolution.height,
             width: options.resolution.width,
-            noise: options.noise ?? 0.2,
+            noise: options.noise ?? session.resolve(config.noise),
             strength: options.strength ?? session.resolve(config.strength),
           })
         }
@@ -334,7 +334,9 @@ export function apply(ctx: Context, config: Config) {
             }
             parameters.dynamic_thresholding = options.decrisper ?? config.decrisper
             if (model === 'nai-diffusion-3' || model === 'nai-diffusion-4-curated-preview') {
+              parameters.params_version = 3
               parameters.legacy = false
+              parameters.legacy_v3_extend = false
               parameters.noise_schedule = options.scheduler ?? config.scheduler
               // Max scale for nai-v3 is 10, but not 20.
               // If the given value is greater than 10,
@@ -343,7 +345,6 @@ export function apply(ctx: Context, config: Config) {
                 parameters.scale = parameters.scale / 2
               }
               if (model === 'nai-diffusion-3') {
-                parameters.legacy_v3_extend = false
                 parameters.sm_dyn = options.smeaDyn ?? config.smeaDyn
                 parameters.sm = (options.smea ?? config.smea) || parameters.sm_dyn
                 if (['k_euler_ancestral', 'k_dpmpp_2s_ancestral'].includes(parameters.sampler)
@@ -357,8 +358,17 @@ export function apply(ctx: Context, config: Config) {
                 }
               }
               if (model === 'nai-diffusion-4-curated-preview') {
-                parameters.use_coords = false  // unknown
+                parameters.add_original_image = true  // unknown
+                parameters.cfg_rescale = session.resolve(config.rescale)
                 parameters.characterPrompts = [] satisfies NovelAI.V4CharacterPrompt[]
+                parameters.controlnet_strength = 1  // unknown
+                parameters.deliberate_euler_ancestral_bug = false  // unknown
+                parameters.prefer_brownian = true  // unknown
+                parameters.reference_image_multiple = []  // unknown
+                parameters.reference_information_extracted_multiple = []  // unknown
+                parameters.reference_strength_multiple = []  // unknown
+                parameters.skip_cfg_above_sigma = null  // unknown
+                parameters.use_coords = false  // unknown
                 parameters.v4_prompt = {
                   caption: {
                     base_caption: prompt,
@@ -479,7 +489,7 @@ export function apply(ctx: Context, config: Config) {
                 prompt[nodeId].inputs.steps = parameters.steps
                 prompt[nodeId].inputs.cfg = parameters.scale
                 prompt[nodeId].inputs.sampler_name = options.sampler
-                prompt[nodeId].inputs.denoise = options.strength ?? config.strength
+                prompt[nodeId].inputs.denoise = options.strength ?? session.resolve(config.strength)
                 prompt[nodeId].inputs.scheduler = options.scheduler ?? config.scheduler
                 const positiveNodeId = prompt[nodeId].inputs.positive[0]
                 const negativeeNodeId = prompt[nodeId].inputs.negative[0]

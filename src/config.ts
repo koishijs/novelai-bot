@@ -226,6 +226,7 @@ interface ParamConfig {
   smea?: boolean
   smeaDyn?: boolean
   scheduler?: string
+  rescale?: Computed<number>
   decrisper?: boolean
   upscaler?: string
   restoreFaces?: boolean
@@ -236,6 +237,7 @@ interface ParamConfig {
   imageSteps?: Computed<number>
   maxSteps?: Computed<number>
   strength?: Computed<number>
+  noise?: Computed<number>
   resolution?: Computed<Orient | Size>
   maxResolution?: Computed<number>
 }
@@ -402,8 +404,9 @@ export const Config = Schema.intersect([
         }),
         Schema.object({
           model: Schema.const('nai-v4-curated-preview'),
-          sampler: sampler.createSchema(sampler.nai4),
+          sampler: sampler.createSchema(sampler.nai4).default('k_euler_a'),
           scheduler: Schema.union(scheduler.nai4).description('默认的调度器。').default('karras'),
+          rescale: Schema.computed(Schema.number(), options).min(0).max(1).description('输入服从度调整规模。').default(0),
         }),
         Schema.object({ sampler: sampler.createSchema(sampler.nai) }),
       ]),
@@ -417,6 +420,7 @@ export const Config = Schema.intersect([
     imageSteps: Schema.computed(Schema.natural(), options).description('以图生图时默认的迭代步数。').default(50),
     maxSteps: Schema.computed(Schema.natural(), options).description('允许的最大迭代步数。').default(64),
     strength: Schema.computed(Schema.number(), options).min(0).max(1).description('默认的重绘强度。').default(0.7),
+    noise: Schema.computed(Schema.number(), options).min(0).max(1).description('默认的重绘添加噪声强度。').default(0.2),
     resolution: Schema.computed(Schema.union([
       Schema.const('portrait').description('肖像 (832x2326)'),
       Schema.const('landscape').description('风景 (1216x832)'),
