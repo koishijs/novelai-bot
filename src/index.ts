@@ -1,4 +1,4 @@
-import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
+import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, sleep, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers, scheduler } from './config'
 import { ImageData, NovelAI, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
@@ -9,6 +9,12 @@ import { resolve } from 'path'
 import { readFile } from 'fs/promises'
 
 export * from './config'
+
+declare module 'koishi' {
+  interface Events {
+    'novelai/finish'(id: string): void
+  }
+}
 
 export const reactive = true
 export const name = 'novelai'
@@ -43,6 +49,7 @@ export function apply(ctx: Context, config: Config) {
 
   const tasks: Dict<Set<string>> = Object.create(null)
   const globalTasks = new Set<string>()
+  const globalPending = new Set<string>()
 
   let tokenTask: Promise<string> = null
   const getToken = () => tokenTask ||= login(ctx)
@@ -297,10 +304,29 @@ export function apply(ctx: Context, config: Config) {
         ? session.text('.pending', [globalTasks.size])
         : session.text('.waiting'))
 
+      if (config.globalConcurrency) {
+        if (globalTasks.size >= config.globalConcurrency) {
+          const pendingId = container.pop()
+          globalPending.add(pendingId)
+          await new Promise<void>((resolve) => {
+            const dispose = ctx.on('novelai/finish', (id) => {
+              if (id !== pendingId) return
+              resolve()
+              dispose()
+            }
+          }))
+        }
+      }
+
       container.forEach((id) => globalTasks.add(id))
       const cleanUp = (id: string) => {
         tasks[session.cid]?.delete(id)
         globalTasks.delete(id)
+        if (globalPending.size) {
+          const id = globalPending.values().next().value
+          globalPending.delete(id)
+          ctx.parallel('novelai/finish', id)
+        }
       }
 
       const path = (() => {
@@ -557,7 +583,6 @@ export function apply(ctx: Context, config: Config) {
             const uuid = res.data.id
 
             const check = () => ctx.http.get(trimSlash(config.endpoint) + '/api/v2/generate/check/' + uuid).then((res) => res.done)
-            const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
             while (await check() === false) {
               await sleep(config.pollInterval)
             }

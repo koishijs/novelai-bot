@@ -260,6 +260,7 @@ export interface Config extends PromptConfig, ParamConfig {
   requestTimeout?: number
   recallTimeout?: number
   maxConcurrency?: number
+  globalConcurrency?: number
   pollInterval?: number
   trustedWorkers?: boolean
   workflowText2Image?: string
@@ -446,6 +447,7 @@ export const Config = Schema.intersect([
     requestTimeout: Schema.number().role('time').description('当请求超过这个时间时会中止并提示超时。').default(Time.minute),
     recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
     maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 以禁用此功能)。').default(0),
+    globalConcurrency: Schema.number().min(0).description('全局的最大并发数量 (设置为 0 以禁用此功能)。').default(0),
   }).description('高级设置'),
 ]) as Schema<Config>
 
