@@ -333,7 +333,9 @@ export function apply(ctx: Context, config: Config) {
               delete parameters.uc
             }
             parameters.dynamic_thresholding = options.decrisper ?? config.decrisper
-            if (model === 'nai-diffusion-3' || model === 'nai-diffusion-4-curated-preview') {
+            const isNAI3 = model === 'nai-diffusion-3'
+            const isNAI4 = model === 'nai-diffusion-4-curated-preview' || model === 'nai-diffusion-4-full'
+            if (isNAI3 || isNAI4) {
               parameters.params_version = 3
               parameters.legacy = false
               parameters.legacy_v3_extend = false
@@ -344,7 +346,7 @@ export function apply(ctx: Context, config: Config) {
               if (parameters.scale > 10) {
                 parameters.scale = parameters.scale / 2
               }
-              if (model === 'nai-diffusion-3') {
+              if (isNAI3) {
                 parameters.sm_dyn = options.smeaDyn ?? config.smeaDyn
                 parameters.sm = (options.smea ?? config.smea) || parameters.sm_dyn
                 if (['k_euler_ancestral', 'k_dpmpp_2s_ancestral'].includes(parameters.sampler)
@@ -356,8 +358,7 @@ export function apply(ctx: Context, config: Config) {
                   parameters.sm_dyn = false
                   delete parameters.noise_schedule
                 }
-              }
-              if (model === 'nai-diffusion-4-curated-preview') {
+              } else if (isNAI4) {
                 parameters.add_original_image = true // unknown
                 parameters.cfg_rescale = session.resolve(config.rescale)
                 parameters.characterPrompts = [] satisfies NovelAI.V4CharacterPrompt[]

@@ -11,6 +11,7 @@ export const modelMap = {
   furry: 'nai-diffusion-furry',
   'nai-v3': 'nai-diffusion-3',
   'nai-v4-curated-preview': 'nai-diffusion-4-curated-preview',
+  'nai-v4-full': 'nai-diffusion-4-full',
 } as const
 
 export const orientMap = {
@@ -266,6 +267,12 @@ export interface Config extends PromptConfig, ParamConfig {
   workflowImage2Image?: string
 }
 
+const NAI4ParamConfig = Schema.object({
+  sampler: sampler.createSchema(sampler.nai4).default('k_euler_a'),
+  scheduler: Schema.union(scheduler.nai4).description('默认的调度器。').default('karras'),
+  rescale: Schema.computed(Schema.number(), options).min(0).max(1).description('输入服从度调整规模。').default(0),
+})
+
 export const Config = Schema.intersect([
   Schema.object({
     type: Schema.union([
@@ -404,9 +411,11 @@ export const Config = Schema.intersect([
         }),
         Schema.object({
           model: Schema.const('nai-v4-curated-preview'),
-          sampler: sampler.createSchema(sampler.nai4).default('k_euler_a'),
-          scheduler: Schema.union(scheduler.nai4).description('默认的调度器。').default('karras'),
-          rescale: Schema.computed(Schema.number(), options).min(0).max(1).description('输入服从度调整规模。').default(0),
+          ...NAI4ParamConfig.dict,
+        }),
+        Schema.object({
+          model: Schema.const('nai-v4-full'),
+          ...NAI4ParamConfig.dict,
         }),
         Schema.object({ sampler: sampler.createSchema(sampler.nai) }),
       ]),
