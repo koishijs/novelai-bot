@@ -1,4 +1,4 @@
-import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
+import { Computed, Context, Dict, h, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers, scheduler } from './config'
 import { ImageData, NovelAI, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
@@ -358,17 +358,17 @@ export function apply(ctx: Context, config: Config) {
                 }
               }
               if (model === 'nai-diffusion-4-curated-preview') {
-                parameters.add_original_image = true  // unknown
+                parameters.add_original_image = true // unknown
                 parameters.cfg_rescale = session.resolve(config.rescale)
                 parameters.characterPrompts = [] satisfies NovelAI.V4CharacterPrompt[]
-                parameters.controlnet_strength = 1  // unknown
-                parameters.deliberate_euler_ancestral_bug = false  // unknown
-                parameters.prefer_brownian = true  // unknown
-                parameters.reference_image_multiple = []  // unknown
-                parameters.reference_information_extracted_multiple = []  // unknown
-                parameters.reference_strength_multiple = []  // unknown
-                parameters.skip_cfg_above_sigma = null  // unknown
-                parameters.use_coords = false  // unknown
+                parameters.controlnet_strength = 1 // unknown
+                parameters.deliberate_euler_ancestral_bug = false // unknown
+                parameters.prefer_brownian = true // unknown
+                parameters.reference_image_multiple = [] // unknown
+                parameters.reference_information_extracted_multiple = [] // unknown
+                parameters.reference_strength_multiple = [] // unknown
+                parameters.skip_cfg_above_sigma = null // unknown
+                parameters.use_coords = false // unknown
                 parameters.v4_prompt = {
                   caption: {
                     base_caption: prompt,
@@ -452,13 +452,13 @@ export function apply(ctx: Context, config: Config) {
             if (image) {
               const body = new FormData()
               const capture = /^data:([\w/.+-]+);base64,(.*)$/.exec(image.dataUrl)
-              const [, mime,] = capture
+              const [, mime] = capture
 
               let name = Date.now().toString()
               const ext = mime === 'image/jpeg' ? 'jpg' : mime === 'image/png' ? 'png' : ''
               if (ext) name += `.${ext}`
               const imageFile = new Blob([image.buffer], { type: mime })
-              body.append("image", imageFile, name)
+              body.append('image', imageFile, name)
               const res = await ctx.http(trimSlash(config.endpoint) + '/upload/image', {
                 method: 'POST',
                 headers: {
@@ -583,7 +583,7 @@ export function apply(ctx: Context, config: Config) {
               await sleep(config.pollInterval)
             }
             // get images by filename
-            const imagesOutput: { data: ArrayBuffer, mime: string }[] = [];
+            const imagesOutput: { data: ArrayBuffer; mime: string }[] = []
             for (const nodeId in outputs) {
               const nodeOutput = outputs[nodeId]
               if ('images' in nodeOutput) {
@@ -603,7 +603,7 @@ export function apply(ctx: Context, config: Config) {
           // data:
           //                                                                        ↓ nai-v3
           if (res.headers.get('content-type') === 'application/x-zip-compressed' || res.headers.get('content-disposition')?.includes('.zip')) {
-            const buffer = Buffer.from(res.data, 'binary')  // Ensure 'binary' encoding
+            const buffer = Buffer.from(res.data, 'binary') // Ensure 'binary' encoding
             const zip = new AdmZip(buffer)
 
             // Gets all files in the ZIP file
