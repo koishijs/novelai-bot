@@ -63,24 +63,24 @@
     "generate"
   ],
   "peerDependencies": {
-    "koishi": "^4.17.8"
+    "koishi": "^4.18.7"
   },
   "devDependencies": {
-    "@cordisjs/vitepress": "^3.2.7",
-    "@koishijs/plugin-help": "^2.4.3",
+    "@cordisjs/vitepress": "^3.3.2",
+    "@koishijs/plugin-help": "^2.4.5",
     "@koishijs/translator": "^1.1.1",
-    "@types/adm-zip": "^0.5.5",
+    "@types/adm-zip": "^0.5.7",
     "@types/libsodium-wrappers-sumo": "^0.7.8",
-    "@types/node": "^20.14.1",
+    "@types/node": "^22.13.8",
     "atsc": "^1.2.2",
-    "koishi": "^4.17.8",
-    "sass": "^1.77.4",
-    "typescript": "^5.4.5",
+    "koishi": "^4.18.7",
+    "sass": "^1.85.1",
+    "typescript": "^5.8.2",
     "vitepress": "1.0.0-rc.40"
   },
   "dependencies": {
-    "adm-zip": "^0.5.13",
-    "image-size": "^1.1.1",
-    "libsodium-wrappers-sumo": "^0.7.13"
+    "adm-zip": "^0.5.16",
+    "image-size": "^1.2.0",
+    "libsodium-wrappers-sumo": "^0.7.15"
   }
 }

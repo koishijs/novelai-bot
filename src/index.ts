@@ -1,4 +1,4 @@
-import { Computed, Context, Dict, h, Logger, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
+import { Computed, Context, Dict, h, omit, Quester, Session, SessionError, trimSlash } from 'koishi'
 import { Config, modelMap, models, orientMap, parseInput, sampler, upscalers, scheduler } from './config'
 import { ImageData, NovelAI, StableDiffusionWebUI } from './types'
 import { closestMultiple, download, forceDataPrefix, getImageSize, login, NetworkError, project, resizeInput, Size } from './utils'
@@ -333,7 +333,9 @@ export function apply(ctx: Context, config: Config) {
               delete parameters.uc
             }
             parameters.dynamic_thresholding = options.decrisper ?? config.decrisper
-            if (model === 'nai-diffusion-3' || model === 'nai-diffusion-4-curated-preview') {
+            const isNAI3 = model === 'nai-diffusion-3'
+            const isNAI4 = model === 'nai-diffusion-4-curated-preview' || model === 'nai-diffusion-4-full'
+            if (isNAI3 || isNAI4) {
               parameters.params_version = 3
               parameters.legacy = false
               parameters.legacy_v3_extend = false
@@ -344,7 +346,7 @@ export function apply(ctx: Context, config: Config) {
               if (parameters.scale > 10) {
                 parameters.scale = parameters.scale / 2
               }
-              if (model === 'nai-diffusion-3') {
+              if (isNAI3) {
                 parameters.sm_dyn = options.smeaDyn ?? config.smeaDyn
                 parameters.sm = (options.smea ?? config.smea) || parameters.sm_dyn
                 if (['k_euler_ancestral', 'k_dpmpp_2s_ancestral'].includes(parameters.sampler)
@@ -356,19 +358,18 @@ export function apply(ctx: Context, config: Config) {
                   parameters.sm_dyn = false
                   delete parameters.noise_schedule
                 }
-              }
-              if (model === 'nai-diffusion-4-curated-preview') {
-                parameters.add_original_image = true  // unknown
+              } else if (isNAI4) {
+                parameters.add_original_image = true // unknown
                 parameters.cfg_rescale = session.resolve(config.rescale)
                 parameters.characterPrompts = [] satisfies NovelAI.V4CharacterPrompt[]
-                parameters.controlnet_strength = 1  // unknown
-                parameters.deliberate_euler_ancestral_bug = false  // unknown
-                parameters.prefer_brownian = true  // unknown
-                parameters.reference_image_multiple = []  // unknown
-                parameters.reference_information_extracted_multiple = []  // unknown
-                parameters.reference_strength_multiple = []  // unknown
-                parameters.skip_cfg_above_sigma = null  // unknown
-                parameters.use_coords = false  // unknown
+                parameters.controlnet_strength = 1 // unknown
+                parameters.deliberate_euler_ancestral_bug = false // unknown
+                parameters.prefer_brownian = true // unknown
+                parameters.reference_image_multiple = [] // unknown
+                parameters.reference_information_extracted_multiple = [] // unknown
+                parameters.reference_strength_multiple = [] // unknown
+                parameters.skip_cfg_above_sigma = null // unknown
+                parameters.use_coords = false // unknown
                 parameters.v4_prompt = {
                   caption: {
                     base_caption: prompt,
@@ -452,13 +453,13 @@ export function apply(ctx: Context, config: Config) {
             if (image) {
               const body = new FormData()
               const capture = /^data:([\w/.+-]+);base64,(.*)$/.exec(image.dataUrl)
-              const [, mime,] = capture
+              const [, mime] = capture
 
               let name = Date.now().toString()
               const ext = mime === 'image/jpeg' ? 'jpg' : mime === 'image/png' ? 'png' : ''
               if (ext) name += `.${ext}`
               const imageFile = new Blob([image.buffer], { type: mime })
-              body.append("image", imageFile, name)
+              body.append('image', imageFile, name)
               const res = await ctx.http(trimSlash(config.endpoint) + '/upload/image', {
                 method: 'POST',
                 headers: {
@@ -583,7 +584,7 @@ export function apply(ctx: Context, config: Config) {
               await sleep(config.pollInterval)
             }
             // get images by filename
-            const imagesOutput: { data: ArrayBuffer, mime: string }[] = [];
+            const imagesOutput: { data: ArrayBuffer; mime: string }[] = []
             for (const nodeId in outputs) {
               const nodeOutput = outputs[nodeId]
               if ('images' in nodeOutput) {
@@ -603,7 +604,7 @@ export function apply(ctx: Context, config: Config) {
           // data:
           //                                                                        ↓ nai-v3
           if (res.headers.get('content-type') === 'application/x-zip-compressed' || res.headers.get('content-disposition')?.includes('.zip')) {
-            const buffer = Buffer.from(res.data, 'binary')  // Ensure 'binary' encoding
+            const buffer = Buffer.from(res.data, 'binary') // Ensure 'binary' encoding
             const zip = new AdmZip(buffer)
 
             // Gets all files in the ZIP file
