@@ -21,7 +21,7 @@ export interface Size {
 
 export function getImageSize(buffer: ArrayBuffer): Size {
   if (typeof Buffer !== 'undefined') {
-    return imageSize(Buffer.from(buffer))
+    return imageSize(new Uint8Array(buffer))
   }
   const blob = new Blob([buffer])
   const image = new Image()

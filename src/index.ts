@@ -610,7 +610,7 @@ export function apply(ctx: Context, config: Config) {
             // Gets all files in the ZIP file
             const zipEntries = zip.getEntries()
             const firstImageBuffer = zip.readFile(zipEntries[0])
-            const b64 = Buffer.from(firstImageBuffer).toString('base64')
+            const b64 = firstImageBuffer.toString('base64')
             return forceDataPrefix(b64, 'image/png')
           }
           return forceDataPrefix(res.data?.trimEnd().slice(27))
