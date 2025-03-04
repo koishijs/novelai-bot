@@ -184,6 +184,7 @@ export interface PromptConfig {
   lowerCase?: boolean
   maxWords?: Computed<number>
   ignoreAllowedInputImageTypes?: Computed<boolean>
+  transformPromptSyntax?: Computed<boolean>
 }
 
 export const PromptConfig: Schema<PromptConfig> = Schema.object({
@@ -201,6 +202,7 @@ export const PromptConfig: Schema<PromptConfig> = Schema.object({
   lowerCase: Schema.boolean().description('是否将输入的标签转换为小写。').default(true),
   maxWords: Schema.computed(Schema.natural(), options).description('允许的最大单词数量。').default(0),
   ignoreAllowedInputImageTypes: Schema.computed(Schema.boolean(), options).description('是否忽略输入图片的类型限制。').default(false),
+  transformPromptSyntax: Schema.computed(Schema.boolean(), options).description('是否自动转换输入的标签语法。').default(false),
 }).description('输入设置')
 
 interface FeatureConfig {
@@ -487,7 +489,7 @@ export function parseInput(session: Session, input: string, config: Config, over
     return [
       null,
       [session.resolve(config.basePrompt), session.resolve(config.defaultPrompt)].join(','),
-      session.resolve(config.negativePrompt)
+      session.resolve(config.negativePrompt),
     ]
   }
 
@@ -499,14 +501,16 @@ export function parseInput(session: Session, input: string, config: Config, over
     .replace(/《/g, '<')
     .replace(/》/g, '>')
 
-  if (config.type === 'sd-webui') {
-    input = input
-      .split('\\{').map(s => s.replace(/\{/g, '(')).join('\\{')
-      .split('\\}').map(s => s.replace(/\}/g, ')')).join('\\}')
-  } else {
-    input = input
-      .split('\\(').map(s => s.replace(/\(/g, '{')).join('\\(')
-      .split('\\)').map(s => s.replace(/\)/g, '}')).join('\\)')
+  if (session.resolve(config.transformPromptSyntax)) {
+    if (config.type === 'sd-webui') {
+      input = input
+        .split('\\{').map(s => s.replace(/\{/g, '(')).join('\\{')
+        .split('\\}').map(s => s.replace(/\}/g, ')')).join('\\}')
+    } else {
+      input = input
+        .split('\\(').map(s => s.replace(/\(/g, '{')).join('\\(')
+        .split('\\)').map(s => s.replace(/\)/g, '}')).join('\\)')
+    }
   }
 
   input = input
