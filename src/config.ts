@@ -183,6 +183,7 @@ export interface PromptConfig {
   translator?: boolean
   lowerCase?: boolean
   maxWords?: Computed<number>
+  ignoreAllowedInputImageTypes?: Computed<boolean>
 }
 
 export const PromptConfig: Schema<PromptConfig> = Schema.object({
@@ -199,6 +200,7 @@ export const PromptConfig: Schema<PromptConfig> = Schema.object({
   latinOnly: Schema.computed(Schema.boolean(), options).description('是否只接受英文输入。').default(false),
   lowerCase: Schema.boolean().description('是否将输入的标签转换为小写。').default(true),
   maxWords: Schema.computed(Schema.natural(), options).description('允许的最大单词数量。').default(0),
+  ignoreAllowedInputImageTypes: Schema.computed(Schema.boolean(), options).description('是否忽略输入图片的类型限制。').default(false),
 }).description('输入设置')
 
 interface FeatureConfig {

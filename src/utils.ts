@@ -33,7 +33,7 @@ const MAX_OUTPUT_SIZE = 1048576
 const MAX_CONTENT_SIZE = 10485760
 const ALLOWED_TYPES = ['image/jpeg', 'image/png']
 
-export async function download(ctx: Context, url: string, headers = {}): Promise<ImageData> {
+export async function download(ctx: Context, url: string, headers = {}, ignoreAllowedTypes = false): Promise<ImageData> {
   if (url.startsWith('data:') || url.startsWith('file:')) {
     const { mime, data } = await ctx.http.file(url)
     if (!ALLOWED_TYPES.includes(mime)) {
@@ -47,7 +47,7 @@ export async function download(ctx: Context, url: string, headers = {}): Promise
       throw new NetworkError('.file-too-large')
     }
     const mimetype = image.headers.get('content-type')
-    if (!ALLOWED_TYPES.includes(mimetype)) {
+    if (!ignoreAllowedTypes && !ALLOWED_TYPES.includes(mimetype)) {
       throw new NetworkError('.unsupported-file-type')
     }
     const buffer = image.data
