@@ -201,8 +201,8 @@ export const PromptConfig: Schema<PromptConfig> = Schema.object({
   latinOnly: Schema.computed(Schema.boolean(), options).description('是否只接受英文输入。').default(false),
   lowerCase: Schema.boolean().description('是否将输入的标签转换为小写。').default(true),
   maxWords: Schema.computed(Schema.natural(), options).description('允许的最大单词数量。').default(0),
-  ignoreAllowedInputImageTypes: Schema.computed(Schema.boolean(), options).description('是否忽略输入图片的类型限制。').default(false),
-  transformPromptSyntax: Schema.computed(Schema.boolean(), options).description('是否自动转换输入的标签语法。').default(false),
+  ignoreAllowedInputImageTypes: Schema.computed(Schema.boolean(), options).description('是否忽略从聊天平台获取的图片的文件类型。').default(false),
+  transformPromptSyntax: Schema.computed(Schema.boolean(), options).description('是否自动转换输入标签的括号语法。').default(false),
 }).description('输入设置')
 
 interface FeatureConfig {
