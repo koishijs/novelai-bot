@@ -201,6 +201,66 @@ export const PromptConfig: Schema<PromptConfig> = Schema.object({
   maxWords: Schema.computed(Schema.natural(), options).description('允许的最大单词数量。').default(0),
 }).description('输入设置')
 
+const dtgModels = [
+  'KBlueLeaf/DanTagGen-delta-rev2',
+  'KBlueLeaf/DanTagGen-delta',
+  'KBlueLeaf/DanTagGen-beta',
+  'KBlueLeaf/DanTagGen-alpha',
+  'KBlueLeaf/DanTagGen-gamma',
+  'KBlueLeaf/DanTagGen-delta-rev2|ggml-model-Q6_K.gguf',
+  'KBlueLeaf/DanTagGen-delta-rev2|ggml-model-Q8_0.gguf',
+  'KBlueLeaf/DanTagGen-delta-rev2|ggml-model-f16.gguf',
+  'KBlueLeaf/DanTagGen-delta|ggml-model-Q6_K.gguf',
+  'KBlueLeaf/DanTagGen-delta|ggml-model-Q8_0.gguf',
+  'KBlueLeaf/DanTagGen-delta|ggml-model-f16.gguf',
+  'KBlueLeaf/DanTagGen-beta|ggml-model-Q6_K.gguf',
+  'KBlueLeaf/DanTagGen-beta|ggml-model-Q8_0.gguf',
+  'KBlueLeaf/DanTagGen-beta|ggml-model-f16.gguf',
+  'KBlueLeaf/DanTagGen-alpha|ggml-model-Q6_K.gguf',
+  'KBlueLeaf/DanTagGen-alpha|ggml-model-Q8_0.gguf',
+  'KBlueLeaf/DanTagGen-alpha|ggml-model-f16.gguf',
+  'KBlueLeaf/DanTagGen-gamma|ggml-model-Q6_K.gguf',
+  'KBlueLeaf/DanTagGen-gamma|ggml-model-Q8_0.gguf',
+  'KBlueLeaf/DanTagGen-gamma|ggml-model-f16.gguf',
+] as const
+
+const dtgTagLengths = ['very short', 'short', 'long', 'very long'] as const
+
+export interface DanTagGenConfig {
+  enabled: boolean
+  disableAfterLen?: number
+  totalTagLength?: 'very short' | 'short' | 'long' | 'very long'
+  banTags?: string
+  promptFormat?: string
+  upsamplingTagsSeed?: number
+  upsamplingTiming?: 'Before' | 'After'
+  model?: string
+  useCpu?: boolean
+  noFormatting?: boolean
+  temperature?: number
+  topP?: number
+  topK?: number
+}
+
+export const danTagGenConfig = Schema.object({
+  enabled: Schema.const(true).required(),
+  disableAfterLen: Schema.number().role('slider').min(0).max(200).description('在输入字数大于该值后不再启用tag生成。').default(100),
+  totalTagLength: Schema.union(dtgTagLengths).description('生成的tag长度。').default('short'),
+  banTags: Schema.string().role('textarea').description('禁止生成的tag，使用","分隔，支持Regex。').default(''),
+  promptFormat: Schema.string().role('textarea').description('生成的格式。').default('<|special|>, <|characters|>,<|artist|>, <|general|>, <|meta|>, <|rating|>'),
+  upsamplingTagsSeed: Schema.number().description('上采样种子。').default(-1),
+  upsamplingTiming: Schema.union([
+    Schema.const('Before').description('其他提示词处理前'),
+    Schema.const('After').description('其他提示词处理后'),
+  ]).description('上采样介入时机。').default('After'),
+  model: Schema.union(dtgModels).description('生成模型。').default('KBlueLeaf/DanTagGen-delta-rev2'),
+  useCpu: Schema.boolean().description('是否使用CPU（GGUF）。').default(false),
+  noFormatting: Schema.boolean().description('是否禁用格式化。').default(false),
+  temperature: Schema.number().role('slider').min(0.1).max(2.5).step(0.01).description('温度。').default(1),
+  topP: Schema.number().role('slider').min(0).max(1).step(0.01).description('Top P。').default(0.8),
+  topK: Schema.number().role('slider').min(0).max(200).description('Top K。').default(80),
+}).description('sd-webui-dtg 配置') as Schema<DanTagGenConfig>
+
 interface FeatureConfig {
   anlas?: Computed<boolean>
   text?: Computed<boolean>
@@ -265,6 +325,7 @@ export interface Config extends PromptConfig, ParamConfig {
   trustedWorkers?: boolean
   workflowText2Image?: string
   workflowImage2Image?: string
+  danTagGen?: DanTagGenConfig,
 }
 
 const NAI4ParamConfig = Schema.object({
@@ -456,6 +517,22 @@ export const Config = Schema.intersect([
     recallTimeout: Schema.number().role('time').description('图片发送后自动撤回的时间 (设置为 0 以禁用此功能)。').default(0),
     maxConcurrency: Schema.number().description('单个频道下的最大并发数量 (设置为 0 以禁用此功能)。').default(0),
   }).description('高级设置'),
+
+
+  Schema.union([
+    Schema.object({
+      type: Schema.const('sd-webui'),
+      danTagGen: danTagGenConfig,
+    })
+  ]),
+  Schema.union([
+    Schema.object({
+      type: Schema.const('sd-webui'),
+      danTagGen: Schema.object({
+        enabled: Schema.boolean().description('是否启用 sd-webui-dtg 插件。').default(false),
+      }).description('sd-webui 插件设置'),
+    }),
+  ]),
 ]) as Schema<Config>
 
 interface Forbidden {
@@ -562,13 +639,14 @@ export function parseInput(session: Session, input: string, config: Config, over
     return ['.too-many-words']
   }
 
+  const sanitizedInput = positive.join(',')
   if (!override) {
     appendToList(positive, session.resolve(config.basePrompt))
     appendToList(negative, session.resolve(config.negativePrompt))
     if (config.defaultPromptSw) appendToList(positive, session.resolve(config.defaultPrompt))
   }
 
-  return [null, positive.join(', '), negative.join(', ')]
+  return [null, positive.join(', '), negative.join(', '), sanitizedInput]
 }
 
 function getWordCount(words: string[]) {
