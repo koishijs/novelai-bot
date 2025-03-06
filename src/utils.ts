@@ -50,6 +50,7 @@ export async function download(
       throw new NetworkError('.file-too-large')
     }
     mime = image.headers.get('content-type')
+    buffer = image.data
   }
 
   if (allowedTypes && allowedTypes.length > 0 && !allowedTypes.includes(mime)) {
