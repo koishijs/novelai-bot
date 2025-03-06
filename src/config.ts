@@ -1,5 +1,5 @@
 import { Computed, Dict, Schema, Session, Time } from 'koishi'
-import { Size } from './utils'
+import { ALLOWED_TYPES, Size } from './utils'
 
 const options: Computed.Options = {
   userFields: ['authority'],
@@ -183,10 +183,14 @@ export interface PromptConfig {
   translator?: boolean
   lowerCase?: boolean
   maxWords?: Computed<number>
+  allowedInputImageTypes?: Computed<string[]>
+  transformPromptSyntax?: Computed<boolean>
 }
 
 export const PromptConfig: Schema<PromptConfig> = Schema.object({
-  basePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的标签。').default('best quality, amazing quality, very aesthetic, absurdres'),
+  basePrompt: Schema.computed(Schema.string().role('textarea'), options)
+    .description('默认附加的标签。')
+    .default('best quality, amazing quality, very aesthetic, absurdres'),
   negativePrompt: Schema.computed(Schema.string().role('textarea'), options).description('默认附加的反向标签。').default(ucPreset),
   forbidden: Schema.computed(Schema.string().role('textarea'), options).description('违禁词列表。请求中的违禁词将会被自动删除。').default(''),
   defaultPromptSw: Schema.boolean().description('是否启用默认标签。').default(false),
@@ -199,6 +203,13 @@ export const PromptConfig: Schema<PromptConfig> = Schema.object({
   latinOnly: Schema.computed(Schema.boolean(), options).description('是否只接受英文输入。').default(false),
   lowerCase: Schema.boolean().description('是否将输入的标签转换为小写。').default(true),
   maxWords: Schema.computed(Schema.natural(), options).description('允许的最大单词数量。').default(0),
+  allowedInputImageTypes: Schema.computed(
+    Schema.array(Schema.string()).role('table').default(ALLOWED_TYPES),
+    options,
+  )
+    .description('允许从聊天平台获取的图片的文件类型，设为空列表表示忽略类型。')
+    .default(ALLOWED_TYPES),
+  transformPromptSyntax: Schema.computed(Schema.boolean(), options).description('是否自动转换输入标签的括号语法。').default(false),
 }).description('输入设置')
 
 interface FeatureConfig {
@@ -485,7 +496,7 @@ export function parseInput(session: Session, input: string, config: Config, over
     return [
       null,
       [session.resolve(config.basePrompt), session.resolve(config.defaultPrompt)].join(','),
-      session.resolve(config.negativePrompt)
+      session.resolve(config.negativePrompt),
     ]
   }
 
@@ -497,14 +508,16 @@ export function parseInput(session: Session, input: string, config: Config, over
     .replace(/《/g, '<')
     .replace(/》/g, '>')
 
-  if (config.type === 'sd-webui') {
-    input = input
-      .split('\\{').map(s => s.replace(/\{/g, '(')).join('\\{')
-      .split('\\}').map(s => s.replace(/\}/g, ')')).join('\\}')
-  } else {
-    input = input
-      .split('\\(').map(s => s.replace(/\(/g, '{')).join('\\(')
-      .split('\\)').map(s => s.replace(/\)/g, '}')).join('\\)')
+  if (session.resolve(config.transformPromptSyntax)) {
+    if (config.type === 'sd-webui') {
+      input = input
+        .split('\\{').map(s => s.replace(/\{/g, '(')).join('\\{')
+        .split('\\}').map(s => s.replace(/\}/g, ')')).join('\\}')
+    } else {
+      input = input
+        .split('\\(').map(s => s.replace(/\(/g, '{')).join('\\(')
+        .split('\\)').map(s => s.replace(/\)/g, '}')).join('\\)')
+    }
   }
 
   input = input

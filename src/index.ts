@@ -180,7 +180,7 @@ export function apply(ctx: Context, config: Config) {
         }
       } else {
         input = haveInput ? h('', h.transform(h.parse(input), {
-          image(attrs) {
+          img(attrs) {
             throw new SessionError('commands.novelai.messages.invalid-content')
           },
         })).toString(true) : input
@@ -236,7 +236,7 @@ export function apply(ctx: Context, config: Config) {
 
       if (imgUrl) {
         try {
-          image = await download(ctx, imgUrl)
+          image = await download(ctx, imgUrl, { allowedTypes: session.resolve(config.allowedInputImageTypes) })
         } catch (err) {
           if (err instanceof NetworkError) {
             return session.text(err.message, err.params)
@@ -731,7 +731,7 @@ export function apply(ctx: Context, config: Config) {
       if (!imgUrl) return session.text('.expect-image')
       let image: ImageData
       try {
-        image = await download(ctx, imgUrl)
+        image = await download(ctx, imgUrl, { allowedTypes: session.resolve(config.allowedInputImageTypes) })
       } catch (err) {
         if (err instanceof NetworkError) {
           return session.text(err.message, err.params)

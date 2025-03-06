@@ -29,31 +29,35 @@ export function getImageSize(buffer: ArrayBuffer): Size {
   return pick(image, ['width', 'height'])
 }
 
-const MAX_OUTPUT_SIZE = 1048576
-const MAX_CONTENT_SIZE = 10485760
-const ALLOWED_TYPES = ['image/jpeg', 'image/png']
+export const MAX_OUTPUT_SIZE = 1048576
+export const MAX_CONTENT_SIZE = 10485760
+export const ALLOWED_TYPES = ['image/jpeg', 'image/png']
 
-export async function download(ctx: Context, url: string, headers = {}): Promise<ImageData> {
+export async function download(
+  ctx: Context,
+  url: string,
+  { headers, allowedTypes }: { headers?: Dict; allowedTypes?: string[] | null },
+): Promise<ImageData> {
+  allowedTypes = allowedTypes === undefined ? ALLOWED_TYPES : allowedTypes
+
+  let mime: string
+  let buffer: ArrayBuffer
   if (url.startsWith('data:') || url.startsWith('file:')) {
-    const { mime, data } = await ctx.http.file(url)
-    if (!ALLOWED_TYPES.includes(mime)) {
-      throw new NetworkError('.unsupported-file-type')
-    }
-    const base64 = arrayBufferToBase64(data)
-    return { buffer: data, base64, dataUrl: `data:${mime};base64,${base64}` }
+    ({ mime, data: buffer } = await ctx.http.file(url))
   } else {
     const image = await ctx.http(url, { responseType: 'arraybuffer', headers })
     if (+image.headers.get('content-length') > MAX_CONTENT_SIZE) {
       throw new NetworkError('.file-too-large')
     }
-    const mimetype = image.headers.get('content-type')
-    if (!ALLOWED_TYPES.includes(mimetype)) {
-      throw new NetworkError('.unsupported-file-type')
-    }
-    const buffer = image.data
-    const base64 = arrayBufferToBase64(buffer)
-    return { buffer, base64, dataUrl: `data:${mimetype};base64,${base64}` }
+    mime = image.headers.get('content-type')
+    buffer = image.data
   }
+
+  if (allowedTypes && allowedTypes.length > 0 && !allowedTypes.includes(mime)) {
+    throw new NetworkError('.unsupported-file-type')
+  }
+  const base64 = arrayBufferToBase64(buffer)
+  return { buffer, base64, dataUrl: `data:${mime};base64,${base64}` }
 }
 
 export async function calcAccessKey(email: string, password: string) {
