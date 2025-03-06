@@ -236,7 +236,7 @@ export function apply(ctx: Context, config: Config) {
 
       if (imgUrl) {
         try {
-          image = await download(ctx, imgUrl, {}, session.resolve(config.ignoreAllowedInputImageTypes))
+          image = await download(ctx, imgUrl, { allowedTypes: session.resolve(config.allowedInputImageTypes) })
         } catch (err) {
           if (err instanceof NetworkError) {
             return session.text(err.message, err.params)
@@ -731,7 +731,7 @@ export function apply(ctx: Context, config: Config) {
       if (!imgUrl) return session.text('.expect-image')
       let image: ImageData
       try {
-        image = await download(ctx, imgUrl)
+        image = await download(ctx, imgUrl, { allowedTypes: session.resolve(config.allowedInputImageTypes) })
       } catch (err) {
         if (err instanceof NetworkError) {
           return session.text(err.message, err.params)

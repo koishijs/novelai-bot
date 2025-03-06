@@ -1,5 +1,5 @@
 import { Computed, Dict, Schema, Session, Time } from 'koishi'
-import { Size } from './utils'
+import { ALLOWED_TYPES, Size } from './utils'
 
 const options: Computed.Options = {
   userFields: ['authority'],
@@ -183,7 +183,7 @@ export interface PromptConfig {
   translator?: boolean
   lowerCase?: boolean
   maxWords?: Computed<number>
-  ignoreAllowedInputImageTypes?: Computed<boolean>
+  allowedInputImageTypes?: Computed<string[]>
   transformPromptSyntax?: Computed<boolean>
 }
 
@@ -201,7 +201,7 @@ export const PromptConfig: Schema<PromptConfig> = Schema.object({
   latinOnly: Schema.computed(Schema.boolean(), options).description('是否只接受英文输入。').default(false),
   lowerCase: Schema.boolean().description('是否将输入的标签转换为小写。').default(true),
   maxWords: Schema.computed(Schema.natural(), options).description('允许的最大单词数量。').default(0),
-  ignoreAllowedInputImageTypes: Schema.computed(Schema.boolean(), options).description('是否忽略从聊天平台获取的图片的文件类型。').default(false),
+  allowedInputImageTypes: Schema.computed(Schema.array(Schema.string()), options).description('允许从聊天平台获取的图片的文件类型，设为空列表表示忽略类型。').default(ALLOWED_TYPES),
   transformPromptSyntax: Schema.computed(Schema.boolean(), options).description('是否自动转换输入标签的括号语法。').default(false),
 }).description('输入设置')
 
